@@ -1,0 +1,41 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="LabAdminMaster.master.cs" Inherits="LabAdmin_LabAdminMaster" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+    <title>实验管理</title>
+    <asp:ContentPlaceHolder id="head" runat="server">
+    </asp:ContentPlaceHolder>
+     <link href="LabAdminCSS.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" >
+        function ConcealDivs(eles) {
+            for (var i = 1, item = $get('div' + i); item; item = $get('div' + (++i)))
+                item.style.display = 'none';
+            for (var i = 0, ele = eles[i]; ele; ele = eles[++i])
+                ele.style.display = 'block';
+        }
+       </script>
+</head>
+<body>
+<form id="form1" runat="server">
+
+<div id="headDiv">
+    <asp:Button ID="ExpBtn" runat="server" Text="实验信息" onclick="ExpBtn_Click" class="headDivBtn " />
+    <asp:Button ID="StuBtn" runat="server" Text="学生管理" onclick="StuBtn_Click" class="headDivBtn " />
+</div>
+<div id="mainDiv">
+ <div id="leftDiv">
+        <asp:ContentPlaceHolder id="leftHolder" runat="server"></asp:ContentPlaceHolder>
+    </div>
+    <div id="rightDiv">
+    <asp:ContentPlaceHolder id="rightHolder" runat="server"></asp:ContentPlaceHolder>
+    </div>
+</div>
+   <script type="text/javascript">
+   </script>
+</form>
+</body>
+</html>

@@ -1,0 +1,693 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="Lab2Model.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2005" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityContainer Name="Lab2ModelStoreContainer">
+          <EntitySet Name="BlackGroup" EntityType="Lab2Model.Store.BlackGroup" store:Type="Tables" store:Schema="dbo" store:Name="BlackGroup">
+            <DefiningQuery>SELECT 
+      [BlackGroup].[ExpNo] AS [ExpNo], 
+      [BlackGroup].[GroupNo] AS [GroupNo]
+      FROM [dbo].[BlackGroup] AS [BlackGroup]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="Class" EntityType="Lab2Model.Store.Class" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Exp" EntityType="Lab2Model.Store.Exp" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="ExpPara" EntityType="Lab2Model.Store.ExpPara" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="ExpType" EntityType="Lab2Model.Store.ExpType" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="ExpValue" EntityType="Lab2Model.Store.ExpValue" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Group" EntityType="Lab2Model.Store.Group" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="GroupRelation" EntityType="Lab2Model.Store.GroupRelation" store:Type="Tables" store:Schema="dbo" store:Name="GroupRelation">
+            <DefiningQuery>SELECT 
+      [GroupRelation].[StudentNo] AS [StudentNo], 
+      [GroupRelation].[GroupNo] AS [GroupNo]
+      FROM [dbo].[GroupRelation] AS [GroupRelation]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="Student" EntityType="Lab2Model.Store.Student" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="WhiteGroup" EntityType="Lab2Model.Store.WhiteGroup" store:Type="Tables" store:Schema="dbo" store:Name="WhiteGroup">
+            <DefiningQuery>SELECT 
+      [WhiteGroup].[ExpNo] AS [ExpNo], 
+      [WhiteGroup].[GroupNo] AS [GroupNo]
+      FROM [dbo].[WhiteGroup] AS [WhiteGroup]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_BlackGroup_Exp" Association="Lab2Model.Store.FK_BlackGroup_Exp">
+            <End Role="Exp" EntitySet="Exp" />
+            <End Role="BlackGroup" EntitySet="BlackGroup" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BlackGroup_Group" Association="Lab2Model.Store.FK_BlackGroup_Group">
+            <End Role="Group" EntitySet="Group" />
+            <End Role="BlackGroup" EntitySet="BlackGroup" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Expirement_ExpType" Association="Lab2Model.Store.FK_Expirement_ExpType">
+            <End Role="ExpType" EntitySet="ExpType" />
+            <End Role="Exp" EntitySet="Exp" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ExpPara_Expirement" Association="Lab2Model.Store.FK_ExpPara_Expirement">
+            <End Role="Exp" EntitySet="Exp" />
+            <End Role="ExpPara" EntitySet="ExpPara" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ExpValue_Exp" Association="Lab2Model.Store.FK_ExpValue_Exp">
+            <End Role="Exp" EntitySet="Exp" />
+            <End Role="ExpValue" EntitySet="ExpValue" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ExpValue_Student" Association="Lab2Model.Store.FK_ExpValue_Student">
+            <End Role="Student" EntitySet="Student" />
+            <End Role="ExpValue" EntitySet="ExpValue" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GroupRelation_GroupMeta" Association="Lab2Model.Store.FK_GroupRelation_GroupMeta">
+            <End Role="Group" EntitySet="Group" />
+            <End Role="GroupRelation" EntitySet="GroupRelation" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GroupRelation_Student" Association="Lab2Model.Store.FK_GroupRelation_Student">
+            <End Role="Student" EntitySet="Student" />
+            <End Role="GroupRelation" EntitySet="GroupRelation" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Student_Class" Association="Lab2Model.Store.FK_Student_Class">
+            <End Role="Class" EntitySet="Class" />
+            <End Role="Student" EntitySet="Student" />
+          </AssociationSet>
+          <AssociationSet Name="FK_WhiteGroup_Exp" Association="Lab2Model.Store.FK_WhiteGroup_Exp">
+            <End Role="Exp" EntitySet="Exp" />
+            <End Role="WhiteGroup" EntitySet="WhiteGroup" />
+          </AssociationSet>
+          <AssociationSet Name="FK_WhiteGroup_Group" Association="Lab2Model.Store.FK_WhiteGroup_Group">
+            <End Role="Group" EntitySet="Group" />
+            <End Role="WhiteGroup" EntitySet="WhiteGroup" />
+          </AssociationSet>
+        </EntityContainer>
+        <!--生成过程中发现错误:
+      警告 6002: 表/视图“Lab2.dbo.BlackGroup”未定义主键。已推断出该键，并将定义创建为只读的表/视图。
+      -->
+        <EntityType Name="BlackGroup">
+          <Key>
+            <PropertyRef Name="ExpNo" />
+            <PropertyRef Name="GroupNo" />
+          </Key>
+          <Property Name="ExpNo" Type="int" Nullable="false" />
+          <Property Name="GroupNo" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Class">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="Grade" Type="char" Nullable="false" MaxLength="4" />
+          <Property Name="No" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+        </EntityType>
+        <EntityType Name="Exp">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Name="TypeNo" Type="int" Nullable="false" />
+          <Property Name="No" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="SubmitMode" Type="smallint" Nullable="false" />
+          <Property Name="ReadMode" Type="smallint" Nullable="false" />
+          <Property Name="Des" Type="nvarchar" MaxLength="250" />
+        </EntityType>
+        <EntityType Name="ExpPara">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Name="No" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="ExpNo" Type="int" Nullable="false" />
+          <Property Name="ValueType" Type="smallint" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="Description" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="ExpType">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="20" />
+          <Property Name="No" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Enable" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ExpValue">
+          <Key>
+            <PropertyRef Name="ExpNo" />
+            <PropertyRef Name="StudentNo" />
+          </Key>
+          <Property Name="Value" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="ExpNo" Type="int" Nullable="false" />
+          <Property Name="StudentNo" Type="int" Nullable="false" />
+          <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+          <Property Name="Seq" Type="int" Nullable="false" />
+          <Property Name="No" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+        </EntityType>
+        <EntityType Name="Group">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Name="No" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="GroupName" Type="nvarchar" Nullable="false" MaxLength="20" />
+          <Property Name="type" Type="smallint" Nullable="false" />
+        </EntityType>
+        <!--生成过程中发现错误:
+      警告 6002: 表/视图“Lab2.dbo.GroupRelation”未定义主键。已推断出该键，并将定义创建为只读的表/视图。
+      -->
+        <EntityType Name="GroupRelation">
+          <Key>
+            <PropertyRef Name="StudentNo" />
+            <PropertyRef Name="GroupNo" />
+          </Key>
+          <Property Name="StudentNo" Type="int" Nullable="false" />
+          <Property Name="GroupNo" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Student">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Name="No" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="StudentName" Type="nvarchar" Nullable="false" MaxLength="20" />
+          <Property Name="UserName" Type="varchar" Nullable="false" MaxLength="20" />
+          <Property Name="Role" Type="smallint" Nullable="false" />
+          <Property Name="Exp" Type="int" Nullable="false" />
+          <Property Name="ClassNo" Type="int" />
+        </EntityType>
+        <!--生成过程中发现错误:
+      警告 6002: 表/视图“Lab2.dbo.WhiteGroup”未定义主键。已推断出该键，并将定义创建为只读的表/视图。
+      -->
+        <EntityType Name="WhiteGroup">
+          <Key>
+            <PropertyRef Name="ExpNo" />
+            <PropertyRef Name="GroupNo" />
+          </Key>
+          <Property Name="ExpNo" Type="int" Nullable="false" />
+          <Property Name="GroupNo" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_BlackGroup_Exp">
+          <End Role="Exp" Type="Lab2Model.Store.Exp" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="BlackGroup" Type="Lab2Model.Store.BlackGroup" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Exp">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="BlackGroup">
+              <PropertyRef Name="ExpNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BlackGroup_Group">
+          <End Role="Group" Type="Lab2Model.Store.Group" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="BlackGroup" Type="Lab2Model.Store.BlackGroup" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Group">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="BlackGroup">
+              <PropertyRef Name="GroupNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Expirement_ExpType">
+          <End Role="ExpType" Type="Lab2Model.Store.ExpType" Multiplicity="1" />
+          <End Role="Exp" Type="Lab2Model.Store.Exp" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ExpType">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="Exp">
+              <PropertyRef Name="TypeNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ExpPara_Expirement">
+          <End Role="Exp" Type="Lab2Model.Store.Exp" Multiplicity="1" />
+          <End Role="ExpPara" Type="Lab2Model.Store.ExpPara" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Exp">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="ExpPara">
+              <PropertyRef Name="ExpNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ExpValue_Exp">
+          <End Role="Exp" Type="Lab2Model.Store.Exp" Multiplicity="1" />
+          <End Role="ExpValue" Type="Lab2Model.Store.ExpValue" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Exp">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="ExpValue">
+              <PropertyRef Name="ExpNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ExpValue_Student">
+          <End Role="Student" Type="Lab2Model.Store.Student" Multiplicity="1" />
+          <End Role="ExpValue" Type="Lab2Model.Store.ExpValue" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="ExpValue">
+              <PropertyRef Name="StudentNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GroupRelation_GroupMeta">
+          <End Role="Group" Type="Lab2Model.Store.Group" Multiplicity="1" />
+          <End Role="GroupRelation" Type="Lab2Model.Store.GroupRelation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Group">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="GroupRelation">
+              <PropertyRef Name="GroupNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GroupRelation_Student">
+          <End Role="Student" Type="Lab2Model.Store.Student" Multiplicity="1" />
+          <End Role="GroupRelation" Type="Lab2Model.Store.GroupRelation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="GroupRelation">
+              <PropertyRef Name="StudentNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Student_Class">
+          <End Role="Class" Type="Lab2Model.Store.Class" Multiplicity="0..1" />
+          <End Role="Student" Type="Lab2Model.Store.Student" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Class">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="Student">
+              <PropertyRef Name="ClassNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_WhiteGroup_Exp">
+          <End Role="Exp" Type="Lab2Model.Store.Exp" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="WhiteGroup" Type="Lab2Model.Store.WhiteGroup" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Exp">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="WhiteGroup">
+              <PropertyRef Name="ExpNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_WhiteGroup_Group">
+          <End Role="Group" Type="Lab2Model.Store.Group" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="WhiteGroup" Type="Lab2Model.Store.WhiteGroup" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Group">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="WhiteGroup">
+              <PropertyRef Name="GroupNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="Lab2Model" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="Lab2Entities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Exps" EntityType="Lab2Model.Exp" />
+          <EntitySet Name="ExpParas" EntityType="Lab2Model.ExpPara" />
+          <EntitySet Name="ExpTypes" EntityType="Lab2Model.ExpType" />
+          <EntitySet Name="ExpValues" EntityType="Lab2Model.ExpValue" />
+          <EntitySet Name="Groups" EntityType="Lab2Model.Group" />
+          <EntitySet Name="Students" EntityType="Lab2Model.Student" />
+          <AssociationSet Name="FK_Expirement_ExpType" Association="Lab2Model.FK_Expirement_ExpType">
+            <End Role="ExpType" EntitySet="ExpTypes" />
+            <End Role="Exp" EntitySet="Exps" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ExpPara_Expirement" Association="Lab2Model.FK_ExpPara_Expirement">
+            <End Role="Exp" EntitySet="Exps" />
+            <End Role="ExpPara" EntitySet="ExpParas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ExpValue_Exp" Association="Lab2Model.FK_ExpValue_Exp">
+            <End Role="Exp" EntitySet="Exps" />
+            <End Role="ExpValue" EntitySet="ExpValues" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ExpValue_Student" Association="Lab2Model.FK_ExpValue_Student">
+            <End Role="Student" EntitySet="Students" />
+            <End Role="ExpValue" EntitySet="ExpValues" />
+          </AssociationSet>
+          <AssociationSet Name="GroupRelation" Association="Lab2Model.GroupRelation">
+            <End Role="Group" EntitySet="Groups" />
+            <End Role="Student" EntitySet="Students" />
+          </AssociationSet>
+          <AssociationSet Name="BlackGroup" Association="Lab2Model.BlackGroup">
+            <End Role="Exp" EntitySet="Exps" />
+            <End Role="Group" EntitySet="Groups" />
+          </AssociationSet>
+          <AssociationSet Name="WhiteGroup" Association="Lab2Model.WhiteGroup">
+            <End Role="Exp" EntitySet="Exps" />
+            <End Role="Group" EntitySet="Groups" />
+          </AssociationSet>
+          <EntitySet Name="Classes" EntityType="Lab2Model.Class" />
+          <AssociationSet Name="FK_Student_Class" Association="Lab2Model.FK_Student_Class">
+            <End Role="Class" EntitySet="Classes" />
+            <End Role="Student" EntitySet="Students" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Exp">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Name="TypeNo" Type="Int32" Nullable="false" />
+          <Property Name="No" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="SubmitMode" Type="Int16" Nullable="false" />
+          <Property Name="ReadMode" Type="Int16" Nullable="false" />
+          <Property Name="Des" Type="String" MaxLength="250" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="ExpType" Relationship="Lab2Model.FK_Expirement_ExpType" FromRole="Exp" ToRole="ExpType" />
+          <NavigationProperty Name="ExpParas" Relationship="Lab2Model.FK_ExpPara_Expirement" FromRole="Exp" ToRole="ExpPara" />
+          <NavigationProperty Name="ExpValues" Relationship="Lab2Model.FK_ExpValue_Exp" FromRole="Exp" ToRole="ExpValue" />
+          <NavigationProperty Name="BlackGroups" Relationship="Lab2Model.BlackGroup" FromRole="Exp" ToRole="Group" />
+          <NavigationProperty Name="WhiteGroups" Relationship="Lab2Model.WhiteGroup" FromRole="Exp" ToRole="Group" />
+        </EntityType>
+        <EntityType Name="ExpPara">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Name="No" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ExpNo" Type="Int32" Nullable="false" />
+          <Property Name="ValueType" Type="Int16" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Description" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="Exp" Relationship="Lab2Model.FK_ExpPara_Expirement" FromRole="ExpPara" ToRole="Exp" />
+        </EntityType>
+        <EntityType Name="ExpType">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="20" Unicode="true" FixedLength="false" />
+          <Property Name="No" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Enable" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Exps" Relationship="Lab2Model.FK_Expirement_ExpType" FromRole="ExpType" ToRole="Exp" />
+        </EntityType>
+        <EntityType Name="ExpValue">
+          <Key>
+            <PropertyRef Name="ExpNo" />
+            <PropertyRef Name="StudentNo" />
+          </Key>
+          <Property Name="Value" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="ExpNo" Type="Int32" Nullable="false" />
+          <Property Name="StudentNo" Type="Int32" Nullable="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" />
+          <NavigationProperty Name="Exp" Relationship="Lab2Model.FK_ExpValue_Exp" FromRole="ExpValue" ToRole="Exp" />
+          <NavigationProperty Name="Student" Relationship="Lab2Model.FK_ExpValue_Student" FromRole="ExpValue" ToRole="Student" />
+          <Property Type="Int32" Name="Seq" Nullable="false" />
+          <Property Type="Int32" Name="No" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+        </EntityType>
+        <EntityType Name="Group">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Name="No" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GroupName" Type="String" Nullable="false" MaxLength="20" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="Students" Relationship="Lab2Model.GroupRelation" FromRole="Group" ToRole="Student" />
+          <NavigationProperty Name="BlackExps" Relationship="Lab2Model.BlackGroup" FromRole="Group" ToRole="Exp" />
+          <NavigationProperty Name="WhiteExps" Relationship="Lab2Model.WhiteGroup" FromRole="Group" ToRole="Exp" />
+          <Property Type="Int16" Name="Type" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Student">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Name="No" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="StudentName" Type="String" Nullable="false" MaxLength="20" Unicode="true" FixedLength="false" />
+          <Property Name="UserName" Type="String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" />
+          <Property Name="Role" Type="Int16" Nullable="false" />
+          <NavigationProperty Name="ExpValues" Relationship="Lab2Model.FK_ExpValue_Student" FromRole="Student" ToRole="ExpValue" />
+          <NavigationProperty Name="Groups" Relationship="Lab2Model.GroupRelation" FromRole="Student" ToRole="Group" />
+          <Property Type="Int32" Name="Exp" Nullable="false" />
+          <Property Type="Int32" Name="ClassNo" />
+          <NavigationProperty Name="Class" Relationship="Lab2Model.FK_Student_Class" FromRole="Student" ToRole="Class" />
+        </EntityType>
+        <Association Name="FK_Expirement_ExpType">
+          <End Role="ExpType" Type="Lab2Model.ExpType" Multiplicity="1" />
+          <End Role="Exp" Type="Lab2Model.Exp" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ExpType">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="Exp">
+              <PropertyRef Name="TypeNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ExpPara_Expirement">
+          <End Role="Exp" Type="Lab2Model.Exp" Multiplicity="1" />
+          <End Role="ExpPara" Type="Lab2Model.ExpPara" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Exp">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="ExpPara">
+              <PropertyRef Name="ExpNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ExpValue_Exp">
+          <End Role="Exp" Type="Lab2Model.Exp" Multiplicity="1" />
+          <End Role="ExpValue" Type="Lab2Model.ExpValue" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Exp">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="ExpValue">
+              <PropertyRef Name="ExpNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ExpValue_Student">
+          <End Role="Student" Type="Lab2Model.Student" Multiplicity="1" />
+          <End Role="ExpValue" Type="Lab2Model.ExpValue" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="ExpValue">
+              <PropertyRef Name="StudentNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="GroupRelation">
+          <End Role="Group" Type="Lab2Model.Group" Multiplicity="*" />
+          <End Role="Student" Type="Lab2Model.Student" Multiplicity="*" />
+        </Association>
+        <Association Name="BlackGroup">
+          <End Type="Lab2Model.Exp" Role="Exp" Multiplicity="*" />
+          <End Type="Lab2Model.Group" Role="Group" Multiplicity="*" />
+        </Association>
+        <Association Name="WhiteGroup">
+          <End Type="Lab2Model.Exp" Role="Exp" Multiplicity="*" />
+          <End Type="Lab2Model.Group" Role="Group" Multiplicity="*" />
+        </Association>
+        <EntityType Name="Class">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Grade" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Type="Int32" Name="No" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="Students" Relationship="Lab2Model.FK_Student_Class" FromRole="Class" ToRole="Student" />
+        </EntityType>
+        <Association Name="FK_Student_Class">
+          <End Type="Lab2Model.Class" Role="Class" Multiplicity="0..1" />
+          <End Type="Lab2Model.Student" Role="Student" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Class">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="Student">
+              <PropertyRef Name="ClassNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="Lab2ModelStoreContainer" CdmEntityContainer="Lab2Entities">
+          <EntitySetMapping Name="Exps">
+            <EntityTypeMapping TypeName="Lab2Model.Exp">
+              <MappingFragment StoreEntitySet="Exp">
+                <ScalarProperty Name="TypeNo" ColumnName="TypeNo" />
+                <ScalarProperty Name="No" ColumnName="No" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="SubmitMode" ColumnName="SubmitMode" />
+                <ScalarProperty Name="ReadMode" ColumnName="ReadMode" />
+                <ScalarProperty Name="Des" ColumnName="Des" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ExpParas">
+            <EntityTypeMapping TypeName="Lab2Model.ExpPara">
+              <MappingFragment StoreEntitySet="ExpPara">
+                <ScalarProperty Name="No" ColumnName="No" />
+                <ScalarProperty Name="ExpNo" ColumnName="ExpNo" />
+                <ScalarProperty Name="ValueType" ColumnName="ValueType" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ExpTypes">
+            <EntityTypeMapping TypeName="Lab2Model.ExpType">
+              <MappingFragment StoreEntitySet="ExpType">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="No" ColumnName="No" />
+                <ScalarProperty Name="Enable" ColumnName="Enable" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ExpValues">
+            <EntityTypeMapping TypeName="Lab2Model.ExpValue">
+              <MappingFragment StoreEntitySet="ExpValue">
+                <ScalarProperty Name="No" ColumnName="No" />
+                <ScalarProperty Name="Seq" ColumnName="Seq" />
+                <ScalarProperty Name="Value" ColumnName="Value" />
+                <ScalarProperty Name="ExpNo" ColumnName="ExpNo" />
+                <ScalarProperty Name="StudentNo" ColumnName="StudentNo" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Groups">
+            <EntityTypeMapping TypeName="Lab2Model.Group">
+              <MappingFragment StoreEntitySet="Group">
+                <ScalarProperty Name="Type" ColumnName="type" />
+                <ScalarProperty Name="No" ColumnName="No" />
+                <ScalarProperty Name="GroupName" ColumnName="GroupName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Students">
+            <EntityTypeMapping TypeName="Lab2Model.Student">
+              <MappingFragment StoreEntitySet="Student">
+                <ScalarProperty Name="ClassNo" ColumnName="ClassNo" />
+                <ScalarProperty Name="Exp" ColumnName="Exp" />
+                <ScalarProperty Name="No" ColumnName="No" />
+                <ScalarProperty Name="StudentName" ColumnName="StudentName" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="Role" ColumnName="Role" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="GroupRelation" TypeName="Lab2Model.GroupRelation" StoreEntitySet="GroupRelation">
+            <EndProperty Name="Group">
+              <ScalarProperty Name="No" ColumnName="GroupNo" />
+            </EndProperty>
+            <EndProperty Name="Student">
+              <ScalarProperty Name="No" ColumnName="StudentNo" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="BlackGroup" TypeName="Lab2Model.BlackGroup" StoreEntitySet="BlackGroup">
+            <EndProperty Name="Group">
+              <ScalarProperty Name="No" ColumnName="GroupNo" />
+            </EndProperty>
+            <EndProperty Name="Exp">
+              <ScalarProperty Name="No" ColumnName="ExpNo" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="WhiteGroup" TypeName="Lab2Model.WhiteGroup" StoreEntitySet="WhiteGroup">
+            <EndProperty Name="Group">
+              <ScalarProperty Name="No" ColumnName="GroupNo" />
+            </EndProperty>
+            <EndProperty Name="Exp">
+              <ScalarProperty Name="No" ColumnName="ExpNo" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <EntitySetMapping Name="Classes">
+            <EntityTypeMapping TypeName="Lab2Model.Class">
+              <MappingFragment StoreEntitySet="Class">
+                <ScalarProperty Name="No" ColumnName="No" />
+                <ScalarProperty Name="Grade" ColumnName="Grade" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams>
+      <Diagram Name="Lab2Model" ZoomLevel="98">
+        <EntityTypeShape EntityType="Lab2Model.Exp" Width="1.5" PointX="3" PointY="3.25" Height="3.1161507161458326" IsExpanded="true" />
+        <EntityTypeShape EntityType="Lab2Model.ExpPara" Width="1.5" PointX="7.625" PointY="3.625" Height="2.1610522460937496" IsExpanded="true" />
+        <EntityTypeShape EntityType="Lab2Model.ExpType" Width="1.5" PointX="0.875" PointY="2.5" Height="1.7790128580729161" IsExpanded="true" />
+        <EntityTypeShape EntityType="Lab2Model.ExpValue" Width="1.5" PointX="5.25" PointY="0.75" Height="2.1610522460937496" IsExpanded="true" />
+        <EntityTypeShape EntityType="Lab2Model.Group" Width="1.5" PointX="0.5" PointY="5.25" Height="1.9700325520833335" IsExpanded="true" />
+        <EntityTypeShape EntityType="Lab2Model.Student" Width="1.5" PointX="5.125" PointY="6.5" Height="2.7341113281249996" IsExpanded="true" />
+        <AssociationConnector Association="Lab2Model.FK_Expirement_ExpType" ManuallyRouted="false">
+          <ConnectorPoint PointX="2.375" PointY="3.7645064290364578" />
+          <ConnectorPoint PointX="3" PointY="3.7645064290364578" />
+        </AssociationConnector>
+        <AssociationConnector Association="Lab2Model.FK_ExpPara_Expirement" ManuallyRouted="false">
+          <ConnectorPoint PointX="4.5" PointY="4.7055261230468748" />
+          <ConnectorPoint PointX="5.2760391666666671" PointY="4.7055261230468739" />
+          <ConnectorPoint PointX="5.4427058333333331" PointY="4.7055261230468748" />
+          <ConnectorPoint PointX="5.9713529166666666" PointY="4.7055261230468739" />
+          <ConnectorPoint PointX="6.1380195833333326" PointY="4.7055261230468748" />
+          <ConnectorPoint PointX="7.625" PointY="4.7055261230468748" />
+        </AssociationConnector>
+        <AssociationConnector Association="Lab2Model.FK_ExpValue_Exp" ManuallyRouted="false">
+          <ConnectorPoint PointX="4.5" PointY="6.1698514811197906" />
+          <ConnectorPoint PointX="5.3593725" PointY="6.1698514811197906" />
+          <ConnectorPoint PointX="5.3593725" PointY="3.2930916341145831" />
+        </AssociationConnector>
+        <AssociationConnector Association="Lab2Model.FK_ExpValue_Student" ManuallyRouted="false">
+          <ConnectorPoint PointX="6.05468625" PointY="6.5" />
+          <ConnectorPoint PointX="6.05468625" PointY="3.2930916341145831" />
+        </AssociationConnector>
+        <AssociationConnector Association="Lab2Model.GroupRelation" ManuallyRouted="false">
+          <ConnectorPoint PointX="2" PointY="6.71875" />
+          <ConnectorPoint PointX="5.125" PointY="6.71875" />
+        </AssociationConnector>
+        <AssociationConnector Association="Lab2Model.BlackGroup" >
+          <ConnectorPoint PointX="3" PointY="6.0379698435465485" />
+          <ConnectorPoint PointX="2" PointY="6.0379698435465485" />
+        </AssociationConnector>
+        <AssociationConnector Association="Lab2Model.WhiteGroup" >
+          <ConnectorPoint PointX="3" PointY="5.5980051676432288" />
+          <ConnectorPoint PointX="2" PointY="5.5980051676432288" />
+        </AssociationConnector>
+        <EntityTypeShape EntityType="Lab2Model.Class" Width="1.5" PointX="2.75" PointY="7" Height="1.7790128580729174" />
+        <AssociationConnector Association="Lab2Model.FK_Student_Class" >
+          <ConnectorPoint PointX="4.25" PointY="7.8895064290364587" />
+          <ConnectorPoint PointX="5.125" PointY="7.8895064290364587" />
+        </AssociationConnector>
+      </Diagram>
+    </Diagrams>
+  </Designer>
+</edmx:Edmx>

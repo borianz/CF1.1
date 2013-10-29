@@ -1,0 +1,107 @@
+﻿body
+{
+    margin: 0px auto;
+    background-color: #000066;
+    min-height: 600px;
+}
+#headDiv
+{
+    margin: 0px auto 10px auto;
+    background-color: blue;
+    width: 1000px;
+    background-image: url('moonhead.jpg');
+}
+
+.headDivBtn
+{
+    margin: 160px 10px 10px 10px;
+    height: 30px;
+    width: 120px;
+    background-color: #FFFFCC;
+    font-family: 微软雅黑;
+    font-size: large;
+    font-weight: normal;
+    font-style: normal;
+    font-variant: small-caps;
+    text-transform: inherit;
+    color: #C0C0C0;
+    cursor:pointer;
+}
+.headDivBtn
+{
+    color:Black ;
+    
+}
+#leftDiv
+{
+    width: 200px;
+    float: left;
+    background-color: #FFFFCC;
+}
+#rightDiv
+{
+    margin-left: 200px;
+    background-color: #FFFFCC;
+}
+#mainDiv
+{
+    border-style: none solid none solid;
+    border-width: medium;
+    margin: 10px auto 0px auto;
+    min-height: 400px;
+    width: 1000px;
+    background-color: #FFFFCC;
+}
+
+.leftBtn
+{
+    border: thin outset #FFFFFF;
+    background-color: #FFFFFF;
+    width: 180px;
+    margin: 10px;
+    font-size: large;
+    cursor: pointer;
+}
+.leftBtn:hover
+{
+    color: #3366CC;
+}
+select
+{
+    width: 313px;
+    margin-left: 0px;
+}
+.AH
+{
+    padding: 5px;
+    border: thin dashed #000000;
+    margin: 0px 5px 0px 5px;
+    background-color: #000099;
+    font-size: x-large;
+    font-weight: bold;
+    color: #FFFFCC;
+    text-align: center;
+    cursor: pointer;
+}
+.AC
+{
+    border: thin outset #000000;
+    background-color: #003399;
+    margin-right: 10px;
+    margin-left: 10px;
+    text-align: center;
+}
+.AC input
+{
+    padding: 5px;
+    border: thin ridge #FFFFCC;
+    font-weight: bolder;
+    font-size: large;
+    margin: 5px auto 0px auto;
+    background-color: #000099;
+    color: #FFFFCC;
+}
+.AC input:hover
+{
+    color:White;
+}

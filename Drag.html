@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script>
+     function DragEnter(e)
+     {
+
+     }
+     function receive(e,ele)
+     {
+
+     }
+    </script>
+</head>
+<body>
+  <canvas id='canvas' width="800" height="600" draggable="true" ></canvas>
+
+<script>
+     var canvas=document.getElementById('canvas');
+     var ctx=canvas.getContext('2d');
+     var img=new Image();
+    img.onload=function()
+    {
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    }
+     canvas.ondrop=function(e){
+          e.preventDefault();
+          var data= e.dataTransfer;
+         var file=data.items[0].getAsFile();
+         var url=window.URL.createObjectURL(file);
+          img.src=url;
+     }
+     canvas.ondragover=function(e)
+     {
+         e.preventDefault();
+         return false;
+     }
+
+</script>
+</body>
+</html>

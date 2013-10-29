@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Axonometric Projection</title>
+    <meta charset="utf-8">
+    <script src="js/Animation.js"></script>
+    <script src="js/CF2.2.js"></script>
+    <script src="js/Controls2.1.js"></script>
+</head>
+<body onload="begin()" style="background-color: rgba(0,0,0,1)">
+<canvas style="position:absolute;z-index: 4 " id="canvas">你的浏览器太老了，要不换个新的浏览器？</canvas>
+<script>
+    var cclock=new simpleClock(4,0,linear,Math.PI*2,0,false,true);
+    var rotateY=Math.PI/5;
+    var rotateX=Math.PI/6;
+    var cosF=Math.cos(rotateY);
+    var sinF=Math.sin(rotateY);
+    var cosS=Math.cos(rotateX);
+    var sinS=Math.sin(rotateX);
+    var Xc=200;
+    var Zc=200;
+
+    var S=0.5;
+    var Op=-Math.PI/3;
+    var Px=S*Math.cos(Op);
+    var Py=S*Math.sin(Op);
+    function begin() {
+        canvas = document.getElementById('canvas');
+        ctx = canvas.getContext('2d');
+        adjustCanvas(canvas,ctx,720,1280);
+
+        var p0=new mainPanel(0);
+        var p1=new mainPanel(Math.PI/2);
+        var p2=new mainPanel(Math.PI);
+        var p3=new mainPanel(Math.PI/2*3);
+        var cubic=new Panel(0,0,window.canvas.height,window.canvas.width,'black');
+        var cleaner=new UIComponent(0,0,0,0);
+        cleaner.cubic=cubic;
+        cleaner.paint=function(){
+            window.ctx.clearRect(0,0,window.canvas.width,window.canvas.height);
+            cclock.update();
+            this.cubic.controls.forEach(function(e){
+                e.b=cclock.value+ e.offset;
+                if(e.b>=Math.PI*2)
+                    e.b-=Math.PI*2;
+                if(e.b<=Math.PI/2)
+                    e.o=0;
+                else if(e.b<=Math.PI)
+                    e.o=1;
+                else if(e.b<=Math.PI*1.5)
+                    e.o=3;
+                else
+                    e.o=2;
+            });
+            this.cubic.controls.sort(function(a,b){
+               if(a.o< b.o) return -1;
+               else if(a.o== b.o) return 0;
+               else return 1;
+                })
+        };
+        p0.bc='red';
+        p1.bc='green';
+        p3.bc='yellow';
+        window.backUIComponents.addCtrl(cleaner,'c');
+        cubic.addCtrl(p0,'0');
+        cubic.addCtrl(p1,'1');
+        cubic.addCtrl(p2,'2');
+        cubic.addCtrl(p3,'3');
+        window.backUIComponents.addCtrl(cubic,'cubic');
+        Init();
+        cclock.start();
+    }
+  function mainPanel(offset)
+  {
+      var panel=new Panel(400,200,400,400,'white');
+      panel.offset=offset;
+      panel.b=offset;
+      panel.transFun=function(ctx)
+      {
+          var dx=Xc-sin(this.b)*Xc-cos(this.b)*Zc;
+          var dz=Zc-cos(this.b)*Xc+sin(this.b)*Zc;
+          var bf=this.b+rotateY;
+          var cosbf=cos(bf);
+          var sinbf=sin(bf);
+          ctx.translate(this.x,this.y);
+          ctx.transform(sinbf,-sinS*cosbf,0,cosS,cosF*dx+sinF*dz,sinS*sinF*dx-sinS*cosF*dz);
+      }
+      panel.transFun=function(ctx){
+          var dx=Xc-sin(this.b)*Xc-cos(this.b)*Zc;
+          var dz=Zc-cos(this.b)*Xc+sin(this.b)*Zc;
+          ctx.translate(this.x,this.y);
+          var sinb=sin(this.b);
+          var cosb=cos(this.b);
+          ctx.transform(sinb+cosb*Px,cosb*Py,0,1,dx+Px*dz,Py*dz);
+      }
+      return panel;
+  }
+    function sin(num){return Math.sin(num);}
+    function cos(num){return Math.cos(num);}
+</script>
+</body>
+</html>

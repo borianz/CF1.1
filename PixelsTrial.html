@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+
+<body>
+<canvas contenteditable="true" height="600" width="1200" id='canvas'></canvas>
+<img style="display: none" src="img/ModernUIPathLow-01.png" id='img'>
+<script src="js/PixelsTool.js"></script>
+ <script>
+      var canvas=document.getElementById('canvas');
+
+      var ctx=canvas.getContext('2d');
+
+          var data=JSON.parse(localStorage.backImage);
+          var imgdata = ctx.createImageData(100, 100);
+          for (var i = 0; i < data.length; i++)
+              imgdata.data[i] =parseInt(data[i]);
+          ctx.putImageData(imgdata,0,0);
+          var oriData= ctx.getImageData(0,0,100,100);
+
+
+          var img=document.getElementById('img');
+          img.onload = function () {
+              ctx.drawImage(img, 0, 0, 100, 100);
+              var oriData = ctx.getImageData(0, 0, 100, 100);
+              var a = new Array();
+              for (i = 0; i < oriData.data.length; i++)
+                  a[i] = oriData.data[i];
+
+              //  ctx.putImageData(oriData,400,400);
+              /*    var neoData=ctx.createImageData(200,200);
+              Scale2Plus(oriData,neoData);
+              ctx.putImageData(neoData,500,0);
+              Scale2(oriData,neoData);
+              ctx.putImageData(neoData,200,0);
+              var c=0;var a=0.25;
+              setInterval(function(){
+              var twirlData=ctx.createImageData(100,100);
+              TwirlFromCenter(Math.PI*c,50,oriData,twirlData);
+              ctx.putImageData(twirlData,400,400);
+              if(c==10)
+              a=-0.25;
+              else if(c==0)
+              a=0.25;
+              c+=a;
+              },100);   */
+            var spherizeData=ctx.createImageData(100,100);
+              Spherize(50,50,150,25,oriData,spherizeData);
+             ctx.putImageData(spherizeData,100,400);
+
+           }
+
+  </script>
+</body>
+</html>

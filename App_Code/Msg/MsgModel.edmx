@@ -1,0 +1,370 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="MsgDBModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2005" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityContainer Name="MsgDBModelStoreContainer">
+          <EntitySet Name="Author" EntityType="MsgDBModel.Store.Author" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Category" EntityType="MsgDBModel.Store.Category" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Comment" EntityType="MsgDBModel.Store.Comment" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="PublicEvent" EntityType="MsgDBModel.Store.PublicEvent" store:Type="Tables" Schema="dbo" />
+          <AssociationSet Name="FK_Comment_Author" Association="MsgDBModel.Store.FK_Comment_Author">
+            <End Role="Author" EntitySet="Author" />
+            <End Role="Comment" EntitySet="Comment" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Comment_PublicEvent" Association="MsgDBModel.Store.FK_Comment_PublicEvent">
+            <End Role="PublicEvent" EntitySet="PublicEvent" />
+            <End Role="Comment" EntitySet="Comment" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PublicEvent_Author" Association="MsgDBModel.Store.FK_PublicEvent_Author">
+            <End Role="Author" EntitySet="Author" />
+            <End Role="PublicEvent" EntitySet="PublicEvent" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PublicEvent_category" Association="MsgDBModel.Store.FK_PublicEvent_category">
+            <End Role="Category" EntitySet="Category" />
+            <End Role="PublicEvent" EntitySet="PublicEvent" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Author">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Name="UserName" Type="varchar" Nullable="false" MaxLength="20" />
+          <Property Name="No" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="RealName" Type="nvarchar" Nullable="false" MaxLength="10" />
+          <Property Name="Grade" Type="nvarchar" MaxLength="20" />
+          <Property Name="Role" Type="smallint" Nullable="false" />
+          <Property Name="EventLimit" Type="smallint" Nullable="false" />
+          <Property Name="Enable" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Category">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Name="No" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="10" />
+          <Property Name="Enable" Type="bit" Nullable="false" />
+          <Property Name="Priority" Type="smallint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Comment">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Name="AuthorNo" Type="int" Nullable="false" />
+          <Property Name="No" Type="int" Nullable="false" />
+          <Property Name="SetDate" Type="datetime" Nullable="false" />
+          <Property Name="EventNo" Type="int" Nullable="false" />
+          <Property Name="Color" Type="varchar" MaxLength="50" />
+          <Property Name="Priority" Type="smallint" Nullable="false" />
+          <Property Name="Deleted" Type="bit" Nullable="false" />
+          <Property Name="Body" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PublicEvent">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="UpdateTime" Type="datetime" Nullable="false" />
+          <Property Name="AuthorName" Type="nvarchar" Nullable="false" MaxLength="10" />
+          <Property Name="ImgUrl" Type="varchar" MaxLength="200" />
+          <Property Name="Enable" Type="bit" Nullable="false" />
+          <Property Name="Text" Type="text" />
+          <Property Name="No" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Priority" Type="smallint" Nullable="false" />
+          <Property Name="MTitle" Type="nvarchar" Nullable="false" MaxLength="10" />
+          <Property Name="CategoryNo" Type="int" Nullable="false" />
+          <Property Name="AudioUrl" Type="varchar" MaxLength="200" />
+          <Property Name="AuthorNo" Type="int" Nullable="false" />
+          <Property Name="SetTime" Type="datetime" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Comment_Author">
+          <End Role="Author" Type="MsgDBModel.Store.Author" Multiplicity="1" />
+          <End Role="Comment" Type="MsgDBModel.Store.Comment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Author">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="Comment">
+              <PropertyRef Name="AuthorNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Comment_PublicEvent">
+          <End Role="PublicEvent" Type="MsgDBModel.Store.PublicEvent" Multiplicity="1" />
+          <End Role="Comment" Type="MsgDBModel.Store.Comment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PublicEvent">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="Comment">
+              <PropertyRef Name="EventNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PublicEvent_Author">
+          <End Role="Author" Type="MsgDBModel.Store.Author" Multiplicity="1" />
+          <End Role="PublicEvent" Type="MsgDBModel.Store.PublicEvent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Author">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="PublicEvent">
+              <PropertyRef Name="AuthorNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PublicEvent_category">
+          <End Role="Category" Type="MsgDBModel.Store.Category" Multiplicity="1" />
+          <End Role="PublicEvent" Type="MsgDBModel.Store.PublicEvent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="PublicEvent">
+              <PropertyRef Name="CategoryNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="MsgDBModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="MsgDBEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="PublicEvents" EntityType="MsgDBModel.PublicEvent" />
+          <EntitySet Name="Authors" EntityType="MsgDBModel.Author" />
+          <EntitySet Name="Categories" EntityType="MsgDBModel.Category" />
+          <EntitySet Name="Comments" EntityType="MsgDBModel.Comment" />
+          <AssociationSet Name="FK_Comment_Author" Association="MsgDBModel.FK_Comment_Author">
+            <End Role="Author" EntitySet="Authors" />
+            <End Role="Comment" EntitySet="Comments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PublicEvent_Author" Association="MsgDBModel.FK_PublicEvent_Author">
+            <End Role="Author" EntitySet="Authors" />
+            <End Role="PublicEvent" EntitySet="PublicEvents" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PublicEvent_category" Association="MsgDBModel.FK_PublicEvent_category">
+            <End Role="Category" EntitySet="Categories" />
+            <End Role="PublicEvent" EntitySet="PublicEvents" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Comment_PublicEvent" Association="MsgDBModel.FK_Comment_PublicEvent">
+            <End Role="PublicEvent" EntitySet="PublicEvents" />
+            <End Role="Comment" EntitySet="Comments" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="PublicEvent">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Name="Title" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="UpdateTime" Type="DateTime" Nullable="false" />
+          <Property Name="ImgUrl" Type="String" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="Enable" Type="Boolean" Nullable="false" />
+          <Property Name="Text" Type="String" MaxLength="Max" Unicode="false" FixedLength="false" />
+          <Property Name="No" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Priority" Type="Int16" Nullable="false" />
+          <Property Type="String" Name="MTitle" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="CategoryNo" Nullable="false" />
+          <Property Type="String" Name="AudioUrl" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Type="Int32" Name="AuthorNo" Nullable="false" />
+          <NavigationProperty Name="Author" Relationship="MsgDBModel.FK_PublicEvent_Author" FromRole="PublicEvent" ToRole="Author" />
+          <NavigationProperty Name="Category" Relationship="MsgDBModel.FK_PublicEvent_category" FromRole="PublicEvent" ToRole="Category" />
+          <NavigationProperty Name="Comments" Relationship="MsgDBModel.FK_Comment_PublicEvent" FromRole="PublicEvent" ToRole="Comment" />
+          <Property Type="String" Name="AuthorName" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Type="DateTime" Name="SetTime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Author">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Type="String" Name="UserName" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Type="Int32" Name="No" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="RealName" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Grade" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Type="Int16" Name="Role" Nullable="false" />
+          <NavigationProperty Name="Comments" Relationship="MsgDBModel.FK_Comment_Author" FromRole="Author" ToRole="Comment" />
+          <NavigationProperty Name="PublicEvents" Relationship="MsgDBModel.FK_PublicEvent_Author" FromRole="Author" ToRole="PublicEvent" />
+          <Property Type="Int16" Name="EventLimit" Nullable="false" />
+          <Property Type="Boolean" Name="Enable" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Category">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Type="Int32" Name="No" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Type="Boolean" Name="Enable" Nullable="false" />
+          <NavigationProperty Name="PublicEvents" Relationship="MsgDBModel.FK_PublicEvent_category" FromRole="Category" ToRole="PublicEvent" />
+          <Property Type="Int16" Name="Priority" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Comment">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Type="Int32" Name="AuthorNo" Nullable="false" />
+          <Property Type="Int32" Name="No" Nullable="false" />
+          <Property Type="DateTime" Name="SetDate" Nullable="false" />
+          <Property Type="Int32" Name="EventNo" Nullable="false" />
+          <Property Type="String" Name="Color" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Int16" Name="Priority" Nullable="false" />
+          <Property Type="Boolean" Name="Deleted" Nullable="false" />
+          <Property Type="String" Name="Body" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Author" Relationship="MsgDBModel.FK_Comment_Author" FromRole="Comment" ToRole="Author" />
+          <NavigationProperty Name="PublicEvent" Relationship="MsgDBModel.FK_Comment_PublicEvent" FromRole="Comment" ToRole="PublicEvent" />
+        </EntityType>
+        <Association Name="FK_Comment_Author">
+          <End Type="MsgDBModel.Author" Role="Author" Multiplicity="1" />
+          <End Type="MsgDBModel.Comment" Role="Comment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Author">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="Comment">
+              <PropertyRef Name="AuthorNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PublicEvent_Author">
+          <End Type="MsgDBModel.Author" Role="Author" Multiplicity="1" />
+          <End Type="MsgDBModel.PublicEvent" Role="PublicEvent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Author">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="PublicEvent">
+              <PropertyRef Name="AuthorNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PublicEvent_category">
+          <End Type="MsgDBModel.Category" Role="Category" Multiplicity="1" />
+          <End Type="MsgDBModel.PublicEvent" Role="PublicEvent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="PublicEvent">
+              <PropertyRef Name="CategoryNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Comment_PublicEvent">
+          <End Type="MsgDBModel.PublicEvent" Role="PublicEvent" Multiplicity="1" />
+          <End Type="MsgDBModel.Comment" Role="Comment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PublicEvent">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="Comment">
+              <PropertyRef Name="EventNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="MsgDBModelStoreContainer" CdmEntityContainer="MsgDBEntities">
+          <EntitySetMapping Name="PublicEvents">
+            <EntityTypeMapping TypeName="MsgDBModel.PublicEvent">
+              <MappingFragment StoreEntitySet="PublicEvent">
+                <ScalarProperty Name="SetTime" ColumnName="SetTime" />
+                <ScalarProperty Name="AuthorName" ColumnName="AuthorName" />
+                <ScalarProperty Name="AuthorNo" ColumnName="AuthorNo" />
+                <ScalarProperty Name="AudioUrl" ColumnName="AudioUrl" />
+                <ScalarProperty Name="CategoryNo" ColumnName="CategoryNo" />
+                <ScalarProperty Name="MTitle" ColumnName="MTitle" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="UpdateTime" ColumnName="UpdateTime" />
+                <ScalarProperty Name="ImgUrl" ColumnName="ImgUrl" />
+                <ScalarProperty Name="Enable" ColumnName="Enable" />
+                <ScalarProperty Name="Text" ColumnName="Text" />
+                <ScalarProperty Name="No" ColumnName="No" />
+                <ScalarProperty Name="Priority" ColumnName="Priority" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Authors">
+            <EntityTypeMapping TypeName="MsgDBModel.Author">
+              <MappingFragment StoreEntitySet="Author">
+                <ScalarProperty Name="Enable" ColumnName="Enable" />
+                <ScalarProperty Name="EventLimit" ColumnName="EventLimit" />
+                <ScalarProperty Name="Role" ColumnName="Role" />
+                <ScalarProperty Name="Grade" ColumnName="Grade" />
+                <ScalarProperty Name="RealName" ColumnName="RealName" />
+                <ScalarProperty Name="No" ColumnName="No" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Categories">
+            <EntityTypeMapping TypeName="MsgDBModel.Category">
+              <MappingFragment StoreEntitySet="Category">
+                <ScalarProperty Name="Priority" ColumnName="Priority" />
+                <ScalarProperty Name="Enable" ColumnName="Enable" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="No" ColumnName="No" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Comments">
+            <EntityTypeMapping TypeName="MsgDBModel.Comment">
+              <MappingFragment StoreEntitySet="Comment">
+                <ScalarProperty Name="Body" ColumnName="Body" />
+                <ScalarProperty Name="Deleted" ColumnName="Deleted" />
+                <ScalarProperty Name="Priority" ColumnName="Priority" />
+                <ScalarProperty Name="Color" ColumnName="Color" />
+                <ScalarProperty Name="EventNo" ColumnName="EventNo" />
+                <ScalarProperty Name="SetDate" ColumnName="SetDate" />
+                <ScalarProperty Name="No" ColumnName="No" />
+                <ScalarProperty Name="AuthorNo" ColumnName="AuthorNo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams>
+      <Diagram Name="MsgModel" ZoomLevel="86">
+        <EntityTypeShape EntityType="MsgDBModel.PublicEvent" Width="1.5" PointX="0.75" PointY="0.75" Height="3.6892097981770826" IsExpanded="true" />
+        <EntityTypeShape EntityType="MsgDBModel.Author" Width="1.5" PointX="4.125" PointY="0.75" Height="2.3520719401041656" />
+        <EntityTypeShape EntityType="MsgDBModel.Category" Width="1.5" PointX="0.5" PointY="5.5" Height="1.7790128580729174" />
+        <EntityTypeShape EntityType="MsgDBModel.Comment" Width="1.5" PointX="3" PointY="4" Height="2.9251310221354156" />
+        <AssociationConnector Association="MsgDBModel.FK_Comment_Author" >
+          <ConnectorPoint PointX="4.3125" PointY="3.1020719401041656" />
+          <ConnectorPoint PointX="4.3125" PointY="4" />
+        </AssociationConnector>
+        <AssociationConnector Association="MsgDBModel.FK_PublicEvent_Author" >
+          <ConnectorPoint PointX="4.125" PointY="1.9260359700520831" />
+          <ConnectorPoint PointX="2.25" PointY="1.9260359700520831" />
+        </AssociationConnector>
+        <AssociationConnector Association="MsgDBModel.FK_PublicEvent_category" >
+          <ConnectorPoint PointX="1.375" PointY="5.5" />
+          <ConnectorPoint PointX="1.375" PointY="4.4392097981770826" />
+        </AssociationConnector>
+        <AssociationConnector Association="MsgDBModel.FK_Comment_PublicEvent" >
+          <ConnectorPoint PointX="2.25" PointY="4.31511474609375" />
+          <ConnectorPoint PointX="3" PointY="4.31511474609375" />
+        </AssociationConnector>
+      </Diagram>
+    </Diagrams>
+  </Designer>
+</edmx:Edmx>
