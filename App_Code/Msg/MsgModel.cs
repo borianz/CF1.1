@@ -16,8 +16,10 @@ namespace Msg
     {
         public Author()
         {
+            this.Enable = true;
             this.Comments = new HashSet<Comment>();
             this.PublicEvents = new HashSet<PublicEvent>();
+            this.Evalutions = new HashSet<Evalution>();
         }
     
         public string UserName { get; set; }
@@ -30,6 +32,7 @@ namespace Msg
     
         public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<PublicEvent> PublicEvents { get; set; }
+        public virtual ICollection<Evalution> Evalutions { get; set; }
     }
 }
 namespace Msg
@@ -41,6 +44,7 @@ namespace Msg
     {
         public Category()
         {
+            this.Enable = true;
             this.PublicEvents = new HashSet<PublicEvent>();
         }
     
@@ -59,6 +63,11 @@ namespace Msg
     
     public partial class Comment
     {
+        public Comment()
+        {
+            this.Evalutions = new HashSet<Evalution>();
+        }
+    
         public int AuthorNo { get; set; }
         public int No { get; set; }
         public System.DateTime SetDate { get; set; }
@@ -69,6 +78,26 @@ namespace Msg
         public string Body { get; set; }
     
         public virtual Author Author { get; set; }
+        public virtual PublicEvent PublicEvent { get; set; }
+        public virtual ICollection<Evalution> Evalutions { get; set; }
+    }
+}
+namespace Msg
+{
+    using System;
+    using System.Collections.Generic;
+    
+    public partial class Evalution
+    {
+        public int No { get; set; }
+        public int AuthorNo { get; set; }
+        public int CommentNo { get; set; }
+        public System.DateTime UpdateTime { get; set; }
+        public byte Type { get; set; }
+        public int EventNo { get; set; }
+    
+        public virtual Author Author { get; set; }
+        public virtual Comment Comment { get; set; }
         public virtual PublicEvent PublicEvent { get; set; }
     }
 }
@@ -81,7 +110,9 @@ namespace Msg
     {
         public PublicEvent()
         {
+            this.CanComment = true;
             this.Comments = new HashSet<Comment>();
+            this.Evalutions = new HashSet<Evalution>();
         }
     
         public string Title { get; set; }
@@ -97,9 +128,11 @@ namespace Msg
         public int AuthorNo { get; set; }
         public string AuthorName { get; set; }
         public System.DateTime SetTime { get; set; }
+        public bool CanComment { get; set; }
     
         public virtual Author Author { get; set; }
         public virtual Category Category { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
+        public virtual ICollection<Evalution> Evalutions { get; set; }
     }
 }

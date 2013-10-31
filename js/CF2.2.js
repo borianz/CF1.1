@@ -38,17 +38,158 @@ function animate() {
         setInterval(rePaint, 1000 / fps);
 }
 function Init() {
-    window.canvas.addEventListener('click', onCanvasClick, true);
-    window.canvas.addEventListener('mousedown', onCanvasMouseDown, true);
-    window.canvas.addEventListener('mouseup', onCanvasMouseUp, true);
-    window.canvas.addEventListener('mousemove', onCanvasMouseMove, true);
-    window.canvas.addEventListener('mousewheel', onCanvasMouseWheel, true);
-    window.canvas.addEventListener('touchstart', onCanvasTouchStart, true);
-    window.canvas.addEventListener('touchend', onCanvasTouchEnd, true);
-    window.canvas.addEventListener('touchmove', onCanvasTouchMove, true);
-    window.canvas.addEventListener('touchcancel', onCanvasTouchEnd, true);
-    window.canvas.addEventListener('DOMMouseScroll',onCanvasMouseWheel,false);
-    addCanvasDropHandler();
+    window.canvas.addEventListener('click',function(e) {
+        e = mouseArg(e);
+        if (window.channelMng.busy())return;
+        window.boxInput.unbind();
+        window.ta.unbind();
+        if (window.curTask && window.curTask.isEnter) {
+            for (var i = window.curTask.cmdUIComponents.length - 1, item = window.curTask.cmdUIComponents[i]; item; item = window.curTask.cmdUIComponents[--i])
+                if (item.clicker&&item.clicker.fire(ctx, e)) return true;
+        }
+        else
+            for (var i = window.backUIComponents.length - 1, item = window.backUIComponents[i]; item; item = window.backUIComponents[--i])
+                if (item.clicker&&item.clicker.fire(ctx, e)) return true;
+        return false;
+    } , true);
+    window.canvas.addEventListener('mousedown',function(e) {
+        var ep = mouseArg(e);
+        if (e.button == 0 && !window.isPress) {
+            if (window.curTask && window.curTask.isEnter) {
+                for (var i = window.curTask.cmdUIComponents.length - 1, item = window.curTask.cmdUIComponents[i]; item; item = window.curTask.cmdUIComponents[--i])
+                    if (item.drager && item.drager.fire(ctx, ep)) {
+                        window.isPress = true;
+                        return true;
+                    }
+            }
+            else
+                for (var i = window.backUIComponents.length - 1, item = window.backUIComponents[i]; item; item = window.backUIComponents[--i])
+                    if (item.drager && item.drager.fire(ctx, ep)) {
+                        window.isPress = true;
+                        return true;
+                    }
+            return false;
+        }
+        else if (e.button == 2 && window.isPress) {
+            window.activeDrager.isEnter = false;
+            window.activeDrager.onDragEnd(ep);
+            window.activeDrager = null;
+            window.isPress = false;
+        }
+        return true;
+    } , true);
+    window.canvas.addEventListener('mouseup',function(e) {
+        if (window.isPress) {
+            var ce = mouseArg(e);
+            window.activeDrager.isEnter = false;
+            window.activeDrager.onDragEnd(ce);
+            window.activeDrager = null;
+            window.isPress = false;
+        }
+    } , true);
+    window.canvas.addEventListener('mousemove',function (e) {
+        var curMouse = mouseArg(e);
+        if (window.channelMng.busy()) return;
+        if (isPress && activeDrager != null) {
+            activeDrager.onDragMove(curMouse);
+        }
+        else {
+            if (window.curTask && window.curTask.isEnter) {
+                for (var i = 0, item = window.curTask.activeSpotters[i]; item; item = window.curTask.activeSpotters[++i])
+                    if (item.fire(ctx, curMouse)) return true;
+            }
+            else
+                for (var i = 0, item = window.BackSpotters[i]; item; item = window.BackSpotters[++i])
+                    if (item.fire(ctx, curMouse)) return true;
+        }
+    } , true);
+    window.canvas.addEventListener('mousewheel', function (e) {
+        e.preventDefault();
+        var we = mouseArg(e);
+        if (e.wheelDelta)
+            we.up = e.wheelDelta > 0;
+        else if (e.detail)
+            we.up = e.detail < 0;
+        if (window.curTask && window.curTask.isEnter) {
+            for (var i = window.curTask.cmdUIComponents.length - 1, item = window.curTask.cmdUIComponents[i]; item; item = window.curTask.cmdUIComponents[--i])
+                if (item.wheeler &&item.wheeler.fire(ctx, we))return true;
+        }
+        else
+            for (var i = window.backUIComponents.length - 1, item = window.backUIComponents[i]; item; item = window.backUIComponents[--i])
+                if (item.wheeler &&item.wheeler.fire(ctx, we)) return true;
+    }, true);
+    window.canvas.addEventListener('touchstart', function (e) {
+        if (e.touches.length == 1) {
+            e.preventDefault();
+            onCanvasClick(e.touches.item(0));
+            if (window.isPress)
+                onCanvasMouseUp(e.touches.item(0));
+            if (!window.isPress) {
+                var ep = mouseArg(e.touches.item(0));
+                if (window.curTask && window.curTask.isEnter) {
+                    for (var i = window.curTask.cmdUIComponents.length - 1, item = window.curTask.cmdUIComponents[i]; item; item = window.curTask.cmdUIComponents[--i])
+                        if (item.drager && item.visible && item.enable)
+                            if (item.drager.fire(ctx, ep)) {
+                                window.isPress = true;
+                                return true;
+                            }
+                }
+                else
+                    for (var i = window.backUIComponents.length - 1, item = window.backUIComponents[i]; item; item = window.backUIComponents[--i])
+                        if (item.drager && item.visible && item.enable)
+                            if (item.drager.fire(ctx, ep)) {
+                                window.isPress = true;
+                                return true;
+                            }
+                return false;
+            }
+        }
+    }, true);
+    window.canvas.addEventListener('touchend', function (e) {
+        e.preventDefault();
+        if (window.isPress)
+            onCanvasMouseUp(e.changedTouches.item(0));
+
+    }, true);
+    window.canvas.addEventListener('touchmove', function (e) {
+        e.preventDefault();
+        if (window.channelMng.busy()) return;
+        if (e.touches.length == 1 && window.isPress && activeDrager != null) {
+            var curMouse = mouseArg(e.touches.item(0));
+            activeDrager.onDragMove(curMouse);
+        }
+    }, true);
+    window.canvas.addEventListener('touchcancel', function (e) {
+        e.preventDefault();
+        if (window.isPress)
+            onCanvasMouseUp(e.changedTouches.item(0));
+
+    }, true);
+    window.canvas.addEventListener('DOMMouseScroll',function (e) {
+        e.preventDefault();
+        var we = mouseArg(e);
+        if (e.wheelDelta)
+            we.up = e.wheelDelta > 0;
+        else if (e.detail)
+            we.up = e.detail < 0;
+        if (window.curTask && window.curTask.isEnter) {
+            for (var i = window.curTask.cmdUIComponents.length - 1, item = window.curTask.cmdUIComponents[i]; item; item = window.curTask.cmdUIComponents[--i])
+                if (item.wheeler &&item.wheeler.fire(ctx, we))return true;
+        }
+        else
+            for (var i = window.backUIComponents.length - 1, item = window.backUIComponents[i]; item; item = window.backUIComponents[--i])
+                if (item.wheeler &&item.wheeler.fire(ctx, we)) return true;
+    },false);
+    window.canvas.ondrop=function(e){
+        e.preventDefault();
+        var data= e.dataTransfer;
+        var file=data.files[0];
+        window.backImg.src=window.URL.createObjectURL(file);
+    };
+    window.canvas.ondragover=function(e){
+        e.preventDefault();
+        return false;
+    };
     window.backStdClock.start();
     window.cmdStdClock.start();
     animate();
@@ -89,7 +230,7 @@ function Task(ID) {
             this.clock = cmdStdClock;
             workOnBackImg();
         }
-    }
+    };
     this.sw = 0;
     this.wait = 0;
     this.decreseWait = function () {
@@ -110,17 +251,17 @@ function Task(ID) {
                 this.wait = this.sw;
             }
         }
-    }
+    };
     this.resetWait = function (num) {
         this.wait = num;
         this.sw = num;
-    }
+    };
     this.exit = function () {
         if (curTask == this && this.isEnter) {
             this.isEnter = false;
             window.backImgData = undefined;
         }
-    }
+    };
     this.activeSpotters = new Array();
     this.cmdUIComponents = new Array();
     this.cmdUIComponents.task = this;
@@ -131,7 +272,7 @@ function Task(ID) {
             uic.ID = id;
         this.push(uic);
         registerEvent(uic, false, this.task);
-    }
+    };
     this.loaded = false;
     return this;
 }
@@ -336,141 +477,6 @@ function absoluteX(x) {
 function absoluteY(y) {
     return  y * window.scale + window.cvsTop;
 }
-function onCanvasMouseDown(e) {
-    var ep = mouseArg(e);
-    if (e.button == 0 && !window.isPress) {
-        if (window.curTask && window.curTask.isEnter) {
-            for (var i = window.curTask.cmdUIComponents.length - 1, item = window.curTask.cmdUIComponents[i]; item; item = window.curTask.cmdUIComponents[--i])
-                if (item.drager && item.drager.fire(ctx, ep)) {
-                        window.isPress = true;
-                        return true;
-                    }
-        }
-        else
-            for (var i = window.backUIComponents.length - 1, item = window.backUIComponents[i]; item; item = window.backUIComponents[--i])
-                if (item.drager && item.drager.fire(ctx, ep)) {
-                        window.isPress = true;
-                        return true;
-                    }
-        return false;
-    }
-    else if (e.button == 2 && window.isPress) {
-        window.activeDrager.isEnter = false;
-        window.activeDrager.onDragEnd(ep);
-        window.activeDrager = null;
-        window.isPress = false;
-    }
-    return true;
-}
-function onCanvasMouseUp(e) {
-    if (window.isPress) {
-        var ce = mouseArg(e);
-        window.activeDrager.isEnter = false;
-        window.activeDrager.onDragEnd(ce);
-        window.activeDrager = null;
-        window.isPress = false;
-    }
-}
-function onCanvasClick(e) {
-    e = mouseArg(e);
-    if (window.channelMng.busy())return;
-    window.boxInput.unbind();
-    window.ta.unbind();
-    if (window.curTask && window.curTask.isEnter) {
-        for (var i = window.curTask.cmdUIComponents.length - 1, item = window.curTask.cmdUIComponents[i]; item; item = window.curTask.cmdUIComponents[--i])
-            if (item.clicker&&item.clicker.fire(ctx, e)) return true;
-    }
-    else
-        for (var i = window.backUIComponents.length - 1, item = window.backUIComponents[i]; item; item = window.backUIComponents[--i])
-            if (item.clicker&&item.clicker.fire(ctx, e)) return true;
-    return false;
-}
-function onCanvasMouseMove(e) {
-    var curMouse = mouseArg(e);
-    if (window.channelMng.busy()) return;
-    if (isPress && activeDrager != null) {
-        activeDrager.onDragMove(curMouse);
-    }
-    else {
-        if (window.curTask && window.curTask.isEnter) {
-            for (var i = 0, item = window.curTask.activeSpotters[i]; item; item = window.curTask.activeSpotters[++i])
-                if (item.fire(ctx, curMouse)) return true;
-        }
-        else
-            for (var i = 0, item = window.BackSpotters[i]; item; item = window.BackSpotters[++i])
-                if (item.fire(ctx, curMouse)) return true;
-    }
-}
-function onCanvasMouseWheel(e) {
-    e.preventDefault();
-    var we = mouseArg(e);
-    if (e.wheelDelta)
-        we.up = e.wheelDelta > 0;
-    else if (e.detail)
-        we.up = e.detail < 0;
-    if (window.curTask && window.curTask.isEnter) {
-        for (var i = window.curTask.cmdUIComponents.length - 1, item = window.curTask.cmdUIComponents[i]; item; item = window.curTask.cmdUIComponents[--i])
-            if (item.wheeler &&item.wheeler.fire(ctx, we))return true;
-    }
-    else
-        for (var i = window.backUIComponents.length - 1, item = window.backUIComponents[i]; item; item = window.backUIComponents[--i])
-            if (item.wheeler &&item.wheeler.fire(ctx, we)) return true;
-}
-function onCanvasTouchStart(e) {
-    if (e.touches.length == 1) {
-        e.preventDefault();
-        onCanvasClick(e.touches.item(0));
-        if (window.isPress)
-            onCanvasMouseUp(e.touches.item(0));
-        if (!window.isPress) {
-            var ep = mouseArg(e.touches.item(0));
-            if (window.curTask && window.curTask.isEnter) {
-                for (var i = window.curTask.cmdUIComponents.length - 1, item = window.curTask.cmdUIComponents[i]; item; item = window.curTask.cmdUIComponents[--i])
-                    if (item.drager && item.visible && item.enable)
-                        if (item.drager.fire(ctx, ep)) {
-                            window.isPress = true;
-                            return true;
-                        }
-            }
-            else
-                for (var i = window.backUIComponents.length - 1, item = window.backUIComponents[i]; item; item = window.backUIComponents[--i])
-                    if (item.drager && item.visible && item.enable)
-                        if (item.drager.fire(ctx, ep)) {
-                            window.isPress = true;
-                            return true;
-                        }
-            return false;
-        }
-    }
-}
-function onCanvasTouchEnd(e) {
-    e.preventDefault();
-    if (window.isPress)
-        onCanvasMouseUp(e.changedTouches.item(0));
-
-}
-function onCanvasTouchMove(e) {
-    e.preventDefault();
-    if (window.channelMng.busy()) return;
-    if (e.touches.length == 1 && window.isPress && activeDrager != null) {
-        var curMouse = mouseArg(e.touches.item(0));
-        activeDrager.onDragMove(curMouse);
-    }
-}
-function addCanvasDropHandler()
-{
-    window.canvas.ondrop=function(e){
-        e.preventDefault();
-        var data= e.dataTransfer;
-        var file=data.files[0];
-        window.backImg.src=window.URL.createObjectURL(file);
-    };
-    window.canvas.ondragover=function(e)
-    {
-        e.preventDefault();
-        return false;
-    };
-}
 function mouseArg(e) {
     var arg = new Object();
     var left = document.body.scrollLeft + document.documentElement.scrollLeft - window.cvsLeft;
@@ -489,7 +495,7 @@ function workOnBackImg() {
         window.worker = w;
         w.onmessage = function (e) {
             window.backImgData = e.data;
-        }
+        };
         w.postMessage(data);
     }
 }
@@ -504,12 +510,12 @@ Array.prototype.addEventer = function (eventer) {
         this.push(eventer);
     }
 
-}
-Array.prototype.removeEventer = function (eventer) {
-    var i = this.indexOf(eventer);
+};
+Array.prototype.remove = function (item) {
+    var i = this.indexOf(item);
     if (i != -1)
         this.splice(i, 1);
-}
+};
 backUIComponents.addCtrl = function (uic, id) {
     uic.isBackUI = true;
     uic.p = null;
@@ -517,7 +523,7 @@ backUIComponents.addCtrl = function (uic, id) {
         uic.ID = id;
     this.push(uic);
     registerEvent(uic, true);
-}
+};
 Array.prototype.removeCtrl = function (id) {
     var ctrl;
     for (var i = 0; i < this.length; i++)
@@ -533,7 +539,7 @@ Array.prototype.removeCtrl = function (id) {
 
     return ctrl;
 
-}
+};
 function registerEvent(uic, isBack, task) {
     if (isBack) {
         uic.isBackUI = true;
@@ -554,13 +560,13 @@ function registerEvent(uic, isBack, task) {
 function removeEvent(uic) {
     if (uic.isBackUI) {
         if (uic.spotter) {
-            window.BackSpotters.removeEventer(uic.spotter);
+            window.BackSpotters.remove(uic.spotter);
             uic.spotter = undefined;
         }
     }
     else {
         if (uic.spotter) {
-            uic.task.activeSpotters.removeEventer(uic.spotter);
+            uic.task.activeSpotters.remove(uic.spotter);
             uic.spotter = undefined;
         }
     }
@@ -571,12 +577,11 @@ Array.prototype.findByID = function (id) {
         if (this[i].ID && this[i].ID == id) return this[i];
     return undefined;
 
-}
+};
 function FindCtrl(ID, TID) {
-    if (!TID)return curTask.cmdUIComponents.findByID(ID);
+    if (!TID) return curTask.cmdUIComponents.findByID(ID);
     else
         for (var i = 0, t = tasks[i]; t; t = tasks[++i])
             if (t.ID == TID)return t.cmdUIComponents.findByID(ID);
-    return false;
-
+    return undefined;
 }

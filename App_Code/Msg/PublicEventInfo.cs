@@ -11,6 +11,7 @@ namespace Msg
         Normal = 0,
         Study=3,
         LixueAdmin = 5,
+        Teacher=7
     }
     public enum MsgCategoryNo
     {
@@ -21,9 +22,30 @@ namespace Msg
         Announcement = 1
 
     }
+    public enum EvalType
+    {
+        good=0, best=1
+    }
     public static partial class PublicEventInfo
     {
         public const string EventNotFound = "似乎你要查看的信息不存在!";
+    }
+    public class EvaluationJS
+    {
+        public int no { get; set; }
+        public int eventNo { get; set; }
+        public int authorNo { get; set; }
+        public int commentNo { get; set; }
+        public byte type { get; set; }
+        public DateTime updateTime{get;set;}
+        public EvaluationJS()
+        {
+            type = 1;
+        }
+        public Evalution ToEntity()
+        {
+            return new Evalution() { EventNo=eventNo, AuthorNo = authorNo, CommentNo = commentNo, No = no,Type= type, UpdateTime = updateTime };
+        }
     }
     public class CommentJS
     {
@@ -37,6 +59,7 @@ namespace Msg
         public bool deleted { get; set; }
         public string dateString { get { return setDate.ToString(); } }
         public string body { get; set; }
+        public List<EvaluationJS> evaluations = new List<EvaluationJS>();
         public Comment ToEntity()
         {
             var c = new Comment()
@@ -50,6 +73,8 @@ namespace Msg
                 Priority = priority,
                 SetDate = setDate
             };
+            foreach (var e in evaluations)
+                c.Evalutions.Add(e.ToEntity());
             return c;
         }
     }
@@ -158,12 +183,18 @@ namespace Msg
                 authorNo = com.AuthorNo,
                 authorName = com.Author.RealName
             };
+            foreach (var e in com.Evalutions)
+                js.evaluations.Add(e.ToEntityJS());
             return js;
         }
         public static AuthorJS ToEntityJS(this Author au)
         {
             var js = new AuthorJS() { userName = au.UserName, role = au.Role, realName = au.RealName, no = au.No, grade = au.Grade };
             return js;
+        }
+        public static EvaluationJS ToEntityJS(this Evalution evl)
+        {
+            return new EvaluationJS() { eventNo=evl.EventNo, updateTime = evl.UpdateTime, type = evl.Type, no = evl.No, commentNo = evl.CommentNo, authorNo = evl.AuthorNo };
         }
     }
 

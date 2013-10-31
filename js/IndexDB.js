@@ -11,10 +11,19 @@ function dbRequest(dbname,version)
         for(var i= 0,func=this._openFun[0];func;func=this._openFun[++i])
            try{func(db); }
            catch (e){db.onerror(e);}
-        return db;
+        for(var j= 0,action=this._storeAction[0];action;action=this._storeAction[++j])
+            try{
+                if(action.write)
+                    action.fun(db.writeTransaction(action.name).store);
+                else
+                    action.fun(db.readTransaction(action.name).store);
+            }
+            catch (e){ db.onerror(e);}
+       this.db=db;
     };
     request.onupgradeneeded=function(){
         var db=this.result;
+        this.db=db;
         db._errorFun=this._errorFun;
         db.onerror=this.onerror;
         db.createStore=function(storeName,keyPath,autoIncrement,indexes,objects){
@@ -35,29 +44,38 @@ function dbRequest(dbname,version)
         };
         for(var i= 0,func=this._changeFun[0];func;func=this._changeFun[++i])
             try{func(db); }
-            catch (e){db.onerror(e);}
-        return db;
+            catch (e){ db.onerror(e);}
     };
     request._openFun=[];
     request._changeFun=[];
     request._errorFun=[];
     request._successFun=[];
-    request.openFunc=function(func)
+    request._storeAction=[];
+    request.whenOpen=function(func)
     {
         this._openFun.push(func);
         return this;
     };
-    request.changeFunc=function(func)
+    request.writeStore=function(storeName,fun)
+    {
+       this._storeAction.push({name:storeName,fun:fun,write:true});
+       return this;
+    };
+    request.readStore=function(storeName,fun){
+        this._storeAction.push({name:storeName,fun:fun,write:false });
+        return this;
+    };
+    request.whenConstruct=function(func)
     {
         this._changeFun.push(func);
         return this;
     };
-    request.errorFunc=function(func)
+    request.whenError=function(func)
     {
         this._errorFun.push(func);
         return this;
     };
-    request.successFunc=function(func){
+    request.whenSuccess=function(func){
         this._successFun.push(func);
         return this;
     };
@@ -67,7 +85,7 @@ function dbRequest(dbname,version)
             func(e);
         return this;
     };
-
+    request.db=undefined;
     return request;
 }
 function addDBMethods(db)
@@ -75,9 +93,9 @@ function addDBMethods(db)
     db.readTransaction=function(storeName)
     {
         var trans= this.transaction(storeName);
+        trans.store=trans.objectStore(storeName);
         addTransMethods(trans);
         addStoreReadMethods(trans.store);
-        trans.store=trans.objectStore(storeName);
         return trans;
     };
     db.writeTransaction=function(storeName)
@@ -101,84 +119,169 @@ function addTransMethods(trans)
     };
     return trans;
 }
+function onrequestSuccess(e){
+    if(this.successFun)this.successFun(e);
+    this.store.requests.remove(this);
+    delete this;
+}
+function onrequestFail(e)
+{
+    if(this.errorFun)this.errorFun(e);
+    this.store.requests.remove(this);
+    delete this;
+}
 function addStoreReadMethods(store)
 {
+    store.addRequest=function(request,des,successFun,errorFun)
+    {
+        request.des=des;
+        request.store=this;
+        if(!this.requests)this.requests=[request];
+        else this.requests.push(request);
+        request.successFun=successFun;
+        request.onsuccess=onrequestSuccess;
+        request.errorFun=errorFun;
+        request.onerror=onrequestFail;
+        return this;
+    };
     store.getObject=function(key,getFun,failFun)
     {
        var request= store.get(key);
-        request.onsuccess=getFun;
-        request.onerror=failFun;
+       this.addRequest(request,'getObj:key;'+ key,getFun,failFun);
+       return this;
+    };
+    store.searhIndex=function(indexName,valueFilterFun,valueAction,endFun,keyRange,direction){
+        if(!direction)direction='next';
+        var request= this.index(indexName).openCursor(keyRange,direction);
+        this.addRequest(request,'searchIndex:'+indexName);
+        request.filter=valueFilterFun;
+        request.act=valueAction;
+        request.end=endFun;
+        request.onsuccess=valueFilterFun?function() {
+            var cursor=this.result;
+            if(cursor){
+                if(this.filter(cursor.value))
+                    this.act(cursor.value);
+                cursor.continue();
+            }
+            else {
+                if(this.end)
+                    this.end();
+                this.store.requests.remove(this);
+                delete this;
+            }
+        }:function(){
+            var cursor=this.result;
+            if(cursor){
+                this.act(cursor.value);
+                cursor.continue();
+            }
+            else {
+                if(this.end)
+                    this.end();
+                this.store.requests.remove(this);
+                delete this;
+            }};
         return this;
     };
-    store.onerror=function()
-    {
-      if(this.transaction)
-         this.transaction.abort();
+    store.select=function(valueFilterFun,resultsArray,endFun){
+        var request=this.openCursor();
+        this.addRequest(request,'selectValue');
+        request.filter=valueFilterFun;
+        request.end=endFun;
+        request.results=resultsArray;
+        request.onsuccess=valueFilterFun?function(){
+            var cursor=this.result;
+            if(cursor){
+                if(this.filter(cursor.value))
+                  this.array.push(cursor.value);
+                cursor.continue();
+            }
+            else {
+                if(this.end)
+                    this.end();
+                this.store.requests.remove(this);
+                delete this;
+            }
+        }:function(){
+            var cursor=this.result;
+            if(cursor){
+                this.results.push(cursor.value);
+                cursor.continue();
+            }
+            else {
+                if(this.end)
+                    this.end();
+                this.store.requests.remove(this);
+                delete this;
+            }};
+        return this;
     };
-
     return store;
 }
 function addStoreWriteMethods(store)
 {
-    store.forEach=function(callFunc,filterFun,endFun)
+    store.forEach=function(cursorActon,cursorFilterFun,endFun)
     {
         var request=this.openCursor();
-        request.filter=filterFun;
-        request.act=callFunc;
+        this.addRequest(request,'forEachCursor');
+        request.filter=cursorFilterFun;
+        request.act=cursorActon;
         request.end=endFun;
-        request.onsuccess=function()
-        {
+        request.onsuccess=cursorFilterFun?function(){
             var cursor=this.result;
             if(cursor){
-                if(this.filter && this.filter(cursor))
+                if(this.filter(cursor))
                     this.act(cursor);
                 cursor.continue();
             }
             else {
                 if(this.end)
                     this.end();
+                this.store.requests.remove(this);
                 delete this;
             }
-        };
+        }:function(){
+            var cursor=this.result;
+            if(cursor){
+            this.act(cursor);
+            cursor.continue();
+            }
+            else {
+                if(this.end)
+                    this.end();
+                this.store.requests.remove(this);
+            delete this;
+            }};
         return this;
     };
-    store.addObjects=function(objects)
+    store.addObjects=function(objects,successFun,failFun)
     {
         for(var i=0,obj=objects[i];obj;obj=objects[++i])
-            this.add(obj);
+        {
+           var request=this.add(obj);
+           this.addRequest(request,'addObj'+i,successFun,failFun);
+        }
         return this;
     };
-    store.putObjects=function(objects)
+    store.putObjects=function(objects,successFun,failFun)
     {
         for(var i=0,obj=objects[i];obj;obj=objects[++i])
-            this.put(obj);
+        {
+            var request=this.put(obj);
+            this.addRequest(request,'putObj'+i,successFun,failFun);
+        }
         return this;
     };
     store.addIndex=function(indexName,indexPath,unique,multiEntry,successFun,failFun)
     {
        var request=this.createIndex(indexName,indexPath,{unique:unique, multiEntry:multiEntry});
-        request.onerror=failFun;
-        request.onsuccess=successFun;
+       this.addRequest(request,'addIndex:'+indexName,successFun,failFun);
        return this;
     };
-    store.putObject=function(obj,onsuccess,onerror)
-    {
-        var r=this.put(obj);
-        r.onsuccess=onsuccess;
-        r.onerror=onerror;
-        return this;
-    };
-    store.addObject=function(obj,onsuccess,onerror)
-    {
-        var r=this.add(obj);
-        r.onsuccess=onsuccess;
-        r.onerror=onerror;
-        return this;
-    };
-    store.deletObject=function(obj,onsuccess,onerror){
-        var r=this.delete(obj);
-        r.onsuccess=onsuccess;
-        r.onerror=onerror;
+    store.deleteObject=function(key,successFun,failFun){
+        var r=this.delete(key);
+        this.addRequest(r,'deleteObj:key'+key,successFun,failFun);
         return this;
     };
     return store;
@@ -202,9 +305,27 @@ function deleteStore(dbName,storeName,version)
         var e=event;var db=this.result;
         db.deleteObjectStore(storeName);
     };
+    return request;
 
+}
+function putObjects(db,storeName,objects,successFun,failFun)
+{
+   return db.writeTransaction(storeName).events(successFun,failFun,failFun).store.putObjects(objects).transaction;
+}
+function deleteObject(db,storeName,key,successFun,failFun)
+{
+   return db.writeTransaction(storeName).store.deleteObject(key,successFun,failFun).transaction;
+}
+function getObject(db,storeName,key,successFun,failFun)
+{
+    return db.writeTransaction(storeName).store.getObject(key,successFun,failFun).transaction;
 }
 function storeIndex(indexName,indexPath,unique,multiEntry)
 {
     return {name:indexName,path:indexPath,attribute:{unique:unique,multiEntry:multiEntry? multiEntry:false}};
 }
+Array.prototype.remove = function (item) {
+    var i = this.indexOf(item);
+    if (i != -1)
+        this.splice(i, 1);
+};

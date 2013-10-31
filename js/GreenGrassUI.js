@@ -335,30 +335,29 @@
         }
         }
     }
-    function ImgWorker(oriImgData,neoImgDate,workerURL,updateFun,endFun,animation,stage,step){
+    function ImgWorker(oriImgData,neoImgDate,workerURL,updateFun,endFun,animation,duration,isCmdClock){
         this.oriImgdata=oriImgData;
         this.neoImgdata=neoImgDate;
         this.disImgdata=ctx.createImageData(canvas.width,canvas.height);
         this.worker=new Worker(workerURL? workerURL:'js/backPixelsWorker.js');
         this.worker.p=this;
-        this.onupdate=updateFun;
+        this.onupdate=updateFun? updateFun:function(worker,disImgdata){return true;};
         this.onend=endFun;
         this.started=false;
-        this.stage=stage;
-        this.step=step;
         this.animation=animation;
-        this.start=function(stage)
+        this.clock=new simpleClock(duration,1,linear,1,0,isCmdClock);
+        this.start=function()
         {
             if(!this.started)
             {
                 this.started=true;
-                this.stage=stage? stage:0;
-                this.worker.postMessage({oriImgdata:this.oriImgdata,neoImgdata:this.neoImgdata,disImgdata:this.disImgdata,p:this.stage,mode:this.animation}) ;
+                this.clock.restart();
+                this.worker.postMessage({oriImgdata:this.oriImgdata,neoImgdata:this.neoImgdata,
+                    disImgdata:this.disImgdata,p:0,mode:this.animation}) ;
             }
         };
-        this.restart=function(stage,oriImgdate,neoImgdate,animation)
+        this.restart=function(oriImgdate,neoImgdate,animation)
         {
-            this.stage=stage? stage:0;
             if(oriImgdate){
                 delete this.oriImgdata;
                 delete this.neoImgdata;
@@ -369,14 +368,17 @@
                 if(animation)this.animation=animation;
             }
             this.started=true;
-            this.worker.postMessage({oriImgdata:this.oriImgdata,neoImgdata:this.neoImgdata,disImgdata:this.disImgdata,p:this.stage,mode:this.animation}) ;
+            this.clock.restart();
+            this.worker.postMessage({oriImgdata:this.oriImgdata,neoImgdata:this.neoImgdata,disImgdata:this.disImgdata,p:0,mode:this.animation}) ;
         };
         this.worker.onmessage=function(e)
         {
-            this.p.stage= e.data.stage+this.p.step;
+            this.p.clock.update();
             this.p.disImgdata= e.data.disImgdata;
-            if(this.p.stage<=1)
-                this.p.onupdate(this.p, e.data);
+            if(this.p.clock.value<1){
+                if(this.p.onupdate(this.p, e.data))
+                    this.postMessage({p:this.p.clock.value,mode:this.p.animation});
+            }
             else{
                 this.p.onend(this.p, e.data);
                 this.p.started=false;
@@ -1501,6 +1503,7 @@
         btn.update=function(){
             this.clock.update();
             this.animation.update();
+            this.txt=window.channelMng.isLogIn? '注销':'登陆';
         };
         btn.clicker.onclick=function()
         {
@@ -1698,32 +1701,30 @@
     }
     function changeBack(img)
     {
+        if(img.width=0)
+           img=window.backImg;
         if(window.Worker)
         {
             window.ctx.drawImage(img,0,0,window.canvas.width/window.scale,window.canvas.height/window.scale);
             var neoImgdate=window.ctx.getImageData(0,0,window.canvas.width,window.canvas.height);
             var oriImgdate=window.ctx.getImageData(0,0,window.canvas.width,window.canvas.height);
             window.ctx.putImageData(window.backImgData,0,0);
-
             if( window.curTask.imgWorker)
-                window.curTask.imgWorker.restart(0,oriImgdate,neoImgdate);
+                window.curTask.imgWorker.restart(oriImgdate,neoImgdate);
             else
            {
                var imgworker=new ImgWorker(oriImgdate,neoImgdate,null,function(iw){
                window.backImgData=iw.disImgdata;
-               iw.worker.postMessage({p:iw.stage,mode:iw.animation});
+               return true;
                },function(iw){
                window.backImgData=iw.neoImgdata;
-               },'color',0,0.1);
+               },'color',1,true);
                window.curTask.imgWorker=imgworker;
-               imgworker.start(0);
+               imgworker.start();
            }
         }
         else{
-            if(img.width>0)
-                window.ctx.drawImage(img,0,0,window.canvas.width/window.scale,window.canvas.height/window.scale);
-            else
-                window.ctx.drawImage(window.backImg,0,0,window.canvas.width/window.scale,window.canvas.height/window.scale);
+            window.ctx.drawImage(img,0,0,window.canvas.width/window.scale,window.canvas.height/window.scale);
             window.backImgData=window.ctx.getImageData(0,0,window.canvas.width,window.canvas.height);
         }
 

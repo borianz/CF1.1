@@ -18,6 +18,7 @@ namespace Msg
             Categories.MergeOption = MergeOption.OverwriteChanges;
             Comments.MergeOption = MergeOption.OverwriteChanges;
             PublicEvents.MergeOption = MergeOption.OverwriteChanges;
+            Evalutions.MergeOption = MergeOption.OverwriteChanges;
         }
     }
     public class MsgDbContext : DbContext
@@ -31,10 +32,12 @@ namespace Msg
            ObjectContext.Categories.MergeOption = MergeOption.OverwriteChanges;
            ObjectContext.Comments.MergeOption = MergeOption.OverwriteChanges;
            ObjectContext.PublicEvents.MergeOption = MergeOption.OverwriteChanges;
+           ObjectContext.Evalutions.MergeOption = MergeOption.OverwriteChanges;
         }
         public DbSet<PublicEvent> PublicEvents { get; set; }
         public DbSet<Author> Authors { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Evalution> Evaluations { get; set; }
     }
 }

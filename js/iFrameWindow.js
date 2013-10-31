@@ -126,7 +126,8 @@ function DisplayLoadingWindow()
         var h = '亲,你的浏览器Just SO SO';
         var p  = "为了获得更好的体验,推荐使用<a target='_blank'  href='https://www.google.com/intl/zh-CN/chrome/browser/'>chrome</a></br>" +
             '你也可以使用IE10+或者最新版本的FireFox,Safari';
-        DisplayMsgWindow(h,p);
+        p += '</br><b>要登陆吗?</b>';
+        DisplayConfirmWindow(h, p, function () { DisplayLogWindow(); });
      }
     else if(!window.localStorage.concealLoadingWindow) {
         var h = '亲,欢迎!';

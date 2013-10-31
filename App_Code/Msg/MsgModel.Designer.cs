@@ -129,16 +129,29 @@ namespace Msg
             }
         }
         private ObjectSet<Comment> _Comments;
+    
+        /// <summary>
+        /// 没有元数据文档可用。
+        /// </summary>
+        public ObjectSet<Evalution> Evalutions
+        {
+            get
+            {
+                if ((_Evalutions == null))
+                {
+                    _Evalutions = base.CreateObjectSet<Evalution>("Evalutions");
+                }
+                return _Evalutions;
+            }
+        }
+        private ObjectSet<Evalution> _Evalutions;
 
         #endregion
-
-       
-
     }
 
     #endregion
 
-
+  
 
     
 }

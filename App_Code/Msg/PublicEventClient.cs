@@ -6,6 +6,7 @@ namespace Msg
 {
     public class PublicEventClient : IDisposable
     {
+        public static const short evalPerComment = 3;
         private MsgDbContext db;
         PublicEventServer server = PublicEventServer.Instance;
         public Author Author { get; private set; }
@@ -106,9 +107,44 @@ namespace Msg
                 setDate = c.SetDate,
                 deleted = false,
                 authorNo = c.ano
+                
             }).ToArray();
         }
-       
+
+        public Evalution ChangeEvaluation(Evalution eva, out string reason)
+        {
+            var oe = db.Evaluations.Find(eva.No);
+            if (oe == null)
+            {
+                if (db.PublicEvents.Where(e => e.AuthorNo == eva.AuthorNo && e.No == eva.EventNo).Count() >= evalPerComment)
+                {
+                    reason = string.Format("您只能在同一个文章下进行{0}次点评", evalPerComment);
+                    return null;
+                }
+                else
+                {
+                    eva.UpdateTime = DateTime.Now;
+                    db.Evaluations.Add(eva);
+                }
+            }
+            else
+            {
+                db.Entry(oe).State = System.Data.EntityState.Detached;
+                db.Entry(db.Evaluations.Attach(eva)).State = System.Data.EntityState.Modified;
+            }
+            try
+            {
+                db.SaveChanges();
+                reason = PublicEventInfo.EvaluateSuccess;
+                return eva;
+            }
+            catch
+            {
+                db.Entry(eva).State = System.Data.EntityState.Detached;
+                reason = PublicEventInfo.EvaluateFail;
+            }
+            return null;
+        }
         public bool UpdateComment(Comment com, out string reason)
         {
             var oldcom=db.Comments.Find (com.No);
@@ -222,6 +258,8 @@ namespace Msg
     }
     public static partial class PublicEventInfo
     {
+        public const string EvaluateSuccess = "亲,点评成功!";
+        public const string EvaluateFail = "亲,点评失败!";
         public const string EventsOutOfRange = "亲,你发布信息的数目有限,请隐藏或者删除一部分信息";
         public const string InvalidAuthor = "亲,您暂时没有评论限权";
         public const string CommentNotExists = "亲,没有找到你的评论";
