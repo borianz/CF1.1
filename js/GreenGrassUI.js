@@ -1892,11 +1892,18 @@
         {
             var cp=this.p.p;
             var event=cp.event;
-            if(event)
-                DisplayConfirmWindow("确定继续?",this.p.updateMode?"修改评论之后,你的评论排名可能会降低":"你只能对相同文章评论一次,但是可以修改你的评论",function(){
-                    var js=new Msg.CommentJS();
+            if(!event) return;
+            else if(this.p.comment)
+             DisplayConfirmWindow("确定修改?","你确定修改你的回复?",function(c){
+                    var js=c;
                     js.body=p.tb.getText().replace(/\n{2,}/g,"\n");
                     js.eventNo=event.no;
+                    updateComment(js,event);
+                },this.p.comment);
+                else
+                 DisplayConfirmWindow("确定发布?","同一篇文章一个人只能发表一次回复,但是可以任意修改",function(){
+                    var js=new Msg.CommentJS();
+                    js.body=p.tb.getText().replace(/\n{2,}/g,"\n");
                     addComment(js,event);
                 });
         };
@@ -1913,14 +1920,13 @@
             this.event=event;
          if(mycomment)
             {
-                this.commit.txt='修改评论';
+                this.commit.txt='修改';
+                this.commit.comment=mycomment;
                 this.tb.setText(mycomment.body);
-               this.commit.updateMode=true;
-            }
+              }
             else{
-                this.commit.txt='发表评论';
-                this.commit.updateMode=false;
-            }
+                this.commit.txt='发表';
+         }
 };
         return p;
     }
@@ -1930,15 +1936,87 @@
         var nl=new Label(5,0,comment.authorName,'25px "微软雅黑"',comment.color);
        var dl=new Label(nl.w+25,2,comment.dateString +":",'22px "幼圆"');
        var body=new Article(5,30,750,150,'22px "幼圆"',false,'22px "幼圆"','black','black','rgba(0,0,0,0)');
+       var good=new GoodBtn(comment.good);
+        var best=new BestBtn(comment.best);
        body.drager=undefined;
         body.wheeler=undefined;
        body.setText(comment.body);
        body.h=body.getMaxH()+3;
-        ep.addCtrl(nl,'name');
+       ep.addCtrl(nl,'name');
        ep.addCtrl(dl,'date');
        ep.addCtrl(body,'body');
         ep.drager=undefined;
+        ep.addCtrl(good,'goodBtn');
+        ep.addCtrl(best,'bestBtn');
+        ep.goodBtn=good;
+        ep.bestBtn=best;
+        ep.changeEval=changeEval;
+        ep.comment=comment;
+        ep.changeEval(comment.authorEval,comment.goodCount,comment.bestCount);
        return ep;
+    }
+    function changeEval(evalType,goodCount,bestCount)
+    {
+        var good=this.goodBtn;
+        var best=this.bestBtn;
+        if(goodCount!=undefined)good.count=goodCount;
+        if(bestCount!=undefined)best.count=bestCount;
+        if(!evalType)
+        {
+            good.selected=false;
+            best.selected=false;
+            best.clicker.onclick=addEval;
+            good.clicker.onclick=addEval;
+         }
+         else if(evalType==1){
+            good.selected=true;
+            best.selected=false;
+            good.clicker.onclick=deleteEval;
+            best.clicker.onclick=function(){};
+        }
+       else 
+        {
+            best.selected=true;
+            good.selected=false;
+            best.clicker.onclick=deleteEval;
+            good.clicker.onclick=function(){};
+        }
+    }
+    function addEval()
+    {
+        var cp=this.p.p;
+        var comment=cp.comment;
+        var isBest=this.p.isBest;
+        if(!window.channelMng.isLogIn) DisplayLogWindow();
+        else
+        {
+            window.channelMng.beginChannel(true,'addeval');
+            PublicEventService.AddEval(comment.no, isBest,
+                function(e,u){
+                    if(e.ok)
+                    u.changeEval(e.data.evalType, e.data.gcount, e.data.bcount);
+                    else
+                    DisplayMsgWindow('Sorry!', e.msg);
+                    window.channelMng.endChannel();
+                }, null, cp);
+        }
+    }
+    function deleteEval(){
+        var cp=this.p.p;
+        var comment=cp.comment;
+        if(!window.channelMng.isLogIn) DisplayLogWindow();
+        else
+        {
+            window.channelMng.beginChannel(true,'deleteeval');
+            PublicEventService.DeleteEval(comment.no,
+                function(e,u){
+                    if(e.ok)u.changeEval(null, e.data.good, e.data.best);
+                    else
+                        DisplayMsgWindow('Sorry!', e.msg);
+                    window.channelMng.endChannel();
+                }
+                , null, cp);
+        }
     }
     function getComments(event) {
         window.channelMng.beginChannel();
@@ -1954,14 +2032,17 @@
         }, null, event);
 
     }
-    function addComment(js,event) {
-        if (window.channelMng.isLogIn) {
+    function updateComment(js,event)
+    {
+     if (window.channelMng.isLogIn) {
             window.channelMng.beginChannel();
             js.body.trimEnd();
+            js.eventNo=event.no;
             PublicEventService.AddComment(js, function (e, u) {
                 if (e.ok) {
-                    u.comments = e.data.comments;
-                    window.curTask.mainPanel.commentsPanel.changeComments(u, e.data.mycomment);
+                    for (var i = 0; i < u.comments.length; i++)
+                    if (u.comments[i].no == e.data.no) {u.comments[i]=e.data;break;}
+                    window.curTask.mainPanel.commentsPanel.changeComments(u, e.data);
                 }
                 else
                     DisplayMsgWindow("囧", e.msg);
@@ -1971,4 +2052,131 @@
         else
             DisplayLogWindow();
     }
+    function addComment(js,event) {
+        if (window.channelMng.isLogIn) {
+            window.channelMng.beginChannel();
+            js.body.trimEnd();
+            js.eventNo=event.no;
+            PublicEventService.AddComment(js, function (e, u) {
+                if (e.ok) {
+                    u.comments.push(e.data);
+                    window.curTask.mainPanel.commentsPanel.changeComments(u, e.data);
+                }
+                else
+                    DisplayMsgWindow("囧", e.msg);
+                window.channelMng.endChannel();
+            }, null, event);
+        }
+        else
+            DisplayLogWindow();
+    }
+    function GoodBtn(g)
+    {
+        var btn=new UIComponent(600,3,30,30);
+        btn.clicker=new clicker(btn);
+        btn.selected=false;
+        btn.count=g;
+        btn.isBest=false;
+        btn.paint=function(ctx){
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.beginPath();
+            ctx.moveTo(25.6, 0.0);
+            ctx.lineTo(4.4, 0.0);
+            ctx.bezierCurveTo(2.0, 0.0, 0.0, 2.0, 0.0, 4.4);
+            ctx.lineTo(0.0, 25.6);
+            ctx.bezierCurveTo(0.0, 28.0, 2.0, 30.0, 4.4, 30.0);
+            ctx.lineTo(25.6, 30.0);
+            ctx.bezierCurveTo(28.0, 30.0, 30.0, 28.0, 30.0, 25.6);
+            ctx.lineTo(30.0, 4.4);
+            ctx.bezierCurveTo(30.0, 2.0, 28.0, 0.0, 25.6, 0.0);
+            ctx.moveTo(27.5, 24.5);
+            ctx.bezierCurveTo(27.5, 26.2, 26.2, 27.5, 24.5, 27.5);
+            ctx.lineTo(5.5, 27.5);
+            ctx.bezierCurveTo(3.8, 27.5, 2.5, 26.2, 2.5, 24.5);
+            ctx.lineTo(2.5, 5.5);
+            ctx.bezierCurveTo(2.5, 3.8, 3.8, 2.5, 5.5, 2.5);
+            ctx.lineTo(24.5, 2.5);
+            ctx.bezierCurveTo(26.2, 2.5, 27.5, 3.8, 27.5, 5.5);
+            ctx.lineTo(27.5, 24.5);
+            ctx.moveTo(15.0, 5.7);
+            ctx.lineTo(12.0, 11.8);
+            ctx.lineTo(5.3, 12.8);
+            ctx.lineTo(10.1, 17.6);
+            ctx.lineTo(9.0, 24.3);
+            ctx.lineTo(15.0, 21.1);
+            ctx.lineTo(21.0, 24.3);
+            ctx.lineTo(19.9, 17.6);
+            ctx.lineTo(24.7, 12.8);
+            ctx.lineTo(18.0, 11.8);
+            ctx.lineTo(15.0, 5.7);
+            ctx.closePath();
+            if(!this.enable)
+                ctx.fillStyle='black';
+            else if(this.selected)
+                ctx.fillStyle = "rgb(255, 255, 47)";
+            else
+                ctx.fillStyle='white';
+            ctx.fill();
+            ctx.textBaseline='hanging';
+            ctx.font='Arial 25px';
+            ctx.fillText(this.count,35,3,40);
+            ctx.restore();
+        };
+        return btn;
+    }
+    function BestBtn(g)
+    {
+        var btn=new UIComponent(660,3,30,30);
+        btn.clicker=new clicker(btn);
+        btn.selected=false;
+        btn.isBest=true;
+        btn.count=g;
+        btn.paint=function(ctx){
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.beginPath();
+            ctx.moveTo(25.6, 0.0);
+            ctx.lineTo(4.4, 0.0);
+            ctx.bezierCurveTo(2.0, 0.0, 0.0, 2.0, 0.0, 4.4);
+            ctx.lineTo(0.0, 25.6);
+            ctx.bezierCurveTo(0.0, 28.0, 2.0, 30.0, 4.4, 30.0);
+            ctx.lineTo(25.6, 30.0);
+            ctx.bezierCurveTo(28.0, 30.0, 30.0, 28.0, 30.0, 25.6);
+            ctx.lineTo(30.0, 4.4);
+            ctx.bezierCurveTo(30.0, 2.0, 28.0, 0.0, 25.6, 0.0);
+            ctx.moveTo(27.5, 24.5);
+            ctx.bezierCurveTo(27.5, 26.2, 26.2, 27.5, 24.5, 27.5);
+            ctx.lineTo(5.5, 27.5);
+            ctx.bezierCurveTo(3.8, 27.5, 2.5, 26.2, 2.5, 24.5);
+            ctx.lineTo(2.5, 5.5);
+            ctx.bezierCurveTo(2.5, 3.8, 3.8, 2.5, 5.5, 2.5);
+            ctx.lineTo(24.5, 2.5);
+            ctx.bezierCurveTo(26.2, 2.5, 27.5, 3.8, 27.5, 5.5);
+            ctx.lineTo(27.5, 24.5);
+            ctx.moveTo(20.1, 8.5);
+            ctx.bezierCurveTo(15.7, 8.5, 15.1, 11.6, 15.1, 11.6);
+            ctx.lineTo(14.9, 11.6);
+            ctx.bezierCurveTo(14.9, 11.6, 14.3, 8.5, 9.9, 8.5);
+            ctx.bezierCurveTo(5.5, 8.5, 3.6, 14.8, 8.7, 17.9);
+            ctx.bezierCurveTo(14.3, 21.4, 14.9, 23.5, 14.9, 23.5);
+            ctx.lineTo(15.1, 23.5);
+            ctx.bezierCurveTo(15.1, 23.5, 15.7, 21.4, 21.4, 17.9);
+            ctx.bezierCurveTo(26.4, 14.8, 24.5, 8.5, 20.1, 8.5);
+            ctx.closePath();
+            if(!this.enable)
+                ctx.fillStyle='black';
+            else if(this.selected)
+                ctx.fillStyle = "rgb(243, 42, 10)";
+            else
+                ctx.fillStyle='white';
+            ctx.fill();
+            ctx.textBaseline='hanging';
+            ctx.font='Arial 25px';
+            ctx.fillText(this.count,35,3,40);
+            ctx.restore();
+        };
+        return btn;
+    }
+
 }

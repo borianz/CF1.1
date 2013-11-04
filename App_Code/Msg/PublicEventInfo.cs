@@ -24,7 +24,7 @@ namespace Msg
     }
     public enum EvalType
     {
-        good=0, best=1
+        good=1, best=3
     }
     public static partial class PublicEventInfo
     {
@@ -57,8 +57,13 @@ namespace Msg
         public string color { get; set; }
         public short priority { get; set; }
         public bool deleted { get; set; }
+        public short score { get; set; }
+        public bool anonymouse { get; set; }
         public string dateString { get { return setDate.ToString(); } }
         public string body { get; set; }
+        public short good { get; set; }
+        public short best { get; set; }
+        public byte? authorEval { get; set; }
         public List<EvaluationJS> evaluations = new List<EvaluationJS>();
         public Comment ToEntity()
         {
@@ -71,7 +76,9 @@ namespace Msg
                 Deleted = deleted,
                 EventNo = eventNo,
                 Priority = priority,
-                SetDate = setDate
+                SetDate = setDate,
+                Score = score,
+                Anonymous = anonymouse
             };
             foreach (var e in evaluations)
                 c.Evalutions.Add(e.ToEntity());
@@ -147,6 +154,7 @@ namespace Msg
     {
         public static PublicEventJS ToEntityJS(this PublicEvent pe)
         {
+            if (pe == null) return null;
             var js = new PublicEventJS()
             {
                 enable = pe.Enable,
@@ -163,6 +171,7 @@ namespace Msg
         }
         public static CategoryJS ToEntityJS(this Category cat, bool withEvents)
         {
+            if (cat == null) return null;
             var js = new CategoryJS() { enable = cat.Enable, name = cat.Name, no = cat.No, priority = cat.Priority };
             if (withEvents)
                 foreach (var e in cat.PublicEvents)
@@ -171,17 +180,22 @@ namespace Msg
         }
         public static CommentJS ToEntityJS(this Comment com)
         {
+            if (com == null)
+                return null;
             var js = new CommentJS()
             {
                 setDate = com.SetDate,
                 priority = com.Priority,
-                eventNo = com.EventNo,
+                eventNo = com.EventNo == null ? 0 : (int)com.EventNo,
                 deleted = com.Deleted,
                 no = com.No,
                 color = com.Color,
                 body = com.Body,
                 authorNo = com.AuthorNo,
-                authorName = com.Author.RealName
+                authorName =(com.Author!=null)? com.Author.RealName:string.Empty ,
+                anonymouse = com.Anonymous,
+                best = com.Best,
+                good = com.Good
             };
             foreach (var e in com.Evalutions)
                 js.evaluations.Add(e.ToEntityJS());
@@ -189,11 +203,13 @@ namespace Msg
         }
         public static AuthorJS ToEntityJS(this Author au)
         {
+            if (au == null) return null;
             var js = new AuthorJS() { userName = au.UserName, role = au.Role, realName = au.RealName, no = au.No, grade = au.Grade };
             return js;
         }
         public static EvaluationJS ToEntityJS(this Evalution evl)
         {
+            if (evl == null) return null;
             return new EvaluationJS() { eventNo=evl.EventNo, updateTime = evl.UpdateTime, type = evl.Type, no = evl.No, commentNo = evl.CommentNo, authorNo = evl.AuthorNo };
         }
     }

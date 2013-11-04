@@ -66,13 +66,17 @@
             <PropertyRef Name="No" />
           </Key>
           <Property Name="AuthorNo" Type="int" Nullable="false" />
-          <Property Name="No" Type="int" Nullable="false" />
+          <Property Name="No" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
           <Property Name="SetDate" Type="datetime" Nullable="false" />
           <Property Name="EventNo" Type="int" />
           <Property Name="Color" Type="varchar" MaxLength="50" />
           <Property Name="Priority" Type="smallint" Nullable="false" />
           <Property Name="Deleted" Type="bit" Nullable="false" />
-          <Property Name="Body" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Body" Type="text" Nullable="false" />
+          <Property Name="Anonymous" Type="bit" Nullable="false" />
+          <Property Name="Good" Type="smallint" Nullable="false" />
+          <Property Name="Best" Type="smallint" Nullable="false" />
+          <Property Name="Score" Type="int" StoreGeneratedPattern="Computed" />
         </EntityType>
         <EntityType Name="Evalution">
           <Key>
@@ -196,11 +200,6 @@
           <EntitySet Name="PublicEvents" EntityType="MsgDBModel.PublicEvent" />
           <EntitySet Name="Authors" EntityType="MsgDBModel.Author" />
           <EntitySet Name="Categories" EntityType="MsgDBModel.Category" />
-          <EntitySet Name="Comments" EntityType="MsgDBModel.Comment" />
-          <AssociationSet Name="FK_Comment_Author" Association="MsgDBModel.FK_Comment_Author">
-            <End Role="Author" EntitySet="Authors" />
-            <End Role="Comment" EntitySet="Comments" />
-          </AssociationSet>
           <AssociationSet Name="FK_PublicEvent_Author" Association="MsgDBModel.FK_PublicEvent_Author">
             <End Role="Author" EntitySet="Authors" />
             <End Role="PublicEvent" EntitySet="PublicEvents" />
@@ -209,21 +208,26 @@
             <End Role="Category" EntitySet="Categories" />
             <End Role="PublicEvent" EntitySet="PublicEvents" />
           </AssociationSet>
-          <AssociationSet Name="FK_Comment_PublicEvent" Association="MsgDBModel.FK_Comment_PublicEvent">
-            <End Role="PublicEvent" EntitySet="PublicEvents" />
-            <End Role="Comment" EntitySet="Comments" />
-          </AssociationSet>
           <EntitySet Name="Evalutions" EntityType="MsgDBModel.Evalution" />
           <AssociationSet Name="FK_Evalution_Author" Association="MsgDBModel.FK_Evalution_Author">
             <End Role="Author" EntitySet="Authors" />
             <End Role="Evalution" EntitySet="Evalutions" />
           </AssociationSet>
-          <AssociationSet Name="FK_Evalution_Comment" Association="MsgDBModel.FK_Evalution_Comment">
-            <End Role="Comment" EntitySet="Comments" />
-            <End Role="Evalution" EntitySet="Evalutions" />
-          </AssociationSet>
           <AssociationSet Name="FK_Evalution_Evalution" Association="MsgDBModel.FK_Evalution_Evalution">
             <End Role="PublicEvent" EntitySet="PublicEvents" />
+            <End Role="Evalution" EntitySet="Evalutions" />
+          </AssociationSet>
+          <EntitySet Name="Comments" EntityType="MsgDBModel.Comment" />
+          <AssociationSet Name="FK_Comment_Author" Association="MsgDBModel.FK_Comment_Author">
+            <End Role="Author" EntitySet="Authors" />
+            <End Role="Comment" EntitySet="Comments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Comment_PublicEvent" Association="MsgDBModel.FK_Comment_PublicEvent">
+            <End Role="PublicEvent" EntitySet="PublicEvents" />
+            <End Role="Comment" EntitySet="Comments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Evalution_Comment" Association="MsgDBModel.FK_Evalution_Comment">
+            <End Role="Comment" EntitySet="Comments" />
             <End Role="Evalution" EntitySet="Evalutions" />
           </AssociationSet>
         </EntityContainer>
@@ -244,11 +248,11 @@
           <Property Type="Int32" Name="AuthorNo" Nullable="false" />
           <NavigationProperty Name="Author" Relationship="MsgDBModel.FK_PublicEvent_Author" FromRole="PublicEvent" ToRole="Author" />
           <NavigationProperty Name="Category" Relationship="MsgDBModel.FK_PublicEvent_category" FromRole="PublicEvent" ToRole="Category" />
-          <NavigationProperty Name="Comments" Relationship="MsgDBModel.FK_Comment_PublicEvent" FromRole="PublicEvent" ToRole="Comment" />
           <Property Type="String" Name="AuthorName" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
           <Property Type="DateTime" Name="SetTime" Nullable="false" />
           <Property Type="Boolean" Name="CanComment" Nullable="false" DefaultValue="True" />
           <NavigationProperty Name="Evalutions" Relationship="MsgDBModel.FK_Evalution_Evalution" FromRole="PublicEvent" ToRole="Evalution" />
+          <NavigationProperty Name="Comments" Relationship="MsgDBModel.FK_Comment_PublicEvent" FromRole="PublicEvent" ToRole="Comment" />
         </EntityType>
         <EntityType Name="Author">
           <Key>
@@ -259,11 +263,11 @@
           <Property Type="String" Name="RealName" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
           <Property Type="String" Name="Grade" MaxLength="20" FixedLength="false" Unicode="true" />
           <Property Type="Int16" Name="Role" Nullable="false" />
-          <NavigationProperty Name="Comments" Relationship="MsgDBModel.FK_Comment_Author" FromRole="Author" ToRole="Comment" />
           <NavigationProperty Name="PublicEvents" Relationship="MsgDBModel.FK_PublicEvent_Author" FromRole="Author" ToRole="PublicEvent" />
           <Property Type="Int16" Name="EventLimit" Nullable="false" />
           <Property Type="Boolean" Name="Enable" Nullable="false" DefaultValue="True" />
           <NavigationProperty Name="Evalutions" Relationship="MsgDBModel.FK_Evalution_Author" FromRole="Author" ToRole="Evalution" />
+          <NavigationProperty Name="Comments" Relationship="MsgDBModel.FK_Comment_Author" FromRole="Author" ToRole="Comment" />
         </EntityType>
         <EntityType Name="Category">
           <Key>
@@ -275,34 +279,6 @@
           <NavigationProperty Name="PublicEvents" Relationship="MsgDBModel.FK_PublicEvent_category" FromRole="Category" ToRole="PublicEvent" />
           <Property Type="Int16" Name="Priority" Nullable="false" />
         </EntityType>
-        <EntityType Name="Comment">
-          <Key>
-            <PropertyRef Name="No" />
-          </Key>
-          <Property Type="Int32" Name="AuthorNo" Nullable="false" />
-          <Property Type="Int32" Name="No" Nullable="false" />
-          <Property Type="DateTime" Name="SetDate" Nullable="false" />
-          <Property Type="Int32" Name="EventNo" Nullable="false" />
-          <Property Type="String" Name="Color" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="Int16" Name="Priority" Nullable="false" />
-          <Property Type="Boolean" Name="Deleted" Nullable="false" />
-          <Property Type="String" Name="Body" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Author" Relationship="MsgDBModel.FK_Comment_Author" FromRole="Comment" ToRole="Author" />
-          <NavigationProperty Name="PublicEvent" Relationship="MsgDBModel.FK_Comment_PublicEvent" FromRole="Comment" ToRole="PublicEvent" />
-          <NavigationProperty Name="Evalutions" Relationship="MsgDBModel.FK_Evalution_Comment" FromRole="Comment" ToRole="Evalution" />
-        </EntityType>
-        <Association Name="FK_Comment_Author">
-          <End Type="MsgDBModel.Author" Role="Author" Multiplicity="1" />
-          <End Type="MsgDBModel.Comment" Role="Comment" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Author">
-              <PropertyRef Name="No" />
-            </Principal>
-            <Dependent Role="Comment">
-              <PropertyRef Name="AuthorNo" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_PublicEvent_Author">
           <End Type="MsgDBModel.Author" Role="Author" Multiplicity="1" />
           <End Type="MsgDBModel.PublicEvent" Role="PublicEvent" Multiplicity="*" />
@@ -327,18 +303,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Comment_PublicEvent">
-          <End Type="MsgDBModel.PublicEvent" Role="PublicEvent" Multiplicity="1" />
-          <End Type="MsgDBModel.Comment" Role="Comment" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PublicEvent">
-              <PropertyRef Name="No" />
-            </Principal>
-            <Dependent Role="Comment">
-              <PropertyRef Name="EventNo" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityType Name="Evalution">
           <Key>
             <PropertyRef Name="No" />
@@ -348,10 +312,10 @@
           <Property Type="Int32" Name="CommentNo" Nullable="false" />
           <Property Type="DateTime" Name="UpdateTime" Nullable="false" />
           <NavigationProperty Name="Author" Relationship="MsgDBModel.FK_Evalution_Author" FromRole="Evalution" ToRole="Author" />
-          <NavigationProperty Name="Comment" Relationship="MsgDBModel.FK_Evalution_Comment" FromRole="Evalution" ToRole="Comment" />
           <Property Type="Byte" Name="Type" Nullable="false" />
           <Property Type="Int32" Name="EventNo" Nullable="false" />
           <NavigationProperty Name="PublicEvent" Relationship="MsgDBModel.FK_Evalution_Evalution" FromRole="Evalution" ToRole="PublicEvent" />
+          <NavigationProperty Name="Comment" Relationship="MsgDBModel.FK_Evalution_Comment" FromRole="Evalution" ToRole="Comment" />
           </EntityType>
         <Association Name="FK_Evalution_Author">
           <End Type="MsgDBModel.Author" Role="Author" Multiplicity="1" />
@@ -365,18 +329,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Evalution_Comment">
-          <End Type="MsgDBModel.Comment" Role="Comment" Multiplicity="1" />
-          <End Type="MsgDBModel.Evalution" Role="Evalution" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Comment">
-              <PropertyRef Name="No" />
-            </Principal>
-            <Dependent Role="Evalution">
-              <PropertyRef Name="CommentNo" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Evalution_Evalution">
           <End Type="MsgDBModel.PublicEvent" Role="PublicEvent" Multiplicity="1" />
           <End Type="MsgDBModel.Evalution" Role="Evalution" Multiplicity="*" />
@@ -386,6 +338,62 @@
             </Principal>
             <Dependent Role="Evalution">
               <PropertyRef Name="EventNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Comment">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Type="Int32" Name="AuthorNo" Nullable="false" />
+          <Property Type="Int32" Name="No" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="DateTime" Name="SetDate" Nullable="false" />
+          <Property Type="Int32" Name="EventNo" />
+          <Property Type="String" Name="Color" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Int16" Name="Priority" Nullable="false" />
+          <Property Type="Boolean" Name="Deleted" Nullable="false" />
+          <Property Type="String" Name="Body" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Type="Boolean" Name="Anonymous" Nullable="false" />
+          <Property Type="Int16" Name="Good" Nullable="false" />
+          <Property Type="Int16" Name="Best" Nullable="false" />
+          <Property Type="Int32" Name="Score" annotation:StoreGeneratedPattern="Computed" />
+          <NavigationProperty Name="Author" Relationship="MsgDBModel.FK_Comment_Author" FromRole="Comment" ToRole="Author" />
+          <NavigationProperty Name="PublicEvent" Relationship="MsgDBModel.FK_Comment_PublicEvent" FromRole="Comment" ToRole="PublicEvent" />
+          <NavigationProperty Name="Evalutions" Relationship="MsgDBModel.FK_Evalution_Comment" FromRole="Comment" ToRole="Evalution" />
+        </EntityType>
+        <Association Name="FK_Comment_Author">
+          <End Type="MsgDBModel.Author" Role="Author" Multiplicity="1" />
+          <End Type="MsgDBModel.Comment" Role="Comment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Author">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="Comment">
+              <PropertyRef Name="AuthorNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Comment_PublicEvent">
+          <End Type="MsgDBModel.PublicEvent" Role="PublicEvent" Multiplicity="0..1" />
+          <End Type="MsgDBModel.Comment" Role="Comment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PublicEvent">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="Comment">
+              <PropertyRef Name="EventNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Evalution_Comment">
+          <End Type="MsgDBModel.Comment" Role="Comment" Multiplicity="1" />
+          <End Type="MsgDBModel.Evalution" Role="Evalution" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Comment">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="Evalution">
+              <PropertyRef Name="CommentNo" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -438,20 +446,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Comments">
-            <EntityTypeMapping TypeName="MsgDBModel.Comment">
-              <MappingFragment StoreEntitySet="Comment">
-                <ScalarProperty Name="Body" ColumnName="Body" />
-                <ScalarProperty Name="Deleted" ColumnName="Deleted" />
-                <ScalarProperty Name="Priority" ColumnName="Priority" />
-                <ScalarProperty Name="Color" ColumnName="Color" />
-                <ScalarProperty Name="EventNo" ColumnName="EventNo" />
-                <ScalarProperty Name="SetDate" ColumnName="SetDate" />
-                <ScalarProperty Name="No" ColumnName="No" />
-                <ScalarProperty Name="AuthorNo" ColumnName="AuthorNo" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="Evalutions">
             <EntityTypeMapping TypeName="MsgDBModel.Evalution">
               <MappingFragment StoreEntitySet="Evalution">
@@ -461,6 +455,24 @@
                 <ScalarProperty Name="CommentNo" ColumnName="CommentNo" />
                 <ScalarProperty Name="AuthorNo" ColumnName="AuthorNo" />
                 <ScalarProperty Name="No" ColumnName="No" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Comments">
+            <EntityTypeMapping TypeName="MsgDBModel.Comment">
+              <MappingFragment StoreEntitySet="Comment">
+                <ScalarProperty Name="Score" ColumnName="Score" />
+                <ScalarProperty Name="Best" ColumnName="Best" />
+                <ScalarProperty Name="Good" ColumnName="Good" />
+                <ScalarProperty Name="Anonymous" ColumnName="Anonymous" />
+                <ScalarProperty Name="Body" ColumnName="Body" />
+                <ScalarProperty Name="Deleted" ColumnName="Deleted" />
+                <ScalarProperty Name="Priority" ColumnName="Priority" />
+                <ScalarProperty Name="Color" ColumnName="Color" />
+                <ScalarProperty Name="EventNo" ColumnName="EventNo" />
+                <ScalarProperty Name="SetDate" ColumnName="SetDate" />
+                <ScalarProperty Name="No" ColumnName="No" />
+                <ScalarProperty Name="AuthorNo" ColumnName="AuthorNo" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -488,11 +500,6 @@
         <EntityTypeShape EntityType="MsgDBModel.PublicEvent" Width="1.5" PointX="0.75" PointY="0.75" Height="3.6892097981770826" IsExpanded="true" />
         <EntityTypeShape EntityType="MsgDBModel.Author" Width="1.5" PointX="6.25" PointY="0.75" Height="2.9251310221354165" />
         <EntityTypeShape EntityType="MsgDBModel.Category" Width="1.5" PointX="0.5" PointY="5.5" Height="1.7790128580729174" />
-        <EntityTypeShape EntityType="MsgDBModel.Comment" Width="1.5" PointX="5.625" PointY="4.125" Height="3.1161507161458326" />
-        <AssociationConnector Association="MsgDBModel.FK_Comment_Author" >
-          <ConnectorPoint PointX="6.6875" PointY="3.6751310221354165" />
-          <ConnectorPoint PointX="6.6875" PointY="4.125" />
-        </AssociationConnector>
         <AssociationConnector Association="MsgDBModel.FK_PublicEvent_Author" >
           <ConnectorPoint PointX="6.25" PointY="1.15625" />
           <ConnectorPoint PointX="2.25" PointY="1.15625" />
@@ -501,25 +508,27 @@
           <ConnectorPoint PointX="1.375" PointY="5.5" />
           <ConnectorPoint PointX="1.375" PointY="5.20328857421875" />
         </AssociationConnector>
-        <AssociationConnector Association="MsgDBModel.FK_Comment_PublicEvent" >
-          <ConnectorPoint PointX="2.25" PointY="4.8329270426432291" />
-          <ConnectorPoint PointX="3.7916666666666665" PointY="4.8329270426432283" />
-          <ConnectorPoint PointX="3.9583333333333335" PointY="4.8329270426432291" />
-          <ConnectorPoint PointX="5.625" PointY="4.8329270426432291" />
-        </AssociationConnector>
         <EntityTypeShape EntityType="MsgDBModel.Evalution" Width="1.5" PointX="3.125" PointY="1.625" Height="2.7341113281249996" />
         <AssociationConnector Association="MsgDBModel.FK_Evalution_Author" >
-          <ConnectorPoint PointX="6.25" PointY="2.6500655110677083" />
-          <ConnectorPoint PointX="4.625" PointY="2.6500655110677083" />
-        </AssociationConnector>
-        <AssociationConnector Association="MsgDBModel.FK_Evalution_Comment" >
-          <ConnectorPoint PointX="5.625" PointY="6.0682913793945312" />
-          <ConnectorPoint PointX="3.875" PointY="6.0682913793945312" />
-          <ConnectorPoint PointX="3.875" PointY="4.359111328125" />
+          <ConnectorPoint PointX="6.25" PointY="2.6500655110677087" />
+          <ConnectorPoint PointX="4.625" PointY="2.6500655110677087" />
         </AssociationConnector>
         <AssociationConnector Association="MsgDBModel.FK_Evalution_Evalution" >
           <ConnectorPoint PointX="2.25" PointY="2.9920556640625" />
           <ConnectorPoint PointX="3.125" PointY="2.9920556640625" />
+        </AssociationConnector>
+        <EntityTypeShape EntityType="MsgDBModel.Comment" Width="1.5" PointX="5.25" PointY="4.625" Height="3.8802294921874996" />
+        <AssociationConnector Association="MsgDBModel.FK_Comment_Author" >
+          <ConnectorPoint PointX="6.5" PointY="3.6751310221354165" />
+          <ConnectorPoint PointX="6.5" PointY="4.625" />
+        </AssociationConnector>
+        <AssociationConnector Association="MsgDBModel.FK_Comment_PublicEvent" >
+          <ConnectorPoint PointX="2.25" PointY="4.9141442871093748" />
+          <ConnectorPoint PointX="5.25" PointY="4.9141442871093748" />
+        </AssociationConnector>
+        <AssociationConnector Association="MsgDBModel.FK_Evalution_Comment" >
+          <ConnectorPoint PointX="5.25" PointY="4.625" />
+          <ConnectorPoint PointX="4.625" PointY="4.359111328125" />
         </AssociationConnector>
       </Diagram>
     </Diagrams>

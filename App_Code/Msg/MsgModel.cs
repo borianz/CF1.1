@@ -17,9 +17,9 @@ namespace Msg
         public Author()
         {
             this.Enable = true;
-            this.Comments = new HashSet<Comment>();
             this.PublicEvents = new HashSet<PublicEvent>();
             this.Evalutions = new HashSet<Evalution>();
+            this.Comments = new HashSet<Comment>();
         }
     
         public string UserName { get; set; }
@@ -30,9 +30,9 @@ namespace Msg
         public short EventLimit { get; set; }
         public bool Enable { get; set; }
     
-        public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<PublicEvent> PublicEvents { get; set; }
         public virtual ICollection<Evalution> Evalutions { get; set; }
+        public virtual ICollection<Comment> Comments { get; set; }
     }
 }
 namespace Msg
@@ -71,11 +71,15 @@ namespace Msg
         public int AuthorNo { get; set; }
         public int No { get; set; }
         public System.DateTime SetDate { get; set; }
-        public int EventNo { get; set; }
+        public Nullable<int> EventNo { get; set; }
         public string Color { get; set; }
         public short Priority { get; set; }
         public bool Deleted { get; set; }
         public string Body { get; set; }
+        public bool Anonymous { get; set; }
+        public short Good { get; set; }
+        public short Best { get; set; }
+        public Nullable<int> Score { get; set; }
     
         public virtual Author Author { get; set; }
         public virtual PublicEvent PublicEvent { get; set; }
@@ -97,8 +101,8 @@ namespace Msg
         public int EventNo { get; set; }
     
         public virtual Author Author { get; set; }
-        public virtual Comment Comment { get; set; }
         public virtual PublicEvent PublicEvent { get; set; }
+        public virtual Comment Comment { get; set; }
     }
 }
 namespace Msg
@@ -111,8 +115,8 @@ namespace Msg
         public PublicEvent()
         {
             this.CanComment = true;
-            this.Comments = new HashSet<Comment>();
             this.Evalutions = new HashSet<Evalution>();
+            this.Comments = new HashSet<Comment>();
         }
     
         public string Title { get; set; }
@@ -132,7 +136,7 @@ namespace Msg
     
         public virtual Author Author { get; set; }
         public virtual Category Category { get; set; }
-        public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<Evalution> Evalutions { get; set; }
+        public virtual ICollection<Comment> Comments { get; set; }
     }
 }

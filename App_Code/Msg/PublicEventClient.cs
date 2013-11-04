@@ -6,7 +6,7 @@ namespace Msg
 {
     public class PublicEventClient : IDisposable
     {
-        public static const short evalPerComment = 3;
+        
         private MsgDbContext db;
         PublicEventServer server = PublicEventServer.Instance;
         public Author Author { get; private set; }
@@ -23,6 +23,7 @@ namespace Msg
         public IEnumerable<Category> Categories { get { return db.Categories; } }
         public IEnumerable<PublicEvent> Events { get { return db.PublicEvents; } }
         public IEnumerable<Comment> Comments { get { return db.Comments; } }
+        public IEnumerable<Evalution> Evaluations { get { return db.Evaluations; } }
         public Author GetAuthor(int no)
         {
             return db.Authors.Find(no);
@@ -57,7 +58,6 @@ namespace Msg
             else
                 try
                 {
-                    com.AuthorNo = Author.No;
                     db.Comments.Add(com);
                     db.SaveChanges();
                     reason = PublicEventInfo.CommentAddSuccess;
@@ -92,83 +92,114 @@ namespace Msg
                 }
             return null;
         }
-        public CommentJS[] GetCommentJs(int evetNo, ushort skip=0,ushort take=30)
+        public IEnumerable<CommentJS> GetCommentJs(int evetNo, ushort skip=0,ushort take=30)
         {
             var cs = db.Comments.Include("Author").Where(c => !c.Deleted && c.EventNo == evetNo).
-                OrderByDescending(c => c.Priority).ThenBy(c => c.No).Skip(skip).Take (take).
-                Select(c => new { realname = c.Author.RealName, c.SetDate, c.Priority, c.No, c.Body, c.Color,ano=c.Author.No  }).ToArray();
-            return cs.Select(c => new CommentJS
+                OrderByDescending(c => c.Score).ThenBy(c => c.No).Skip(skip).Take (take).
+                Select(c => new {c.Good, c.Best,c.Anonymous, realname = c.Author.RealName, c.SetDate, c.Priority, c.No, c.Body, c.Color,ano=c.Author.No  }).ToArray();
+            var coms = cs.Select(c => new CommentJS
             {
-                authorName = c.realname,
+                authorName = c.Anonymous ? "匿名用户" : c.realname,
                 body = c.Body,
                 color = c.Color,
                 no = c.No,
                 priority = c.Priority,
                 setDate = c.SetDate,
                 deleted = false,
-                authorNo = c.ano
-                
-            }).ToArray();
-        }
-
-        public Evalution ChangeEvaluation(Evalution eva, out string reason)
-        {
-            var oe = db.Evaluations.Find(eva.No);
-            if (oe == null)
-            {
-                if (db.PublicEvents.Where(e => e.AuthorNo == eva.AuthorNo && e.No == eva.EventNo).Count() >= evalPerComment)
-                {
-                    reason = string.Format("您只能在同一个文章下进行{0}次点评", evalPerComment);
-                    return null;
-                }
-                else
-                {
-                    eva.UpdateTime = DateTime.Now;
-                    db.Evaluations.Add(eva);
-                }
+                authorNo = c.ano,
+                good = c.Good,
+                best = c.Best
+            }).ToDictionary(js => js.no);
+            if(Author!=null ){
+                var evals = db.Evaluations.Where(e => e.AuthorNo == Author.No && e.EventNo == evetNo).Select (e=>new { e.CommentNo,e.Type});
+                foreach (var eva in evals)
+                    coms[eva.CommentNo].authorEval = eva.Type;
             }
+            return coms.Values;
+        }
+        public Evalution AddEvaluation(Evalution eva, out string reason)
+        {
+            if (eva.Type == (byte)EvalType.best && db.Evaluations.Any(e => e.EventNo == eva.EventNo && e.Type == (byte)EvalType.best && e.AuthorNo == eva.AuthorNo))
+                reason = PublicEventInfo.EvaBestExceed;
+            else if (db.Evaluations.Any(e => e.AuthorNo == eva.AuthorNo && e.CommentNo == eva.CommentNo && e.EventNo == eva.EventNo))
+                reason = PublicEventInfo.EvaExists;
             else
             {
-                db.Entry(oe).State = System.Data.EntityState.Detached;
-                db.Entry(db.Evaluations.Attach(eva)).State = System.Data.EntityState.Modified;
-            }
-            try
-            {
-                db.SaveChanges();
-                reason = PublicEventInfo.EvaluateSuccess;
-                return eva;
-            }
-            catch
-            {
-                db.Entry(eva).State = System.Data.EntityState.Detached;
-                reason = PublicEventInfo.EvaluateFail;
+                var com = db.Comments.Find(eva.CommentNo);
+                try
+                {
+                    eva.UpdateTime = DateTime.Now;
+                    if (eva.Type == (byte)EvalType.good)
+                        com.Good += 1;
+                    else if (eva.Type == (byte)EvalType.best)
+                        com.Best += 1;
+                    db.Evaluations.Add(eva);
+                    db.SaveChanges();
+                    reason = PublicEventInfo.EvaluateSuccess;
+                    return eva;
+                }
+                catch
+                {
+                    db.Entry(eva).State = System.Data.EntityState.Detached;
+                    db.Entry(com).State = System.Data.EntityState.Detached;
+                    reason = PublicEventInfo.EvaluateFail;
+                }
             }
             return null;
         }
-        public bool UpdateComment(Comment com, out string reason)
+        public bool DeleteEvaluation(int no, out string reason)
         {
-            var oldcom=db.Comments.Find (com.No);
+            var eva=db.Evaluations.Include ("Comment").FirstOrDefault (e=>e.No==no);
+            if(eva==null)
+                reason = PublicEventInfo.EvaNotExists;
+            else
+            {
+                var com = eva.Comment;
+                if (eva.Type == (byte)EvalType.good)
+                    com.Good -= 1;
+                else if (eva.Type == (byte)EvalType.best)
+                    com.Best -= 1;
+                db.Evaluations.Remove(eva);
+                try
+                {
+                    db.SaveChanges();
+                    reason = PublicEventInfo.EvaDeleteSuccess;
+                    return true;
+                }
+                catch
+                {
+                    db.Entry(com).State = System.Data.EntityState.Detached;
+                    if (db.Evaluations.Local.Contains(eva))
+                        db.Entry(eva).State = System.Data.EntityState.Detached;
+                    reason = PublicEventInfo.EvaDeleteFail;
+                }
+            }
+            return false;
+
+        }
+    
+        public Comment UpdateComment(int no,Action<Comment> update, out string reason)
+        {
+            var oldcom=db.Comments.Find (no);
             if (oldcom==null)
                 reason = PublicEventInfo.CommentNotExists;
             else
             {
-                db.Entry(oldcom).State = System.Data.EntityState.Detached;
-                db.Comments.Attach(com);
-                db.Entry(com).State = System.Data.EntityState.Modified;
-                com.SetDate = DateTime.Now;
+                update(oldcom);
+                oldcom.SetDate = DateTime.Now;
                 try
                 {
                     db.SaveChanges();
                     reason = PublicEventInfo.CommentUpdateSuccess;
-                    return true;
+                    return oldcom;
                 }
                 catch (Exception ex)
                 {
-                    db.Entry(com).Reload();
+                    db.Entry(oldcom).Reload();
                     reason = PublicEventInfo.CommentUpdateFail;
                 }
             }
-            return false;
+            return null;
         }
         public PublicEvent GetEvent(int no)
         {
@@ -195,7 +226,7 @@ namespace Msg
                 }
             return false;
         }
-        public bool  UpdatePublicEvent(PublicEvent pe,out string reason,bool reloadCategory=false)
+        public bool UpdatePublicEvent(PublicEvent pe,out string reason,bool reloadCategory=false)
         {
             if (reloadCategory && pe.Enable && db.PublicEvents.Where(e => e.AuthorNo == pe.AuthorNo && e.Enable).Count() >= pe.Author.EventLimit)
             {
@@ -258,6 +289,11 @@ namespace Msg
     }
     public static partial class PublicEventInfo
     {
+        public const string EvaBestExceed = "亲,每个问题只能选一个最佳答案";
+        public const string EvaDeleteSuccess="亲,取消点评成功";
+        public const string EvaDeleteFail = "亲,取消点评失败";
+        public const string EvaNotExists = "亲,你要删除的评论不存在";
+        public const string EvaExists = "亲,你已经点评过了,如果想修改,请先删掉以前的点评";
         public const string EvaluateSuccess = "亲,点评成功!";
         public const string EvaluateFail = "亲,点评失败!";
         public const string EventsOutOfRange = "亲,你发布信息的数目有限,请隐藏或者删除一部分信息";

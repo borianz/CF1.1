@@ -73,7 +73,7 @@ function UIComponent(x, y, w, h) {
     this.paintFun = undefined;
     this.transFun = function (ctx) {
         ctx.translate(this.x, this.y);
-    }
+    };
     this.animation = undefined;
     this.clock = undefined;
     this.update = function () {

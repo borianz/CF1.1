@@ -161,7 +161,7 @@ function DisplayMsgWindow(title,msg)
     var mw=new modalWindow(iframeDiv);
     mw.display();
 }
-function DisplayConfirmWindow(title,msg,confirmFun)
+function DisplayConfirmWindow(title,msg,confirmFun,userContext)
 {
     var iframeDiv = document.getElementById('iframeDiv')
     if(iframeDiv.content)
@@ -172,7 +172,8 @@ function DisplayConfirmWindow(title,msg,confirmFun)
     document.getElementById('msgContent').innerHTML=msg;
     var c= document.getElementById('confirm');
     c.style.display = "inline";
-    c.onclick =function(){window.currentModalWindow.close();confirmFun();};
+    c.userContext=userContext;
+    c.onclick =function(){window.currentModalWindow.close();confirmFun(this.userContext);};
     document.getElementById('cancel').style.display="inline";
     document.getElementById('close').style.display="none";
     iframeDiv.content = content;

@@ -117,22 +117,6 @@ namespace Msg
         /// <summary>
         /// 没有元数据文档可用。
         /// </summary>
-        public ObjectSet<Comment> Comments
-        {
-            get
-            {
-                if ((_Comments == null))
-                {
-                    _Comments = base.CreateObjectSet<Comment>("Comments");
-                }
-                return _Comments;
-            }
-        }
-        private ObjectSet<Comment> _Comments;
-    
-        /// <summary>
-        /// 没有元数据文档可用。
-        /// </summary>
         public ObjectSet<Evalution> Evalutions
         {
             get
@@ -145,13 +129,31 @@ namespace Msg
             }
         }
         private ObjectSet<Evalution> _Evalutions;
+    
+        /// <summary>
+        /// 没有元数据文档可用。
+        /// </summary>
+        public ObjectSet<Comment> Comments
+        {
+            get
+            {
+                if ((_Comments == null))
+                {
+                    _Comments = base.CreateObjectSet<Comment>("Comments");
+                }
+                return _Comments;
+            }
+        }
+        private ObjectSet<Comment> _Comments;
 
         #endregion
+
+
     }
 
     #endregion
 
-  
+   
 
     
 }

@@ -72,6 +72,11 @@
         if (window.currentModalWindow && window.channelMng.isLogIn)
          window.currentModalWindow.close();
     };
+    PublicEventService.set_defaultFailedCallback(function (e) {
+        var error = e;
+        window.channelMng.endChannel();
+    });
+    
 </script>
 </body>
 </html>

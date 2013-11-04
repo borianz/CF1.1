@@ -12,6 +12,7 @@ using Msg;
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 [GenerateScriptType (typeof (PublicEventJS))]
 [GenerateScriptType (typeof (CommentJS))]
+[GenerateScriptType (typeof (EvaluationJS))]
 [System.Web.Script.Services.ScriptService]
 public class PublicEventService : System.Web.Services.WebService {
 
@@ -42,13 +43,10 @@ public class PublicEventService : System.Web.Services.WebService {
     {
         return UsingClient(client =>
         {
-            var jses = client.GetCommentJs(eveNo, skip,999);
-            CommentJS my=null;
-            if(client.Author!=null )
-                my=jses.FirstOrDefault (js=>js.authorNo==client.Author.No);
+            var jses = client.GetCommentJs(eveNo, skip, 999);
+            var  my =client.Author==null? null:jses.FirstOrDefault(c => c.authorNo == client.Author.No);
             return new OperationResult(true, new{comments=jses,mycomment=my});
         });
-
     }
     [WebMethod]
     public OperationResult AddComment(CommentJS js)
@@ -62,15 +60,15 @@ public class PublicEventService : System.Web.Services.WebService {
                 js.authorNo = client.Author.No;
                 var addCom = js.ToEntity();
                 if (client.Comments.Any(c => c.No == js.no))
-                    if (client.UpdateComment(addCom, out r))
-                        return new OperationResult(true, r, new { comments = client.GetCommentJs(js.eventNo, 0, 999), mycomment = addCom.ToEntityJS() });
-                    else
-                        return new OperationResult(false, r, null);
+                {
+                        var neoComment=client.UpdateComment(js.no, comment => { comment.Body = js.body; comment.Anonymous = js.anonymouse;}, out r);
+                        return new OperationResult(neoComment != null, r, neoComment.ToEntityJS());
+                }
                 else
                     if (client.AddComment(addCom, out r) == null)
                         return new OperationResult(false, r, null);
                     else
-                        return new OperationResult(true, r, new { comments = client.GetCommentJs(js.eventNo, 0, 999), mycomment = addCom.ToEntityJS() });
+                        return new OperationResult(true, r, addCom.ToEntityJS());
             });
     }
     [WebMethod]
@@ -83,7 +81,76 @@ public class PublicEventService : System.Web.Services.WebService {
         });
 
     }
+    [WebMethod]
+    public OperationResult AddEval(int commentNo,bool best)
+    {
+        return UsingClient(client =>
+        {
+            if (client.Author == null)
+                return new OperationResult(false, "亲,还没登陆啊!", null);
+            string r;
+            var comment = client.Comments.FirstOrDefault(c => c.No == commentNo);
+            if (comment == null) return new OperationResult(false, "你要支持的答案不见了?", null);
+            else if (comment.AuthorNo == client.Author.No)
+                return new OperationResult(false, "谦虚使人进步,请不要给自己点评", null);
+            else
+            {
+                var eva = client.AddEvaluation(new Evalution()
+                {
+                    Type = best ? ((byte)EvalType.best) : ((byte)EvalType.good),
+                    CommentNo = commentNo,
+                    AuthorNo = client.Author.No,
+                    EventNo=(int)comment.EventNo 
+                }, out r);
+                if (eva != null)
+                    return new OperationResult(true, r, new {evalType=eva.Type, gcount = eva.Comment.Good, bcount= eva.Comment.Best });
+                else
+                    return new OperationResult(false, r, null);
 
+            }
+        });
+    }
+    [WebMethod]
+    public OperationResult DeleteEval(int commentNo)
+    {
+        return UsingClient(client =>
+            {
+                string r;
+                if (client.Author == null)
+                    return new OperationResult(false, "亲,还没登陆啊!", null);
+                else
+                {
+                    var eva = client.Evaluations.FirstOrDefault(e => e.CommentNo == commentNo && e.AuthorNo == client.Author.No);
+                    if (eva == null)
+                        return new OperationResult(false, "亲,你只能取消你自己的点评", null);
+                    else
+                    {
+                        var com = eva.Comment;
+                        if (client.DeleteEvaluation(eva.No, out r))
+                            return new OperationResult(true, r, new { good = com.Good,best = com.Best });
+                        else
+                            return new OperationResult(false, r, null);
+                    }
+                }
+            });
+    }
+    [WebMethod]
+    public OperationResult GetEvals(int eventNo)
+    {
+      return   UsingClient(client =>
+        {
+            if (client.Author == null)
+                return new OperationResult(false, "", null);
+            else
+            {
+                var evals = client.Evaluations.Where(e => e.EventNo == eventNo && e.AuthorNo == client.Author.No);
+                return new OperationResult(true, evals.OrderByDescending(e => e.Type).Select(e => e.ToEntityJS()));
+            }
+        });
+
+
+
+    }
     private OperationResult UsingClient(Func<PublicEventClient, OperationResult> func)
     {
         using (var client = PublicEventClient.Get(User.Identity.Name))

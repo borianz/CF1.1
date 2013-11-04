@@ -578,6 +578,12 @@ Array.prototype.findByID = function (id) {
     return undefined;
 
 };
+Array.prototype.findByNo = function (no) {
+    for (var i = 0; i < this.length; i++)
+        if (this[i].no && this[i].no == no) return this[i];
+    return undefined;
+
+};
 function FindCtrl(ID, TID) {
     if (!TID) return curTask.cmdUIComponents.findByID(ID);
     else
