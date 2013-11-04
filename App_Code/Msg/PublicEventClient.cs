@@ -99,7 +99,7 @@ namespace Msg
                 Select(c => new {c.Good, c.Best,c.Anonymous, realname = c.Author.RealName, c.SetDate, c.Priority, c.No, c.Body, c.Color,ano=c.Author.No  }).ToArray();
             var coms = cs.Select(c => new CommentJS
             {
-                authorName = c.Anonymous ? "匿名用户" : c.realname,
+                authorName = c.realname,
                 body = c.Body,
                 color = c.Color,
                 no = c.No,
@@ -108,7 +108,8 @@ namespace Msg
                 deleted = false,
                 authorNo = c.ano,
                 good = c.Good,
-                best = c.Best
+                best = c.Best,
+                anonymouse=c.Anonymous
             }).ToDictionary(js => js.no);
             if(Author!=null ){
                 var evals = db.Evaluations.Where(e => e.AuthorNo == Author.No && e.EventNo == evetNo).Select (e=>new { e.CommentNo,e.Type});

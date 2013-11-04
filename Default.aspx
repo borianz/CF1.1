@@ -13,7 +13,7 @@
 </head>
 <body style="background-color:Black" >
 <form id="form1" style="display:none; " runat="server">
-<asp:ScriptManager ID="ScriptManager1" runat="server"  AllowCustomErrorsRedirect="false"  CompositeScript-ScriptMode="Release" ScriptMode="Release" EnableHistory="True" RoleService-LoadRoles="False">
+<asp:ScriptManager ID="ScriptManager1" runat="server"  AllowCustomErrorsRedirect="false"  CompositeScript-ScriptMode="Release" ScriptMode="Release" EnableHistory="True" RoleService-LoadRoles="True" ViewStateMode="Enabled">
 <Services >
 <asp:ServiceReference Path="~/LabService.asmx" />
 <asp:ServiceReference Path="~/RecruitService.asmx" />
@@ -72,11 +72,7 @@
         if (window.currentModalWindow && window.channelMng.isLogIn)
          window.currentModalWindow.close();
     };
-    PublicEventService.set_defaultFailedCallback(function (e) {
-        var error = e;
-        window.channelMng.endChannel();
-    });
     
-</script>
+  </script>
 </body>
 </html>

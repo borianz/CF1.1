@@ -37,21 +37,32 @@ function animate() {
     else
         setInterval(rePaint, 1000 / fps);
 }
+function onCanvasClick (e) {
+    e = mouseArg(e);
+    if (window.channelMng.busy())return;
+    window.boxInput.unbind();
+    window.ta.unbind();
+    if (window.curTask && window.curTask.isEnter) {
+        for (var i = window.curTask.cmdUIComponents.length - 1, item = window.curTask.cmdUIComponents[i]; item; item = window.curTask.cmdUIComponents[--i])
+            if (item.clicker&&item.clicker.fire(ctx, e)) return true;
+    }
+    else
+        for (var i = window.backUIComponents.length - 1, item = window.backUIComponents[i]; item; item = window.backUIComponents[--i])
+            if (item.clicker&&item.clicker.fire(ctx, e)) return true;
+    return false;
+}
+function onCanvasMouseUp(e)
+{
+    if (window.isPress) {
+        var ce = mouseArg(e);
+        window.activeDrager.isEnter = false;
+        window.activeDrager.onDragEnd(ce);
+        window.activeDrager = null;
+        window.isPress = false;
+    }
+}
 function Init() {
-    window.canvas.addEventListener('click',function(e) {
-        e = mouseArg(e);
-        if (window.channelMng.busy())return;
-        window.boxInput.unbind();
-        window.ta.unbind();
-        if (window.curTask && window.curTask.isEnter) {
-            for (var i = window.curTask.cmdUIComponents.length - 1, item = window.curTask.cmdUIComponents[i]; item; item = window.curTask.cmdUIComponents[--i])
-                if (item.clicker&&item.clicker.fire(ctx, e)) return true;
-        }
-        else
-            for (var i = window.backUIComponents.length - 1, item = window.backUIComponents[i]; item; item = window.backUIComponents[--i])
-                if (item.clicker&&item.clicker.fire(ctx, e)) return true;
-        return false;
-    } , true);
+    window.canvas.addEventListener('click',onCanvasClick , true);
     window.canvas.addEventListener('mousedown',function(e) {
         var ep = mouseArg(e);
         if (e.button == 0 && !window.isPress) {
@@ -78,15 +89,7 @@ function Init() {
         }
         return true;
     } , true);
-    window.canvas.addEventListener('mouseup',function(e) {
-        if (window.isPress) {
-            var ce = mouseArg(e);
-            window.activeDrager.isEnter = false;
-            window.activeDrager.onDragEnd(ce);
-            window.activeDrager = null;
-            window.isPress = false;
-        }
-    } , true);
+    window.canvas.addEventListener('mouseup',onCanvasMouseUp , true);
     window.canvas.addEventListener('mousemove',function (e) {
         var curMouse = mouseArg(e);
         if (window.channelMng.busy()) return;
@@ -283,7 +286,7 @@ function ChannelManager() {
     var tempender = new Array();
     this.addBeginHander = function (fun, id) {
         beginers.push({fire: fun, ID: id});
-    }
+    };
      this.logIn = function () {
         if (window.channelMng.isLogIn) {
             $get('logStatus').innerHTML = window.channelMng.userName + ',欢迎你!';
@@ -325,17 +328,17 @@ function ChannelManager() {
             clearInterval(intervalid);
             $get('logStatus').innerHTML = '请报告管理员<br/>' + e._message;
         }, intervalID);
-    }
+    };
     this.logOut=function()
     {
         Sys.Services.AuthenticationService.logout();
-    }
+    };
     this.loadRoles=function()
     {
         if(!this.loadedRoles)
             Sys.Services.RoleService.load(function(e){
                 window.channelMng.loadedRoles=true;});
-    }
+    };
     this.getProfile = function () {
         if (this.getProfiled)return;
         else
@@ -369,11 +372,11 @@ function ChannelManager() {
     };
     this.addTempEnder = function (fun) {
         tempender.push(fun);
-    }
+    };
     var doingID;
     this.busy = function () {
         return isChanneling;
-    }
+    };
     this.beginChannel = function (throwError, id) {
         if (throwError != false) throwError = true;
         if (isChanneling && throwError)
@@ -389,7 +392,7 @@ function ChannelManager() {
                     loading.visible = true;
             }
         }
-    }
+    };
     this.endChannel = function () {
         if (isChanneling) {
             isChanneling = false;
@@ -407,7 +410,7 @@ function ChannelManager() {
             if (loading)
                 loading.visible = false;
         }
-    }
+    };
     this._isLogIn = false;
     this.userName = '';
     this.password = '';
@@ -427,7 +430,7 @@ ChannelManager.prototype = {
         this.loadRoles();
        }
     }
-}
+};
 var channelMng = new ChannelManager();
 
 function adjustScale(iw,ih){
@@ -584,10 +587,3 @@ Array.prototype.findByNo = function (no) {
     return undefined;
 
 };
-function FindCtrl(ID, TID) {
-    if (!TID) return curTask.cmdUIComponents.findByID(ID);
-    else
-        for (var i = 0, t = tasks[i]; t; t = tasks[++i])
-            if (t.ID == TID)return t.cmdUIComponents.findByID(ID);
-    return undefined;
-}

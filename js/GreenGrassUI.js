@@ -1880,14 +1880,29 @@
         var cp=new Panel(0,40,500,780,'rgba(0,0,0,0)');
         var tb=new TextBlock(5,570,600,100,'20px "微软雅黑"','black','rgba(255,255,255,0.7)');
         var l=new Label(5,545,'我的评论:','22px "幼圆"');
-        var addbtn=new Button(620,635,100,40,'发表评论','25px "黑体"','rgba(172,223,235,0.7)',true);
+        var addbtn=new Button(610,635,70,40,'发表','25px "黑体"','rgba(172,223,235,0.7)');
+        var anobtn=new Button(690,635,70,40,'匿名','25px "黑体"','rgba(172,223,235,0.7)');
+        anobtn.visible=false;
         p.addCtrl(l,'mc');
         p.addCtrl(title,'title');
         p.addCtrl(cp,'cp');
         p.addCtrl(tb,'tb');
         p.addCtrl(addbtn,'addBtn');
+        p.addCtrl(anobtn,'anoBtn');
         p.commit=addbtn;
         p.tb=tb;
+        anobtn.clicker.onclick=function(){
+            var cp=this.p.p;
+            var event=cp.event;
+            if(!event || !cp.commit.comment) return;
+            var msg=cp.commit.comment.anonymouse? '要恢复显示您的大名?':'你要成为一个匿名回答者?';
+            DisplayConfirmWindow("确定修改?",msg,function(c){
+                    var js=c;
+                    js.body=p.tb.getText().replace(/\n{2,}/g,"\n");
+                    js.eventNo=event.no;
+                    updateComment(js,event,true);
+                },cp.commit.comment);
+        };
         addbtn.clicker.onclick=function()
         {
             var cp=this.p.p;
@@ -1910,6 +1925,7 @@
         title.x=(p.w-title.w)/2;
         p.title=title;
         p.cp=cp;
+        p.anoBtn=anobtn;
         p.changeComments=function(event,mycomment)
         {
             this.title.changeText(event.title);
@@ -1923,9 +1939,15 @@
                 this.commit.txt='修改';
                 this.commit.comment=mycomment;
                 this.tb.setText(mycomment.body);
+                this.anoBtn.visible=true;
+                if(mycomment.anonymouse)
+                    this.anoBtn.txt='实名';
+                else
+                    this.anoBtn.txt='匿名';
               }
             else{
                 this.commit.txt='发表';
+             this.anoBtn.visible=false;
          }
 };
         return p;
@@ -1933,7 +1955,7 @@
     function CommentExpand(y,comment)
     {
         var ep=new Expand(5,y,750,100,'rgba(0,0,0,0)',720,5,25,25,'black');
-        var nl=new Label(5,0,comment.authorName,'25px "微软雅黑"',comment.color);
+        var nl=new Label(5,0,comment.anonymouse?'匿名者':comment.authorName,'25px "微软雅黑"',comment.color);
        var dl=new Label(nl.w+25,2,comment.dateString +":",'22px "幼圆"');
        var body=new Article(5,30,750,150,'22px "幼圆"',false,'22px "幼圆"','black','black','rgba(0,0,0,0)');
        var good=new GoodBtn(comment.good);
@@ -2032,12 +2054,14 @@
         }, null, event);
 
     }
-    function updateComment(js,event)
+    function updateComment(js,event,reversAnonymous)
     {
      if (window.channelMng.isLogIn) {
             window.channelMng.beginChannel();
             js.body.trimEnd();
             js.eventNo=event.no;
+         if(reversAnonymous)
+            js.anonymouse=!js.anonymouse;
             PublicEventService.AddComment(js, function (e, u) {
                 if (e.ok) {
                     for (var i = 0; i < u.comments.length; i++)
