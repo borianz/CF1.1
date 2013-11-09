@@ -40,4 +40,17 @@ public partial class LogForm : System.Web.UI.Page
         else
             Label1.Text = Invalid;
     }
+    protected void Button3_Click(object sender, EventArgs e)
+    {
+        if (Membership.ValidateUser(txtUserName.Text, txtPassWord.Text))
+        {
+            FormsAuthentication.SetAuthCookie(txtUserName.Text, true);
+            if (Roles.IsUserInRole(txtUserName.Text, "MsgAccountAdmin"))
+                Response.Redirect("MsgAdmin/AccountRegister.aspx");
+            else
+                Label1.Text = NotInRole;
+        }
+        else
+            Label1.Text = Invalid;
+    }
 }

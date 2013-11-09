@@ -51,6 +51,7 @@
                 </td>
                 <td>
                     <asp:Button ID="Button2" runat="server" onclick="Button2_Click" Text="公共信息管理" />
+                    <asp:Button ID="Button3" runat="server"  Text="账号注册" onclick="Button3_Click" />
                 </td>
             </tr>
             <tr>

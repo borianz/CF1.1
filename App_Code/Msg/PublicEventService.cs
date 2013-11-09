@@ -59,17 +59,35 @@ public class PublicEventService : System.Web.Services.WebService {
                     return new OperationResult(false, "亲,你还没有评论限权", null);
                 js.authorNo = client.Author.No;
                 var addCom = js.ToEntity();
-                if (client.Comments.Any(c => c.No == js.no))
-                {
-                        var neoComment=client.UpdateComment(js.no, comment => { comment.Body = js.body; comment.Anonymous = js.anonymouse;}, out r);
-                        return new OperationResult(neoComment != null, r, neoComment.ToEntityJS());
-                }
+                if (client.Comments.Any(c =>c.EventNo==js.eventNo && c.AuthorNo==client.Author.No))
+                    return new OperationResult(false, PublicEventInfo.CommentExists, null);
                 else
                     if (client.AddComment(addCom, out r) == null)
                         return new OperationResult(false, r, null);
                     else
                         return new OperationResult(true, r, addCom.ToEntityJS());
             });
+    }
+    [WebMethod]
+    public OperationResult UpdateComment(CommentJS js)
+    {
+        return UsingClient(client =>
+        {
+            js.setDate = DateTime.Now;
+            string r;
+            if (client.Author == null)
+                return new OperationResult(false, "亲,你还没有评论限权", null);
+            js.authorNo = client.Author.No;
+            var addCom = js.ToEntity();
+            if (client.Comments.Any(c => c.No == js.no))
+            {
+                var neoComment = client.UpdateComment(js.no, comment => { comment.Body = js.body; comment.Anonymous = js.anonymouse; }, out r);
+                return new OperationResult(neoComment != null, r, neoComment.ToEntityJS());
+            }
+            else
+                return new OperationResult(false, PublicEventInfo.CommentNotExists, null);
+        });
+
     }
     [WebMethod]
     public OperationResult DeleteComment(int comNo)

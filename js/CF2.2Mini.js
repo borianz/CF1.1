@@ -12,7 +12,7 @@ var activeDrager;
 var scale;
 var BackSpotters = new Array();
 var curTask;
-var fps = 40;
+var fps = 30;
 var backUIComponents = new Array();
 var backStdClock = new standardClock('back');
 var cmdStdClock = new standardClock('cmd');
@@ -20,7 +20,6 @@ var tasks = new Array();
 var cvsTop = 0;
 var cvsLeft = 0;
 var backImg;
-var worker;
 function animate() {
     if (window.requestAnimationFrame) {
         rePaint();
@@ -51,7 +50,8 @@ function onCanvasClick (e) {
             if (item.clicker&&item.clicker.fire(ctx, e)) return true;
     return false;
 }
-function onCanvasMouseUp(e){
+function onCanvasMouseUp(e)
+{
     if (window.isPress) {
         var ce = mouseArg(e);
         window.activeDrager.isEnter = false;
@@ -182,6 +182,16 @@ function Init() {
             for (var i = window.backUIComponents.length - 1, item = window.backUIComponents[i]; item; item = window.backUIComponents[--i])
                 if (item.wheeler &&item.wheeler.fire(ctx, we)) return true;
     },false);
+    window.canvas.ondrop=function(e){
+        e.preventDefault();
+        var data= e.dataTransfer;
+        var file=data.files[0];
+        window.backImg.src=window.URL.createObjectURL(file);
+    };
+    window.canvas.ondragover=function(e){
+        e.preventDefault();
+        return false;
+    };
     window.backStdClock.start();
     window.cmdStdClock.start();
     animate();
@@ -220,7 +230,6 @@ function Task(ID) {
         if (curTask == this && !this.isEnter) {
             this.isEnter = true;
             this.clock = cmdStdClock;
-            workOnBackImg();
         }
     };
     this.sw = 0;
@@ -478,18 +487,6 @@ function mouseArg(e) {
     arg.ox = e.clientX + left;
     arg.oy = e.clientY + top;
     return arg;
-}
-function workOnBackImg() {
-    var data = window.ctx.getImageData(0, 0, window.canvas.width, window.canvas.height);
-    window.backImgData = data;
-    if (window.Worker) {
-        var w = new Worker('js/blurWorker.js');
-        window.worker = w;
-        w.onmessage = function (e) {
-            window.backImgData = e.data;
-        };
-        w.postMessage(data);
-    }
 }
 Array.prototype.addEventer = function (eventer) {
     if (this.indexOf(eventer) == -1) {

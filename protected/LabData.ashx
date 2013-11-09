@@ -22,18 +22,21 @@ public class LabData : IHttpHandler {
                     {
                         table = GetTable(exp);
                         Lab2Server.Instance.DataTables.AddOrUpdate(expNo, table, (eno, t) => table);
+                        response.Write("<!DOCTYPE html><head><html><title>" + Lab2Server.Instance.GetLocalExp(expNo).Name + "</title><meta charset='UTF-8\'><style type=\"text/css\">td{border-style:groove;border-width:2px}</style></head><body>");
+                        response.Write(table);
+                        response.Write("<p>请将数据复制粘贴到Excel或其他软件中进行处理</p>");
+                        response.Write("</body></html>");
                     }
                     else
                     {
-                        response.Write("<!DOCTYPE html><html><title>错误请求/title><meta charset='UTF-8\'><style type=\"text/css\">td{border-style:groove;border-width:2px}</style></head><body>");
+                        response.Write("<!DOCTYPE html><html><head><title>错误请求</title><meta charset='UTF-8'></head><body>");
                         response.Write("<p>亲,这个实验突然人间蒸发了</p>");
                         response.Write("</body></html>");
                     }
                 }
             else
             {
-              
-                response.Write("<!DOCTYPE html><html><title>" + Lab2Server.Instance.GetLocalExp(expNo).Name + "</title><meta charset='UTF-8\'><style type=\"text/css\">td{border-style:groove;border-width:2px}</style></head><body>");
+                response.Write("<!DOCTYPE html><head><html><title>" + Lab2Server.Instance.GetLocalExp(expNo).Name + "</title><meta charset='UTF-8\'><style type=\"text/css\">td{border-style:groove;border-width:2px}</style></head><body>");
                 response.Write(table);
                 response.Write("<p>请将数据复制粘贴到Excel或其他软件中进行处理</p>");
                 response.Write("</body></html>");
@@ -42,11 +45,12 @@ public class LabData : IHttpHandler {
         }
         else
         {
-            response.Write("<!DOCTYPE html><html><title>" + "过期的请求" + "</title><meta charset='UTF-8\'></head><body>");
+            response.Write("<!DOCTYPE html><html><head><title>" + "过期的请求" + "</title><meta charset='UTF-8'></head><body>");
             response.Write("<h2>请求已过期</h2><p>为了保证数据的安全性,请重新回到那个漂亮的网页,申请获得数据</p>");
             response.Write("<p>每次申请获得数据成功后,后只能查看一次,请按规则操作</p>");
             response.Write("</body></html>");
         }
+        response.End();
         
     }
     public bool IsReusable {

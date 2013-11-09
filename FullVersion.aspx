@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Default.aspx.cs" Inherits="GreenGrass" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="FullVersion.aspx.cs" Inherits="GreenGrass" %>
 <!DOCTYPE html>
 <html>
 <head id="Head1" runat="server">
@@ -61,12 +61,7 @@
     </div>
 </div>
 <script type="text/javascript">
-    try {
-        window.channelMng.isLogIn = Sys.Services.AuthenticationService.get_isLoggedIn();
-    }
-    catch (ex) {
-        DisplayLoadingWindow();
-    }
+    window.channelMng.isLogIn = Sys.Services.AuthenticationService.get_isLoggedIn();
     if (!window.channelMng.isLogIn) DisplayLoadingWindow();
     window.backImg = new Image();
     window.backImg.src = 'img/GreenGrass.jpg';
@@ -76,6 +71,8 @@
         fullScreen(canvas);
         InitBackUI(window.backImg);
         Init();
+        GetImgdataIndexedBD();
+        CloseLoadingWindow();
     };
     function fullScreen() {
         var docElm = document.documentElement;
@@ -90,13 +87,6 @@
            
         }
     }
-    PublicEventService.set_defaultFailedCallback(function (e) {
-        DisplayMsgWindow("糟糕,程序出错", "请联系我们!xlbaishushu@163.com<br/>" + e.message);
-    });
-    LabService.set_defaultFailedCallback(function (e) {
-        DisplayMsgWindow("糟糕,程序出错", "请联系我们!xlbaishushu@163.com<br/>" + e.message);
-    });
-    
   </script>
 </body>
 </html>

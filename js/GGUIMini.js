@@ -1,3 +1,6 @@
+/**
+ * Created by Administrator on 13-11-8.
+ */
 //backpart
 {
     function BtnLab() {
@@ -220,6 +223,7 @@
     function backGround(img) {
         var ui = new UIComponent();
         window.ctx.drawImage(img, 0, 0,canvas.width / scale ,canvas.height / scale );
+        window.backImg=img;
         ui.oriImgdata=window.ctx.getImageData(0,0,window.canvas.width,window.canvas.height);
         window.backImgData=ui.oriImgdata;
         ui.paint= function (ctx) {
@@ -227,220 +231,8 @@
         };
         return ui;
     }
-    function SlideAnimation(backUI){
-        var disImgdata=ctx.createImageData(canvas.width,canvas.height);
-            backUI.stage=0.1;
-            backUI.worker=new Worker('js/backPixelsWorker.js');
-            backUI.worker.p=backUI;
-            backUI.worker.onmessage=function(e)
-            {
-                var s= e.data.stage+0.1;
-                var disImgdata= e.data.disImgdata;
-                var backUI=this.p;
-                if(s <= 1)
-                {
-                    backUI.disImgdata=disImgdata;
-                    backUI.paint=function(ctx){ctx.putImageData(this.disImgdata,0,0);}
-                    backUI.stage=s;
-                    backUI.worker.postMessage({p:backUI.stage,mode:'slide'});
-                }
-                else
-                {
-                    backUI.oriImgdata=backUI.neoImgdata; backUI.disImgdata=undefined;
-                    backUI.paint=function(ctx){ctx.putImageData(this.oriImgdata,0,0);}
-                }
-            } ;
-            backUI.worker.postMessage({oriImgdata:backUI.oriImgdata,neoImgdata:backUI.neoImgdata,disImgdata:disImgdata,p:backUI.stage,mode:'slide'}) ;
-        }
-    function RandomAnimation(backUI){
-        var disImgdata=ctx.createImageData(canvas.width,canvas.height);
-        backUI.stage=0;
-        backUI.pause=4;
-        backUI.worker=new Worker('js/backPixelsWorker.js');
-        backUI.worker.p=backUI;
-        backUI.worker.onmessage=function(e)
-        {
-            var s= e.data.stage+0.1;
-            var disImgdata= e.data.disImgdata;
-            var backUI=this.p;
-            if(s <= 1)
-            {
-                backUI.disImgdata=disImgdata;
-                backUI.stage=s;
-            }
-            else
-            {
-                backUI.oriImgdata=backUI.neoImgdata; backUI.disImgdata=undefined;
-                backUI.update=function(){};
-                backUI.paint=function(ctx){ ctx.putImageData(this.oriImgdata,0,0);}
-
-            }
-        } ;
-        backUI.worker.postMessage({oriImgdata:backUI.oriImgdata,neoImgdata:backUI.neoImgdata,disImgdata:disImgdata,p:backUI.stage,mode:'random'}) ;
-        backUI.update=function()
-        {
-            if(this.pause>0)this.pause--
-            else
-            {
-                if(this.stage<=0.5)
-                    this.pause=4;
-                else
-                    this.pause=2;
-                this.worker.postMessage({p:this.stage,mode:'random'});
-            }
-        }
-        backUI.paint=function(ctx){
-            if(this.disImgdata)
-                ctx.putImageData(this.disImgdata,0,0);
-            else
-                ctx.putImageData(this.oriImgdata,0,0)   }
-    }
-    function SaveImgdata(imgdata,username){
-        if(window.indexedDB)
-        {
-            var request=indexedDB.open('backImgDB');
-            request.onsuccess=function(){
-                var db=request.result;
-                var tx=db.transaction('backData','readwrite');
-                var store=tx.objectStore("backData");
-                store.delete(username);
-                store.put({imgdata:imgdata,username:username});
-            }
-            request.onupgradeneeded=function(){
-                var db=request.result;
-                var store=db.createObjectStore("backData",{keyPath:'username'});
-                store.put({imgdata:imgdata,username:username});
-            }
-        }
-    }
-    function GetImgdataIndexedBD(){
-        if(window.indexedDB)
-        {
-            var request=indexedDB.open('backImgDB');
-            request.onsuccess=function(evt){
-                var db=evt.target.result;
-                var tx=db.transaction('backData','readonly');
-                var store=tx.objectStore("backData");
-                var r= store.get('borian');
-                r.onsuccess=function()
-                {
-                    if(r.result){
-                        var backUI=window.backUIComponents.findByID('backGround');
-                        backUI.neoImgdata= r.result.imgdata;
-                        SlideAnimation(backUI);
-                    }}
-            };
-            request.onupgradeneeded=function(evt){
-            var db=evt.target.result;
-            var store=db.createObjectStore("backData",{keyPath:'username'});
-        }
-        }
-    }
-    function ImgWorker(oriImgData,neoImgDate,workerURL,updateFun,endFun,animation,duration,isCmdClock){
-        this.oriImgdata=oriImgData;
-        this.neoImgdata=neoImgDate;
-        this.disImgdata=ctx.createImageData(canvas.width,canvas.height);
-        this.worker=new Worker(workerURL? workerURL:'js/backPixelsWorker.js');
-        this.worker.p=this;
-        this.onupdate=updateFun? updateFun:function(worker,disImgdata){return true;};
-        this.onend=endFun;
-        this.started=false;
-        this.animation=animation;
-        this.clock=new simpleClock(duration,1,linear,1,0,isCmdClock);
-        this.start=function()
-        {
-            if(!this.started)
-            {
-                this.started=true;
-                this.clock.restart();
-                this.worker.postMessage({oriImgdata:this.oriImgdata,neoImgdata:this.neoImgdata,
-                    disImgdata:this.disImgdata,p:0,mode:this.animation}) ;
-            }
-        };
-        this.restart=function(oriImgdate,neoImgdate,animation)
-        {
-            if(oriImgdate){
-                delete this.oriImgdata;
-                delete this.neoImgdata;
-                delete this.disImgdata;
-                this.oriImgdata=oriImgdate;
-                this.neoImgdata=neoImgdate;
-                this.disImgdata=window.ctx.createImageData(window.canvas.width,window.canvas.height);
-                if(animation)this.animation=animation;
-            }
-            this.started=true;
-            this.clock.restart();
-            this.worker.postMessage({oriImgdata:this.oriImgdata,neoImgdata:this.neoImgdata,disImgdata:this.disImgdata,p:0,mode:this.animation}) ;
-        };
-        this.worker.onmessage=function(e)
-        {
-            this.p.clock.update();
-            this.p.disImgdata= e.data.disImgdata;
-            if(this.p.clock.value<1){
-                if(this.p.onupdate(this.p, e.data))
-                    this.postMessage({p:this.p.clock.value,mode:this.p.animation});
-            }
-            else{
-                this.p.onend(this.p, e.data);
-                this.p.started=false;
-            }
-        };
-
-    }
-    function ColorAnimation(backUI){
-        var disImgdata=ctx.createImageData(canvas.width,canvas.height);
-        backUI.stage=0;
-        backUI.pause=9;
-        backUI.worker=new Worker('js/backPixelsWorker.js');
-        backUI.worker.p=backUI;
-        backUI.worker.onmessage=function(e)
-        {
-            var s= e.data.stage+0.1;
-            var disImgdata= e.data.disImgdata;
-            var backUI=this.p;
-            if(s <= 1)
-            {
-                backUI.disImgdata=disImgdata;
-                backUI.stage=s;
-            }
-            else
-            {
-                backUI.oriImgdata=backUI.neoImgdata;  backUI.disImgdata=undefined;
-                backUI.update=function(){};
-                backUI.paint=function(ctx){ ctx.putImageData(this.oriImgdata,0,0);}
-            }
-        } ;
-        backUI.worker.postMessage({oriImgdata:backUI.oriImgdata,neoImgdata:backUI.neoImgdata,disImgdata:disImgdata,p:backUI.stage,mode:'color'}) ;
-        backUI.update=function()
-        {
-            if(this.pause>0)this.pause--
-            else
-            {
-                if(this.stage<=0.5)
-                this.pause=9;
-                else
-                this.pause=4;
-                this.worker.postMessage({p:this.stage,mode:'color'});
-            }
-        }
-        backUI.paint=function(ctx){
-            if(this.disImgdata)
-                ctx.putImageData(this.disImgdata,0,0);
-            else
-                ctx.putImageData(this.oriImgdata,0,0)   }
-    }
     function InitBackUI(img) {
         adjustCanvas(canvas, ctx, img.naturalHeight, img.naturalWidth);
-        window.backImg.onload=function()
-        {
-            var backUI=window.backUIComponents.findByID('backGround');
-            ctx.drawImage(window.backImg,0,0,window.canvas.width/window.scale,window.canvas.height/window.scale);
-            backUI.neoImgdata=ctx.getImageData(0,0,window.canvas.width,window.canvas.height);
-            SaveImgdata(backUI.neoImgdata,'borian');
-            ctx.putImageData(backUI.oriImgdata,0,0);
-            var disImgdata=ctx.createImageData(window.canvas.width,window.canvas.height);
-            RandomAnimation(backUI);
-        } ;
         backUIComponents.addCtrl(new backGround(img),'backGround');
         var labBtn = new BtnLab();
         labBtn.clicker.onclick = function (e) {
@@ -465,7 +257,7 @@
             t.begin();
             for(var i= 0,item=window.curTask.cmdUIComponents[i];item;item=window.curTask.cmdUIComponents[++i])
                 if(item.clock) item.clock.start();
-        }
+        };
         var recBtn = new BtnRecruit();
         backUIComponents.addCtrl(msgBtn, 'msgBtn');
         backUIComponents.addCtrl(labBtn, 'labBtn');
@@ -493,7 +285,7 @@
         t.cmdUIComponents.addCtrl(lp,'left');
         t.cmdUIComponents.addCtrl(new LabLoading(),'loading');
         t.onbegin.subscribe(function () {
-        if (!window.curTask.loaded) {
+            if (!window.curTask.loaded) {
                 window.channelMng.beginChannel(true, 'labChannel');
                 LabService.GetIndex(function (data) {
                     var ets = data.ExpTypes;
@@ -540,8 +332,8 @@
                     window.channelMng.endChannel();
                 },function(e)
                 {
-                alert(e.message);
-                
+                    alert(e.message);
+
                 });
             }
         });
@@ -549,7 +341,7 @@
     }
     function LabRightPanel()
     {
-       var p=new Panel(491,15,690,730,'rgba(10,10,10,0.7)') ;
+        var p=new Panel(491,15,690,730,'rgba(10,10,10,0.7)') ;
         var sb=new UIComponent(50,565,80,80);
         sb.clicker=new clicker(sb);
         p.addCtrl(sb,'submitBtn');
@@ -573,9 +365,9 @@
         } ;
         p.addCtrl(eb,'exitBtn');
         p.transFun=function (ctx){
-         var sin=Math.sin(this.clock.value);
-         var cos=Math.cos(this.clock.value);
-         ctx.transform(cos,-sin,sin,cos,(1-cos)*this.w+this.x,this.y+sin*this.w);
+            var sin=Math.sin(this.clock.value);
+            var cos=Math.cos(this.clock.value);
+            ctx.transform(cos,-sin,sin,cos,(1-cos)*this.w+this.x,this.y+sin*this.w);
         } ;
         gb.paintFun=function(ctx){
             ctx.save();
@@ -846,24 +638,24 @@
             ctx.restore();
         };
         p.paintFun=function(ctx){
-        ctx.beginPath();
-        ctx.rect(0,0,this.w,this.h);
-        ctx.closePath();
-        ctx.clip();
-        ctx.fillStyle=this.bc;
-        ctx.fill();
-        ctx.fillStyle='white';
-        ctx.font='40px 幼圆';
-        ctx.textBaseline='hanging';
-        ctx.strokeStyle='white';
-        ctx.fillText('详细信息',280,7);
-        ctx.strokeText('详细信息',280,7);
-        ctx.beginPath();
-        ctx.moveTo(35,55);
-        ctx.lineTo(690,55);
-        ctx.closePath();
-        ctx.stroke();
-    };
+            ctx.beginPath();
+            ctx.rect(0,0,this.w,this.h);
+            ctx.closePath();
+            ctx.clip();
+            ctx.fillStyle=this.bc;
+            ctx.fill();
+            ctx.fillStyle='white';
+            ctx.font='40px 幼圆';
+            ctx.textBaseline='hanging';
+            ctx.strokeStyle='white';
+            ctx.fillText('详细信息',280,7);
+            ctx.strokeText('详细信息',280,7);
+            ctx.beginPath();
+            ctx.moveTo(35,55);
+            ctx.lineTo(690,55);
+            ctx.closePath();
+            ctx.stroke();
+        };
         sb.update=function ()
         {
             var sp=this.p.findByID('submitPanel');
@@ -876,7 +668,7 @@
                 this.enable = (c == 0);
             }
             else
-             this.enable = false;
+                this.enable = false;
         } ;
         sb.clicker.onclick = function () {
             if(!this.p.enable) return true;
@@ -898,14 +690,14 @@
             }
         };
         db.clicker.onclick = function () {
-         if(!this.p.enable) return true;
+            if(!this.p.enable) return true;
             var rp = window.curTask.cmdUIComponents.findByID('right');
             var sp = rp.findByID('readPanel');
             if (sp && sp.exp)
                 onTryDeletePV(sp.exp.ExpNo);
         };
         gb.clicker.onclick = function () {
-         if(!this.p.enable) return true;
+            if(!this.p.enable) return true;
             var rp = window.curTask.cmdUIComponents.findByID('right');
             var sp = rp.findByID('readPanel');
             if (sp && sp.exp)
@@ -926,8 +718,8 @@
         db.clicker=new clicker(db);
         p.addCtrl(db,'downBtn');
         p.transFun=function (ctx){
-           ctx.translate(this.x,this.y);
-           ctx.rotate(this.clock.value);
+            ctx.translate(this.x,this.y);
+            ctx.rotate(this.clock.value);
         } ;
         db.paintFun=function(ctx){
             ctx.save();
@@ -1000,14 +792,14 @@
         ub.paintFun=function(ctx){
             ctx.save();
             if(this.focus){
-            ctx.shadowBlur = 5;
-            ctx.shadowColor='gray';
-            ctx.shadowOffsetX=3;
-            ctx.shadowOffsetY=3;
-            ctx.fillStyle='white';
+                ctx.shadowBlur = 5;
+                ctx.shadowColor='gray';
+                ctx.shadowOffsetX=3;
+                ctx.shadowOffsetY=3;
+                ctx.fillStyle='white';
             }
             else
-              ctx.fillStyle='gray';
+                ctx.fillStyle='gray';
             ctx.beginPath();
             ctx.moveTo(81.6, 16.8);
             ctx.lineTo(68.5, 3.9);
@@ -1087,24 +879,24 @@
             ctx.restore();
         };
         p.paintFun=function(ctx){
-        ctx.beginPath();
-        ctx.rect(0,0,this.w,this.h);
-        ctx.closePath();
-        ctx.clip();
-        ctx.fillStyle=this.bc;
-        ctx.fill();
-        ctx.fillStyle='white';
-        ctx.font='40px 幼圆';
-        ctx.textBaseline='hanging';
-        ctx.strokeStyle='white';
-        ctx.fillText('目录',170,7);
-        ctx.strokeText('目录',170,7);
-        ctx.beginPath();
-        ctx.moveTo(15,55);
-        ctx.lineTo(410,55);
-        ctx.closePath();
-        ctx.stroke();
-    };
+            ctx.beginPath();
+            ctx.rect(0,0,this.w,this.h);
+            ctx.closePath();
+            ctx.clip();
+            ctx.fillStyle=this.bc;
+            ctx.fill();
+            ctx.fillStyle='white';
+            ctx.font='40px 幼圆';
+            ctx.textBaseline='hanging';
+            ctx.strokeStyle='white';
+            ctx.fillText('目录',170,7);
+            ctx.strokeText('目录',170,7);
+            ctx.beginPath();
+            ctx.moveTo(15,55);
+            ctx.lineTo(410,55);
+            ctx.closePath();
+            ctx.stroke();
+        };
         p.maxh= p.h;
         return p;
     }
@@ -1150,15 +942,15 @@
                 h += 47;
                 drop.addCtrl(btn, exps[j].ExpNo);
                 btn.exp = exps[j];
-              btn.clicker.onclick = function () {
-                  var rightPanel=window.curTask.cmdUIComponents.findByID('right');
-                  var sp=rightPanel.findByID('submitPanel');
-                  if(sp && sp.exp.ExpNo==this.p.exp.ExpNo) return;
-                  rightPanel.removeCtrl('submitPanel');
-                  rightPanel.removeCtrl('readPanel');
-                  var panel = new LabSubmitPanel(this.p.exp);
-                  rightPanel.addCtrl(panel,'submitPanel');
-              } ;
+                btn.clicker.onclick = function () {
+                    var rightPanel=window.curTask.cmdUIComponents.findByID('right');
+                    var sp=rightPanel.findByID('submitPanel');
+                    if(sp && sp.exp.ExpNo==this.p.exp.ExpNo) return;
+                    rightPanel.removeCtrl('submitPanel');
+                    rightPanel.removeCtrl('readPanel');
+                    var panel = new LabSubmitPanel(this.p.exp);
+                    rightPanel.addCtrl(panel,'submitPanel');
+                } ;
             }
             if (drop.controls.length > 0)
                 panel.addCtrl(drop, ets[i].ExpTypeNo);
@@ -1166,8 +958,8 @@
         panel.clock=new simpleClock(0.3,1,linear,-1,1,true,false);
         panel.transFun=function(ctx)
         {
-             ctx.translate(this.x,this.y);
-             ctx.transform((1-this.clock.value),0,0,(1-this.clock.value),this.clock.value*this.w/2,this.clock.value*this.h/2);
+            ctx.translate(this.x,this.y);
+            ctx.transform((1-this.clock.value),0,0,(1-this.clock.value),this.clock.value*this.w/2,this.clock.value*this.h/2);
         } ;
         return panel;
     }
@@ -1184,7 +976,7 @@
                 drop.addCtrl(btn, exps[j].ExpNo);
                 btn.exp = exps[j];
                 btn.clicker.onclick = function () {
-                   getExpDetail(this.p.exp);
+                    getExpDetail(this.p.exp);
                 }
             }
             if (drop.controls.length > 0)
@@ -1276,11 +1068,11 @@
                 var state=e.data;
                 window.channelMng.endChannel();
             },null, exp);
-       }
+        }
         else{
             DisplayLogWindow();
-      }
-}
+        }
+    }
     function onTryReadData(expNo) {
         window.channelMng.isLogIn = Sys.Services.AuthenticationService.get_isLoggedIn();
         if (!window.channelMng.isLogIn)
@@ -1288,8 +1080,8 @@
         else {
             window.channelMng.beginChannel(true, 'readData');
             LabService.GetExpData(expNo,function (e) {
-            DisplayMsgWindow(e[0], e[1]);
-            window.channelMng.endChannel();
+                DisplayMsgWindow(e[0], e[1]);
+                window.channelMng.endChannel();
             });
         }
     }
@@ -1702,6 +1494,46 @@
         };
         return p;
     }
+    function viewEvent(event)
+    {
+        var dp=window.curTask.mainPanel.detailPanel;
+        window.curTask.mainPanel.commentsPanel.clock.reverse();
+        if(event)
+        {
+            dp.visible=true;
+            var tl=dp.findByID('title');
+            tl.changeText(event.title);
+            tl.x= (dp.w-tl.w)/2;
+            var al=dp.findByID('author');
+            al.changeText(event.authorName);
+            if(event.authorName=='展开评论'){
+                al.clicker.onclick=function(){window.curTask.mainPanel.commentBtn.clicker.onclick(); };
+                al.fc='rgba(172,223,235,0.9)';
+            }
+            else{
+                al.clicker.onclick=function(){};
+                al.fc='white';
+            }
+            al.x=(dp.w-al.w)/2;
+            dp.findByID('body').setText(event.text);
+            window.curTask.mainPanel.findByID('commentBtn').enable=true;
+        }
+        else
+        {
+            dp.findByID('title').changeText('');
+            dp.findByID('author').changeText('');
+            dp.findByID('body').setText('');
+            window.curTask.mainPanel.findByID('commentBtn').enable=false;
+        }
+        dp.event=event;
+    }
+    function changeBack(img)
+    {
+        if(img.width=0)
+            img=window.backImg;
+        window.ctx.drawImage(img,0,0,window.canvas.width/window.scale,window.canvas.height/window.scale);
+        window.backImgData=window.ctx.getImageData(0,0,window.canvas.width,window.canvas.height);
+    }
     function PublicEventsIndex(cats)
     {
         for(var j= 0,cat=cats[j];cat;cat=cats[++j]){
@@ -1719,6 +1551,45 @@
         }
         window.curTask.loaded=true;
         window.channelMng.endChannel();
+    }
+    function viewEventDetail()
+    {
+        if(this.p.event.title==null){
+            window.channelMng.beginChannel(true,'eventDetail');
+            PublicEventService.GetEvent(this.p.event.no,
+                function(e,u){
+                    if(e.ok){
+                        u.event = e.data;
+                        viewEvent(e.data);
+                        if(e.data.imgUrl)
+                        {
+                            var img=document.createElement('img');
+                            img.style.display='none';
+                            img.setAttribute('src', e.data.imgUrl);
+                            u.img=img;
+                            img.onload=function()
+                            {
+                                changeBack(this);
+                            }
+                        }
+                        else
+                            changeBack(window.backImg);
+                    }
+                    else DisplayMsgWindow("亲,出错了", e.msg);
+                    window.channelMng.endChannel();
+                },null,this.p);
+        }
+        else{
+            var dp=window.curTask.mainPanel.detailPanel;
+            if(dp.event!==this.p.event){
+                viewEvent(this.p.event);
+                if(this.p.img)
+                    changeBack(this.p.img);
+                else
+                    changeBack(window.backImg);
+            }
+        }
+        return true;
     }
     function MusicBtn()
     {
@@ -1841,8 +1712,8 @@
         addbtn.clicker.onclick=function()
         {
             if(!window.channelMng.isLogIn){
-                DisplayLogWindow();
-                return true;
+              DisplayLogWindow();
+              return true;
             }
             var cp=this.p.p;
             var event=cp.event;
@@ -2141,112 +2012,6 @@
         return btn;
     }
 
-    //不要覆盖
-    function viewEvent(event)
-    {
-        var dp=window.curTask.mainPanel.detailPanel;
-        window.curTask.mainPanel.commentsPanel.clock.reverse();
-        if(event)
-        {
-            dp.visible=true;
-            var tl=dp.findByID('title');
-            tl.changeText(event.title);
-            tl.x= (dp.w-tl.w)/2;
-            var al=dp.findByID('author');
-            al.changeText(event.authorName);
-            if(event.authorName=='展开评论'){
-                al.clicker.onclick=function(){window.curTask.mainPanel.commentBtn.clicker.onclick(); };
-                al.fc='rgba(172,223,235,0.9)';
-            }
-            else{
-                al.clicker.onclick=function(){};
-                al.fc='white';
-            }
-            al.x=(dp.w-al.w)/2;
-            dp.findByID('body').setText(event.text);
-            window.curTask.mainPanel.findByID('commentBtn').enable=true;
-        }
-        else
-        {
-            var tl=dp.findByID('title');
-            tl.changeText('');
-            var al=dp.findByID('author');
-            al.changeText('');
-            dp.findByID('body').setText('');
-            window.curTask.mainPanel.findByID('commentBtn').enable=false;
-        }
-        dp.event=event;
-    }
-    //不要覆盖
-    function changeBack(img)
-    {
-        if(img.width=0)
-            img=window.backImg;
-        if(window.Worker)
-        {
-            window.ctx.drawImage(img,0,0,window.canvas.width/window.scale,window.canvas.height/window.scale);
-            var neoImgdate=window.ctx.getImageData(0,0,window.canvas.width,window.canvas.height);
-            var oriImgdate=window.ctx.getImageData(0,0,window.canvas.width,window.canvas.height);
-            window.ctx.putImageData(window.backImgData,0,0);
-            if( window.curTask.imgWorker)
-                window.curTask.imgWorker.restart(oriImgdate,neoImgdate);
-            else
-            {
-                var imgworker=new ImgWorker(oriImgdate,neoImgdate,null,function(iw){
-                    window.backImgData=iw.disImgdata;
-                    return true;
-                },function(iw){
-                    window.backImgData=iw.neoImgdata;
-                },'color',1,true);
-                window.curTask.imgWorker=imgworker;
-                imgworker.start();
-            }
-        }
-        else{
-            window.ctx.drawImage(img,0,0,window.canvas.width/window.scale,window.canvas.height/window.scale);
-            window.backImgData=window.ctx.getImageData(0,0,window.canvas.width,window.canvas.height);
-        }
-
-    }
-    //不要覆盖
-    function viewEventDetail(){
-        if(this.p.event.title==null){
-            window.channelMng.beginChannel(true,'eventDetail');
-            PublicEventService.GetEvent(this.p.event.no,
-                function(e,u){
-                    if(e.ok){
-                        u.event = e.data;
-                        viewEvent(e.data);
-                        if(e.data.imgUrl)
-                        {
-                            var img=document.createElement('img');
-                            img.style.display='none';
-                            img.setAttribute('src', e.data.imgUrl);
-                            u.img=img;
-                            img.onload=function()
-                            {
-                                changeBack(this);
-                            }
-                        }
-                        else
-                            changeBack(window.backImg);
-                    }
-                    else DisplayMsgWindow("亲,出错了", e.msg);
-                    window.channelMng.endChannel();
-                },null,this.p);
-        }
-        else{
-            var dp=window.curTask.mainPanel.detailPanel;
-            if(dp.event!==this.p.event){
-                viewEvent(this.p.event);
-                if(this.p.img)
-                    changeBack(this.p.img);
-                else
-                    changeBack(window.backImg);
-            }
-        }
-        return true;
-    }
 }
 //tools
 {
@@ -2275,7 +2040,7 @@
         get:function()
         {
             if(this.important.length>0)
-              return this.important.shift();
+                return this.important.shift();
             else{
                 if(this.interval==0)
                     this.load();

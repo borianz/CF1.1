@@ -20,6 +20,14 @@
             width: 74px;
         }
     </style>
+      <script type="text/javascript">
+          function Clear() {
+              document.getElementById('txtAuthor').value = '';
+              document.getElementById('textInput').value = '';
+              document.getElementById('txtMTitle').value = '';
+              document.getElementById('txtTitle').value = '';
+          }
+    </script>
 </head>
 <body>
     <form id="form1" runat="server">
@@ -43,7 +51,7 @@
                         AutoPostBack="True" 
                         onselectedindexchanged="EventSelect_SelectedIndexChanged">
                     </asp:DropDownList>
-                    <input onclick="clear()" type="button" value="新建" /></td>
+                    <input onclick="Clear();" type="button" value="新建" /></td>
             </tr>
             <tr>
                 <td class="style2">
@@ -129,16 +137,9 @@
                     &nbsp;</td>
             </tr>
         </table>
-    
+   
     </div>
     </form>
-    <script type="text/javascript">
-        function clear() {
-            document.getElementById('txtAuthor').value = '';
-            document.getElementById('textInput').value = '';
-            document.getElementById('txtMTitle').value = '';
-            document.getElementById('txtTitle').value = '';
-        }
-    </script>
+   
 </body>
 </html>

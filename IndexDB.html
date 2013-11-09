@@ -3,30 +3,99 @@
 <head>
     <meta charset="utf-8">
     <title>indexDB</title>
-    <script src='js/IndexDB.js'></script>
+    <script src='js/ImgDB.js'></script>
 </head>
 <body>
 <input type="button" onclick="init();" value="indexedDB">
+<canvas id="canvas" width="800" height="600"></canvas>
 <script>
+    var img=new Image();
     function book(name,authoer,no)
     {
         return {author:authoer,name:name,no:no};
     }
+    var src='img/GreenGrass.jpg';
     function init(){
-var books=[book('看见','jake',1),book('幸福了吗','jake',2),book('少有人走的路','mike',3)];
+       /* var books=[book('看见','jake',1),book('幸福了吗','jake',2),book('少有人走的路','mike',3)];
         var newbooks=[book('看见2','jake',4),book('幸福了吗2','jake',5),book('少有人走的路2','mike',6)];
         var ixs=[storeIndex('ix_author','author',false,true),storeIndex('ix_name','name',true,false)];
-        var bookDB= dbRequest('trial').whenOpen(function(db){
+       var bookDB= dbRequest('trial').whenOpen(function(db){
           //  db.deleteStore('books').
         }).whenConstruct(function(db){
               db.createStore('books','no',true,ixs,books.concat(newbooks));
           }).readStore('books',function(store){
              store.getObject(3,function(e){alert(this.result.name);});
-        });
-
-
-
+        });*/
+        var canvas=document.getElementById('canvas');
+        var ctx=canvas.getContext('2d');
+        var imgBb;
+        var dbjs=document.createElement('script');
+        dbjs.src='js/IndexDB.js';
+        document.body.appendChild(dbjs);
+        dbjs.onload=function(){
+            readBackImg(src,img);
+        };
     }
+   /* var imgDb;
+    function readBackImg(src,img){
+        imgDb=dbRequest('Images').whenConstruct(function(db){
+            db.createStore('backImg','src',true);
+            img.src=src;
+            img.data={src:src,data:undefined};
+            img.onload=function(){
+                var canvas=document.getElementById('canvas');
+                var ctx=canvas.getContext('2d');
+                ctx.drawImage(this,0,0,canvas.width,canvas.height);
+                var dataurl=canvas.toDataURL('image/jpg',1);
+                this.data.data=dataurl;
+                imgDb.db.writeTransaction('backImg').store.putObjects([this.data],function(e,u){
+                    window.localStorage.backImg=u;},function(e){
+                    window.localStorage.backImg=undefined;},this.data.src);
+                this.data=undefined;
+            };
+        }).readStore('backImg',function(store){
+            store.getObject(src,function(e){
+                var img2=new Image();
+                img2.src= e.data;
+                img2.onload=function(){
+                    var canvas=document.getElementById('canvas');
+                    var ctx=canvas.getContext('2d');
+                    ctx.drawImage(this,0,0,canvas.width,canvas.height);
+                }
+            },function(e,u)
+            {
+                img.src=u;
+                img.data={src:u,data:undefined};
+                img.onload=function(){
+                    var canvas=document.getElementById('canvas');
+                    var ctx=canvas.getContext('2d');
+                    ctx.drawImage(this,0,0,canvas.width,canvas.height);
+                    var dataurl=canvas.toDataURL('image/jpg',1);
+                    this.data.data=dataurl;
+                    imgDb.db.writeTransaction('backImg').store.putObjects([this.data],
+                            function(e,u){
+                        window.localStorage.backImg=u;},
+                            function(e){
+                        window.localStorage.backImg=undefined;},this.data.src);
+                    this.data=undefined;
+                };
+            },src)});
+    }
+    function saveBackImg(data){
+        if(window.localStorage.backImg!=data.src)
+        var imgDb=dbRequest('Images').whenConstruct(function(db){
+            db.createStore('backImg','src',true);
+        }).whenOpen(function(db){
+                  db.writeTransaction('backImg').store.putObjects([data],
+                          function(e,u){
+                      window.localStorage.backImg=u;
+                  },function(){
+                      window.localStorage.backImg=undefined;
+                  },data.src)});
+    }
+
+*/
+
 
 </script>
 </body>

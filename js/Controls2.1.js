@@ -69,24 +69,21 @@ function UIComponent(x, y, w, h) {
     var borian = 'borian@vip.qq.com';
     this.contactMe = function () {
         alert(borian);
-    }
+    };
     this.paintFun = undefined;
     this.transFun = function (ctx) {
-        ctx.translate(this.x, this.y);
+        ctx.translate(this._x, this._y);
     };
-    this.animation = undefined;
     this.clock = undefined;
     this.update = function () {
         if (!this.enable) return;
-        if (this.animation)
-            this.animation.update();
-        else if (this.clock)
+        if (this.clock)
             this.clock.update();
     };
     this.enable = true;
-    this.visible = true;
+    this._visible = true;
     this.paint = function (ctx) {
-        if (!this.visible)   return;
+        if (!this._visible)   return;
         ctx.save();
         if (!this.enable)
             ctx.globalAlpha = 0.4;
@@ -103,6 +100,7 @@ function UIComponent(x, y, w, h) {
     this.isBackUI = null;
     this.onchangeY = undefined;
     this.onchangeX = undefined;
+    this.onchangeVisible=undefined;
     this.dispose = function () {
         if (this.clicker)
             this.clicker.dispose();
@@ -116,7 +114,7 @@ function UIComponent(x, y, w, h) {
         if (this.clock)
             this.clock = null;
         delete  this;
-    }
+    };
     return this;
 }
 function Article(x, y, w, h, font, flCenter, flfont, fcolor, flcolor, backColor,lineSpace) {
@@ -131,7 +129,7 @@ function Article(x, y, w, h, font, flCenter, flfont, fcolor, flcolor, backColor,
                 this.p.moveDown();
             this.p.mouseY = e.cy;
         }
-    }
+    };
     this.lines = new Array();
     this.curline = 0;
     this.bc = backColor ? backColor : 'rgba(200,200,200,0.7)';
@@ -240,7 +238,7 @@ function Article(x, y, w, h, font, flCenter, flfont, fcolor, flcolor, backColor,
             this.fh =parseInt(parseFloat(this.font.match(/\b\d+px/i)[0].replace('px', ''))*ls);
             this.flh = parseInt(parseFloat(this.flf.match(/\b\d+px/i)[0].replace('px', ''))*ls);
         }
-    }
+    };
     return this;
 }
 function Label(x, y, txt, font, fontColor, backColor) {
@@ -262,14 +260,14 @@ function Label(x, y, txt, font, fontColor, backColor) {
         ctx.fillRect(0, 0, this.w, this.h);
         ctx.fillStyle = this.fc;
         ctx.fillText(this.txt, 0, 0);
-    }
+    };
     this.changeText = function (txt) {
         this.txt = txt;
         ctx.save();
         ctx.font=this.font;
         this.w = window.ctx.measureText(this.txt).width;
         ctx.restore();
-    }
+    };
     return this;
 }
 function Button(x, y, w, h, txt, font, backColor, isCmdClock, frameColor, textColor, useSpotter) {
@@ -278,7 +276,7 @@ function Button(x, y, w, h, txt, font, backColor, isCmdClock, frameColor, textCo
         this.spotter = new spotter(this);
         this.spotter.onmouseIn = function () {
             this.p.clock.restart();
-        }
+        };
         this.spotter.onmouseOut = function () {
             this.p.clock.reset();
             this.p.clock.stop();
@@ -320,7 +318,7 @@ function Button(x, y, w, h, txt, font, backColor, isCmdClock, frameColor, textCo
         ctx.strokeStyle = this.fc;
         ctx.stroke();
         ctx.fillText(this.txt, w > this.w ? 0 : (this.w - w) / 2, (this.h - this.fh) / 2, this.w);
-    }
+    };
     this.clock.stop();
     return this;
 }
@@ -356,7 +354,7 @@ function Switch(x, y, w, h, r, ltxt, rtxt, font, txtColor, backColor, upColor, f
             p.left = false;
             p.vtxt = p.rtxt;
         }
-    }
+    };
     this.paintFun = function (ctx) {
         ctx.font = this.font;
         ctx.textBaseline = 'hanging';
@@ -383,7 +381,7 @@ function Switch(x, y, w, h, r, ltxt, rtxt, font, txtColor, backColor, upColor, f
         ctx.shadowOffsetY = 0;
         ctx.stroke();
         ctx.fill();
-    }
+    };
     return this;
 }
 function Panel(x, y, h, w, backColor) {
@@ -411,12 +409,12 @@ function Panel(x, y, h, w, backColor) {
             registerEvent(ctrl, false, curTask);
         if (ctrl.y + ctrl.h > this.maxh)this.maxh = ctrl.y + ctrl.h + 10;
         //写个panel一直bug....联系我吧 borian@vip.qq.com
-    }
+    };
     this.findByID = function (id) {
         for (var i = 0; i < this.controls.length; i++)
             if (this.controls[i].id == id) return this.controls[i];
         return null;
-    }
+    };
     this.removeCtrl = function (id) {
         var index = -1;
         var ctrl;
@@ -434,7 +432,7 @@ function Panel(x, y, h, w, backColor) {
             ctrl.p = null;
             ctrl.dispose();
         }
-    }
+    };
     this.clearCtrls = function () {
         for (var i = 0; i < this.controls.length; i++) {
             removeEvent(this.controls[i]);
@@ -442,7 +440,7 @@ function Panel(x, y, h, w, backColor) {
         }
         this.controls = new Array();
         this.maxh = 0;
-    }
+    };
     this.paintFun = function (ctx) {
         ctx.beginPath();
         ctx.rect(0, 0, this.w + 3, this.h);
@@ -450,7 +448,7 @@ function Panel(x, y, h, w, backColor) {
         ctx.clip();
         ctx.fillStyle = this.bc;
         ctx.fillRect(0, 0, this.w, this.h);
-    }
+    };
     this.paint = function (ctx) {
         if (!this.visible) return;
         ctx.save();
@@ -468,7 +466,7 @@ function Panel(x, y, h, w, backColor) {
         for (var i = 0; i < this.controls.length; i++)
             this.controls[i].y += dy;
         this.baseLine += dy;
-    }
+    };
     this.mouseY = 0;
     this.drager.onDragEnd = function (e) {
         this.p.mouseY = 0;
@@ -491,8 +489,7 @@ function Panel(x, y, h, w, backColor) {
                 this.p.baseLine += d;
             }
         }
-
-    }
+    };
     this.drager.onDragMove = function (e) {
         if (this.p.maxh <= this.p.h)return;
         var dy = e.cy - this.p.mouseY;
@@ -500,7 +497,7 @@ function Panel(x, y, h, w, backColor) {
         else if (dy < -20) dy = -20;
         this.p.moveBaseline(dy);
         this.p.mouseY = e.cy;
-    }
+    };
     this.clicker.fire = function (ctx, e) {
         this.pathFun(ctx);
         if (ctx.isPointInPath(e.ox, e.oy)) {
@@ -511,7 +508,7 @@ function Panel(x, y, h, w, backColor) {
         }
         else
             return false;
-    }
+    };
     this.clicker.onclick = function (e) {
         return true;
     }
@@ -525,7 +522,7 @@ function Panel(x, y, h, w, backColor) {
             return true;
         }
         return false;
-    }
+    };
     this.wheeler.onwheelUp = function () {
         if (this.p.baseLine < 0) {
             if(this.p.baseLine<-35)
@@ -534,15 +531,14 @@ function Panel(x, y, h, w, backColor) {
             this.p.moveBaseline(-this.p.baseLine);
             return true;
         }
-
         return false;
-    }
+    };
     this.update = function () {
         if (this.clock)
             this.clock.update();
         for (var i = 0, item = this.controls[i]; item; item = this.controls[++i])
             item.update();
-    }
+    };
     return this;
 }
 function Expand(x, y,w,h, backColor,ix,iy,iw,ih,strokeColor) {
@@ -671,7 +667,7 @@ function Drop(x, y, w, headerText, headerFont, headerBack, headerColor, backColo
             ctx.rect(this.p.absX, this.p.absY, this.p.w, this.p.offsetY);
         ctx.closePath();
 
-    }
+    };
     this.clicker.onclick = function (e) {
         var p = this.p;
         if (p.expanded)
@@ -689,9 +685,8 @@ function Drop(x, y, w, headerText, headerFont, headerBack, headerColor, backColo
             p.expanded = true;
             p.clock.restart();
         }
-
         return true;
-    }
+    };
     this.addCtrl = function (ctrl, id) {
         this.controls.push(ctrl);
         ctrl.p = this;
@@ -708,7 +703,6 @@ function Drop(x, y, w, headerText, headerFont, headerBack, headerColor, backColo
             registerEvent(ctrl, false, curTask);
         }
         this.h = ctrl.y + ctrl.h + 10;
-
     };
     this.removeCtrl = function (id) {
         var index = -1;
@@ -730,14 +724,14 @@ function Drop(x, y, w, headerText, headerFont, headerBack, headerColor, backColo
             // ctrl.dispose();
         }
         return ctrl;
-    }
+    };
     this.clearCtrls = function () {
         for (var i = 0, item = this.controls[i]; item; item = this.controls[++i]) {
             removeEvent(item);
         }
         this.controls = new Array();
         this.h = this.offsetY;
-    }
+    };
     this.paintFun = function (ctx) {
         ctx.fillStyle = this.hb;
         ctx.fillRect(0, 0, this.w, this.offsetY);
@@ -771,7 +765,7 @@ function Drop(x, y, w, headerText, headerFont, headerBack, headerColor, backColo
         }
         for (var i = 0, item = this.controls[i]; item; item = this.controls[++i])
             item.update();
-    }
+    };
     this.controls = new Array();
     return this;
 }
@@ -816,13 +810,13 @@ function TextBox(x, y, w, font, fontcolor, backcolor, validateType, wtrmkColor, 
         else
             this.vtxt = null;
         return false;
-    }
+    };
     this.update = function () {
         if (this.input) {
             this.txt = this.input.value;
             this.input.resetPosition(this);
         }
-    }
+    };
     this.paintFun = function (ctx) {
         if (this.input && this.input.isShow()) return;
         ctx.textBaseline = 'hanging';
@@ -842,8 +836,7 @@ function TextBox(x, y, w, font, fontcolor, backcolor, validateType, wtrmkColor, 
             ctx.fillText(this.vtxt, 0, 0, this.w);
         }
         ctx.globalAlpha = 1;
-
-    }
+    };
     this.clicker = new clicker(this);
     this.clicker.fire = function (ctx, e) {
         if (!this.p.enable || !this.enable)
@@ -857,10 +850,7 @@ function TextBox(x, y, w, font, fontcolor, backcolor, validateType, wtrmkColor, 
             return  true
         }
         else
-            return false;
-
-    }
-
+            return false;}
 }
 function Select(x, y, w, headerFont, items, backColor, headerColor, wtrmkTxt, frameColr) {
     this._x = x;
@@ -874,11 +864,11 @@ function Select(x, y, w, headerFont, items, backColor, headerColor, wtrmkTxt, fr
     this.fc = frameColr ? frameColr : 'gray';
     this.selectedIndex = -1;
     this.onSelected = function (num) {
-    }
+    };
     this.items = items ? items : new Array();
     this.selectedItem = function () {
         return this.selectedIndex == -1 ? null : this.items[this.selectedIndex];
-    }
+    };
     this.expanded = false;
     this.clicker = new clicker(this);
     this.paintFun = function (ctx) {
@@ -896,7 +886,7 @@ function Select(x, y, w, headerFont, items, backColor, headerColor, wtrmkTxt, fr
         pointTrianglePath(d * 2, d * 2, ctx, this.expanded);
         ctx.fillStyle = this.fc;
         ctx.fill();
-    }
+    };
     this.concealSheet = function () {
         var array;
         if (!this.p)
@@ -909,7 +899,7 @@ function Select(x, y, w, headerFont, items, backColor, headerColor, wtrmkTxt, fr
         array.splice(array.indexOf(this.sheet), 1);
         this.sheet.visible = false;
         this.expanded = false;
-    }
+    };
     this.revealSheet = function () {
         if (!this.p)
             if (window.curTask)
@@ -920,13 +910,13 @@ function Select(x, y, w, headerFont, items, backColor, headerColor, wtrmkTxt, fr
             this.p.addCtrl(this.sheet, this.ID + 'sheet');
         this.sheet.visible = true;
         this.expanded = true;
-    }
+    };
     this.clicker.onclick = function () {
         if (this.p.expanded)
             this.p.concealSheet();
         else
             this.p.revealSheet();
-    }
+    };
     this.sheet = new SelectSheet(this);
 }
 function TextBlock(x, y, w, h, font, fontcolor, backcolor) {
@@ -955,7 +945,7 @@ function TextBlock(x, y, w, h, font, fontcolor, backcolor) {
             ts.style.top =parseInt( absoluteY(this.absY)) + 'px';
             ts.style.left =parseInt(absoluteX(this.absX))+ 'px';
         }
-    }
+    };
     this._show = false;
     this.paint = function (ctx) {
         if (!this._show)this.article.paint(ctx);
@@ -1008,7 +998,7 @@ function SelectSheet(select) {
         this.p.select.selectedIndex = Math.floor(d / this.p.sh);
         this.p.select.onSelected(Math.floor(d / this.p.sh));
         this.p.select.concealSheet();
-    }
+    };
     this.paintFun = function (ctx) {
         ctx.fillStyle = this.select.bc;
         ctx.fillRect(0, 0, this.w, this.h);
@@ -1017,7 +1007,7 @@ function SelectSheet(select) {
         ctx.textBaseline = 'hanging';
         for (var i = 0; i < this.select.items.length; i++)
             ctx.fillText(this.select.items[i], 2, i * this.sh, this.select.w);
-    }
+    };
     return this;
 }
 function BoxedInput() {
@@ -1028,7 +1018,7 @@ function BoxedInput() {
     input.style.position = 'absolute';
     this.setValue = function (val) {
         input.value = val;
-    }
+    };
     this.getValue = function () {
         return input.value;
     };
@@ -1050,9 +1040,7 @@ function BoxedInput() {
             txt.input = undefined;
             this.textbox = undefined;
             this.conceal();
-        }
-
-    }
+        }};
     this.resetPosition = function (textbox) {
         if (textbox.y < 0 || (textbox.p && textbox.y + textbox.h > textbox.p.h))
             this.conceal();
@@ -1062,19 +1050,19 @@ function BoxedInput() {
             input.style.top = absoluteY(textbox.absY) + 'px';
             input.style.left = absoluteX(textbox.absX) + 'px';
         }
-    }
+    };
     this.conceal = function () {
         if (show) {
             document.body.removeChild(input);
             show = false;
         }
-    }
+    };
     this.reveal = function () {
         if (!show) {
             document.body.appendChild(input);
             show = true;
         }
-    }
+    };
     this.isShow = function () {
         return show;
     }
@@ -1084,7 +1072,6 @@ var ta = {
     unbind: function () {
         if (this.textblock)this.textblock.conceal();
     }
-
 };
 
 var boxInput = new BoxedInput();
@@ -1138,9 +1125,13 @@ UIComponent.prototype = {
     },
     get z() {
         return this._z;
-    }
+    },
+    get visible(){
+        return this._visible;},
+    set visible(val){
+        if(val!=this._visible){this._visible=val;if(this.onchangeVisible)this.onchangeVisible();}}
 
-}
+};
 BoxedInput.prototype = {
     set value(val) {
         this.setValue(val);

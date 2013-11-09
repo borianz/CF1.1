@@ -82,7 +82,8 @@ public class LabService : System.Web.Services.WebService {
         if (User.Identity.IsAuthenticated)
             using (var client = Lab2Client.Get(User.Identity.Name))
             {
-              return new OperationResult (b,client.GetStuExpJS(expNo));
+                var js=client.GetStuExpJS(expNo);
+              return new OperationResult (true,js);
             }
         else
             return new OperationResult(b, r);

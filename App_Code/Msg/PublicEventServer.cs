@@ -29,6 +29,7 @@ namespace Msg
         {
             lock (db)
             {
+                var dic = new Dictionary<int, CategoryJS>();
                 foreach (var cat in db.Categories.Where (c=>c.Enable).ToArray())
                 {
                     var cjs = cat.ToEntityJS(false);
@@ -36,9 +37,10 @@ namespace Msg
                         ThenByDescending (pe=>pe.UpdateTime ).
                         ThenByDescending (pe=>pe.No ).Select(pe => new { no = pe.No, mtitle = pe.MTitle }))
                         cjs.events.Add(new PublicEventJS { no = e.no, mtitle = e.mtitle });
-                    catDic[cjs.no] = cjs;
+                    dic.Add (cjs.no,cjs);
                 }
-                ReorderDic();
+                dic.OrderByDescending(pair => pair.Value.priority);
+                catDic = dic;
             }
            
         }

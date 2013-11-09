@@ -224,40 +224,22 @@ namespace Lab2
                     oldExp.Des = expjs.Des;
                     try
                     {
-                        lock(db)
                         db.SaveChanges();
                         reason = Lab2Info.ExpAddSuccess;
+                        var nexpJS = oldExp.ToEntityJS();
+                        RefreshExpIndex();
+                        updateResult = nexpJS;
                         return true;
                     }
                     catch (Exception ex)
                     {
-                        lock (db)
                         db.Entry(oldExp).Reload();
                         reason = ex.InnerException.Message;
                     }
-                    finally
-                    {
-                        var nexpJS=oldExp.ToEntityJS();
-                        updateResult = nexpJS;
-                        if (updateResult.CanRead || updateResult.CanSubmit)
-                            try
-                            {
-                                var et= localIndex.ExpTypes.Single(t=>t.ExpTypeNo==nexpJS.ExpTypeNo);
-                                var eti = localIndex.ExpTypes.IndexOf(et);
-                                var ej = et.Exps.Single(e => e.ExpNo == nexpJS.ExpNo);
-                                var eji = et.Exps.IndexOf(ej);
-                                lock (localIndex)
-                                localIndex.ExpTypes[eti].Exps[eji] = nexpJS;
-                            }
-                            catch
-                            {
-                                RefreshExpIndex();
-                            }
-                    }
                 }
-                updateResult = oldExp.ToEntityJS();
-                return false;
             }
+            updateResult= null;
+            return false;
         }
     }
     public static partial class Lab2Info

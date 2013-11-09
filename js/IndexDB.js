@@ -28,11 +28,13 @@ function dbRequest(dbname,version)
         db.onerror=this.onerror;
         db.createStore=function(storeName,keyPath,autoIncrement,indexes,objects){
             var store=this.createObjectStore(storeName,{keyPath:keyPath? keyPath:null,autoIncrement:autoIncrement});
+            if(indexes)
             for(var i= 0,index=indexes[i];index;index=indexes[++i])
                 if(index.attribute)
                     store.createIndex(index.name,index.path,index.attribute);
                 else
                     store.createIndex(index.name,index.path);
+            if(objects)
             for(var j= 0,obj=objects[j];obj;obj=objects[++j])
                 store.put(obj);
             return store;
@@ -119,20 +121,23 @@ function addTransMethods(trans)
     };
     return trans;
 }
-function onrequestSuccess(e){
-    if(this.successFun)this.successFun(e);
+function onrequestSuccess(e)
+{
+    if(this.successFun)this.successFun(e,this.userContext);
     this.store.requests.remove(this);
+    this.userContext=undefined;
     delete this;
 }
 function onrequestFail(e)
 {
-    if(this.errorFun)this.errorFun(e);
+    if(this.errorFun)this.errorFun(e,this.userContext);
     this.store.requests.remove(this);
+    this.userContext=undefined;
     delete this;
 }
 function addStoreReadMethods(store)
 {
-    store.addRequest=function(request,des,successFun,errorFun)
+    store.addRequest=function(request,des,successFun,errorFun,userContext)
     {
         request.des=des;
         request.store=this;
@@ -142,12 +147,20 @@ function addStoreReadMethods(store)
         request.onsuccess=onrequestSuccess;
         request.errorFun=errorFun;
         request.onerror=onrequestFail;
+        request.userContext=userContext;
         return this;
     };
-    store.getObject=function(key,getFun,failFun)
+    store.getObject=function(key,getFun,failFun,context)
     {
        var request= store.get(key);
-       this.addRequest(request,'getObj:key;'+ key,getFun,failFun);
+       this.addRequest(request,'getObj:key;'+ key,getFun,failFun,context);
+       request.onsuccess=function(e){
+           if(this.successFun && this.result)this.successFun(this.result,this.userContext);
+           else if(!this.result && this.errorFun)this.errorFun(e,this.userContext);
+           this.store.requests.remove(this);
+           this.userContext=undefined;
+           delete this;
+       };
        return this;
     };
     store.searhIndex=function(indexName,valueFilterFun,valueAction,endFun,keyRange,direction){
@@ -184,22 +197,23 @@ function addStoreReadMethods(store)
             }};
         return this;
     };
-    store.select=function(valueFilterFun,resultsArray,endFun){
+    store.select=function(valueFilterFun,resultsArray,endFun,userContext){
         var request=this.openCursor();
         this.addRequest(request,'selectValue');
         request.filter=valueFilterFun;
         request.end=endFun;
-        request.results=resultsArray;
+        request.context=userContext;
+        request.results=resultsArray? resultsArray:[];
         request.onsuccess=valueFilterFun?function(){
             var cursor=this.result;
             if(cursor){
                 if(this.filter(cursor.value))
-                  this.array.push(cursor.value);
+                  this.results.push(cursor.value);
                 cursor.continue();
             }
             else {
                 if(this.end)
-                    this.end();
+                    this.end(this.results,this.context);
                 this.store.requests.remove(this);
                 delete this;
             }
@@ -211,7 +225,7 @@ function addStoreReadMethods(store)
             }
             else {
                 if(this.end)
-                    this.end();
+                    this.end(this.results,this.context);
                 this.store.requests.remove(this);
                 delete this;
             }};
@@ -255,33 +269,33 @@ function addStoreWriteMethods(store)
             }};
         return this;
     };
-    store.addObjects=function(objects,successFun,failFun)
+    store.addObjects=function(objects,successFun,failFun,context)
     {
         for(var i=0,obj=objects[i];obj;obj=objects[++i])
         {
            var request=this.add(obj);
-           this.addRequest(request,'addObj'+i,successFun,failFun);
+           this.addRequest(request,'addObj'+i,successFun,failFun,context);
         }
         return this;
     };
-    store.putObjects=function(objects,successFun,failFun)
+    store.putObjects=function(objects,successFun,failFun,context)
     {
         for(var i=0,obj=objects[i];obj;obj=objects[++i])
         {
             var request=this.put(obj);
-            this.addRequest(request,'putObj'+i,successFun,failFun);
+            this.addRequest(request,'putObj'+i,successFun,failFun,context);
         }
         return this;
     };
-    store.addIndex=function(indexName,indexPath,unique,multiEntry,successFun,failFun)
+    store.addIndex=function(indexName,indexPath,unique,multiEntry,successFun,failFun,context)
     {
        var request=this.createIndex(indexName,indexPath,{unique:unique, multiEntry:multiEntry});
-       this.addRequest(request,'addIndex:'+indexName,successFun,failFun);
+       this.addRequest(request,'addIndex:'+indexName,successFun,failFun,context);
        return this;
     };
-    store.deleteObject=function(key,successFun,failFun){
+    store.deleteObject=function(key,successFun,failFun,context){
         var r=this.delete(key);
-        this.addRequest(r,'deleteObj:key'+key,successFun,failFun);
+        this.addRequest(r,'deleteObj:key'+key,successFun,failFun,context);
         return this;
     };
     return store;
@@ -324,8 +338,3 @@ function storeIndex(indexName,indexPath,unique,multiEntry)
 {
     return {name:indexName,path:indexPath,attribute:{unique:unique,multiEntry:multiEntry? multiEntry:false}};
 }
-Array.prototype.remove = function (item) {
-    var i = this.indexOf(item);
-    if (i != -1)
-        this.splice(i, 1);
-};

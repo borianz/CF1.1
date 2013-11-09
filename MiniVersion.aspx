@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Default.aspx.cs" Inherits="GreenGrass" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="MiniVersion.aspx.cs" Inherits="GreenGrass" %>
 <!DOCTYPE html>
 <html>
 <head id="Head1" runat="server">
@@ -20,17 +20,16 @@
 <asp:ServiceReference Path="~/PublicEventService.asmx" />
 </Services>
 <Scripts>
-<asp:ScriptReference Path="~/js/Animation.js" ScriptMode="Release" />
-<asp:ScriptReference Path="~/js/CF2.2.js" ScriptMode="Release" />
-<asp:ScriptReference Path="~/js/Controls2.1.js" ScriptMode="Release" />
-<asp:ScriptReference Path="~/js/GreenGrassUI.js" ScriptMode="Release" />
-<asp:ScriptReference Path="~/js/iFrameWindow.js" ScriptMode="Release" />
-<asp:ScriptReference Path="~/js/IndexDB.js" ScriptMode="Release" />
-<asp:ScriptReference Path="~/js/ImgDB.js"  ScriptMode="Release" />
+<asp:ScriptReference Path="~/js/Animation.js" />
+<asp:ScriptReference Path="~/js/CF2.2Mini.js" />
+<asp:ScriptReference Path="~/js/Controls2.1.js" />
+<asp:ScriptReference Path="~/js/GGUIMini.js" />
+<asp:ScriptReference Path="~/js/iFrameWindow.js" />
 </Scripts>
 </asp:ScriptManager>
 </form>
 <canvas style="position:absolute" id='canvas' width="600" height=600></canvas>
+<img src="img/GreenGrass.jpg"  id='img' style='display:none;'/>
 <div style="display:none; padding:20px;" id="iframeDiv">
     <div id='msgDiv' style="display: none">
         <h2 id='msgTitle'></h2>
@@ -40,7 +39,7 @@
         <input type="button" id="cancel" onclick="window.currentModalWindow.close()" value="取消"/>
         <input type="button" id="close" onclick="window.currentModalWindow.close()"  value="知道了" />
        </div>
-    <div id='logDiv' style="display:none; height:195px;">
+    <div id='logDiv' style="display:none">
         <h2>亲,请登录</h2>
         <table>
             <tr>
@@ -56,46 +55,25 @@
                 <td><input type="button" onclick="window.currentModalWindow.close()"  value="取消" /></td>
             </tr>
         </table>
-        <p id='logStatus' style="color:gray;font-weight:lighter;  display:inline">初始密码为身份证后6位</p>
-       
+        <p id='logStatus' style="color:gray;font-weight:lighter; display:inline">初始密码为身份证后6位</p>
     </div>
+   
 </div>
 <script type="text/javascript">
     try {
         window.channelMng.isLogIn = Sys.Services.AuthenticationService.get_isLoggedIn();
     }
-    catch (ex) {
-        DisplayLoadingWindow();
-    }
-    if (!window.channelMng.isLogIn) DisplayLoadingWindow();
-    window.backImg = new Image();
-    window.backImg.src = 'img/GreenGrass.jpg';
+    catch (ex) { DisplayLoadingWindow(); }
+    if(!window.channelMng.isLogIn) DisplayLoadingWindow();
+    window.backImg = document.getElementById('img');
     window.backImg.onload = function () {
         canvas = document.getElementById('canvas');
         ctx = canvas.getContext('2d');
-        fullScreen(canvas);
         InitBackUI(window.backImg);
         Init();
+        if (window.currentModalWindow && window.channelMng.isLogIn)
+         window.currentModalWindow.close();
     };
-    function fullScreen() {
-        var docElm = document.documentElement;
-        if (docElm.requestFullscreen) {
-            docElm.requestFullscreen();
-        }
-        else if (docElm.mozRequestFullScreen) {
-            docElm.mozRequestFullScreen();
-        }
-        else if (docElm.webkitRequestFullScreen) {
-            docElm.webkitRequestFullScreen();
-           
-        }
-    }
-    PublicEventService.set_defaultFailedCallback(function (e) {
-        DisplayMsgWindow("糟糕,程序出错", "请联系我们!xlbaishushu@163.com<br/>" + e.message);
-    });
-    LabService.set_defaultFailedCallback(function (e) {
-        DisplayMsgWindow("糟糕,程序出错", "请联系我们!xlbaishushu@163.com<br/>" + e.message);
-    });
     
   </script>
 </body>

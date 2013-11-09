@@ -199,7 +199,7 @@ namespace Lab2
             else
             {
                 db.Configuration.ProxyCreationEnabled = false;
-                list = exp.ExpValues.OrderBy(ep => ep.UpdateDate).Select(ev => new KeyValuePair<int, string>(ev.No,ev.Student.StudentName)).ToArray();
+                list = db.ExpValues.Include("Student").Where(ev => ev.ExpNo == expno).Select(ev => new { ev.No, ev.Student.StudentName }).ToArray().Select(p => new KeyValuePair<int, string>(p.No, p.StudentName)).ToArray();
                 reason = string.Format(Lab2Info.ExpValueStudentListResult, list.Length);
                 db.Configuration.ProxyCreationEnabled = true;
                 return true;
@@ -216,7 +216,7 @@ namespace Lab2
         }
         public StuExpJS GetStuExpJS(int expNo)
         {
-            var state = new StuExpJS();
+            StuExpJS state = new StuExpJS();
             if (Student == null)
             {
                 state.canRead = false;
