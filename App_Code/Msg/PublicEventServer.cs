@@ -35,8 +35,8 @@ namespace Msg
                     var cjs = cat.ToEntityJS(false);
                     foreach (var e in cat.PublicEvents.Where (pe=>pe.Enable).OrderByDescending (pe=>pe.Priority ).
                         ThenByDescending (pe=>pe.UpdateTime ).
-                        ThenByDescending (pe=>pe.No ).Select(pe => new { no = pe.No, mtitle = pe.MTitle }))
-                        cjs.events.Add(new PublicEventJS { no = e.no, mtitle = e.mtitle });
+                        ThenByDescending (pe=>pe.No ).Select(pe => new { no = pe.No, mtitle = pe.MTitle,update=pe.UpdateTime  }))
+                        cjs.events.Add(new PublicEventJS { no = e.no, mtitle = e.mtitle,updateTime=e.update  });
                     dic.Add (cjs.no,cjs);
                 }
                 dic.OrderByDescending(pair => pair.Value.priority);

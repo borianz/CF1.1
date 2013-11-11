@@ -177,7 +177,34 @@ function Article(x, y, w, h, font, flCenter, flfont, fcolor, flcolor, backColor,
         ctx.fillStyle = this.fc;
         var curh = 0;
         var maxh = this.h - this.fh;
-        for (var l = this.curline; curh <= maxh && l < this.lines.length; l++) {
+        if(this.maxLine)
+            for (var l = this.curline; curh <= maxh && l < this.maxLine; l++) {
+                if (this.flc) {
+                    if (l == 0) {
+                        ctx.font = this.flf;
+                        ctx.fillStyle = this.flcolor;
+                        var left = (this.w - ctx.measureText(this.lines[0]).width) / 2;
+                        ctx.fillText(this.lines[0], left, 0);
+                        ctx.font = this.font;
+                        curh = this.flh;
+                        ctx.fillStyle = this.fc;
+                    }
+                    else {
+                        if (this.curline == 0)
+                            ctx.fillText(this.lines[l], 0, (l - 1) * this.fh + this.flh);
+                        else
+                            ctx.fillText(this.lines[l], 0, (l - this.curline) * this.fh);
+                        curh += this.fh;
+                    }
+
+                }
+                else {
+                    ctx.fillText(this.lines[l], 0, (l - this.curline) * this.fh);
+                    curh += this.fh;
+                }
+            }
+        else
+            for (var l = this.curline; curh <= maxh && l < this.lines.length; l++) {
             if (this.flc) {
                 if (l == 0) {
                     ctx.font = this.flf;
@@ -203,6 +230,9 @@ function Article(x, y, w, h, font, flCenter, flfont, fcolor, flcolor, backColor,
             }
         }
         ctx.fillRect(this.w - 4, 0, 4, this.h * l / this.lines.length);
+    };
+    this.setMaxLine=function(val){
+        this.maxLine=val;
     };
     this.wheeler = new wheeler(this);
     this.wheeler.fire = function (ctx, e) {
@@ -552,6 +582,7 @@ function Expand(x, y,w,h, backColor,ix,iy,iw,ih,strokeColor) {
     this.iw=iw;
     this.ih=ih;
     this.expanded = false;
+    this.onheaderClick=undefined;
     this.bc = backColor;
     this.sc=strokeColor;
     this.paintFun = function (ctx) {
@@ -565,9 +596,6 @@ function Expand(x, y,w,h, backColor,ix,iy,iw,ih,strokeColor) {
         ctx.closePath();
         ctx.stroke();
         ctx.clip();
-        for (var i = 0; i < this.controls.length; i++)
-            if (this.controls[i].h + this.controls[i].y > 0 && this.controls[i].y <h)
-                this.controls[i].paint(ctx);
         ctx.lineWidth=2;
         if(!this.expanded && this.maxh>this.minh){
             ctx.translate(this.ix,this.iy);
@@ -584,6 +612,9 @@ function Expand(x, y,w,h, backColor,ix,iy,iw,ih,strokeColor) {
            ctx.translate(-this.ix,-this.iy);
         }
         else if(this.expanded){
+            for (var i = 0; i < this.controls.length; i++)
+                if (this.controls[i].h + this.controls[i].y > 0 && this.controls[i].y <h)
+                    this.controls[i].paint(ctx);
             ctx.translate(this.ix,this.iy);
             ctx.beginPath();
             ctx.rect(0,0,this.iw,this.ih);
@@ -606,6 +637,7 @@ function Expand(x, y,w,h, backColor,ix,iy,iw,ih,strokeColor) {
         }
         this.expanded=!this.expanded;
         this.h=this.expanded? this.maxh:this.minh;
+        if(this.onheaderClick)this.onheaderClick();
     };
     this.clicker = new clicker(this);
     this.clicker.pathFun = function (ctx) {
@@ -658,6 +690,7 @@ function Drop(x, y, w, headerText, headerFont, headerBack, headerColor, backColo
     this.hc = headerColor ? headerColor : 'black';
     this.bc = backColor ? backColor : 'rgba(250,250,250,0.7)';
     this.clicker = new clicker(this);
+    this.onheaderClick=undefined;
     this.clock = new clock(0.7, 0, 1, true, 1, bounceEaseOut, 1, 1, 0, isCmdClock);
     this.clicker.pathFun = function (ctx) {
         ctx.beginPath();
@@ -680,10 +713,12 @@ function Drop(x, y, w, headerText, headerFont, headerBack, headerColor, backColo
             else {
                 p.expanded = false;
                 p.clock.reverse();
+                if(p.onheaderClick)p.onheaderClick();
             }
         else {
             p.expanded = true;
             p.clock.restart();
+            if(p.onheaderClick)p.onheaderClick();
         }
         return true;
     };

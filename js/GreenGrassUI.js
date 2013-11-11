@@ -1702,15 +1702,67 @@
         };
         return p;
     }
+    function viewEvent(event)
+    {
+        var dp=window.curTask.mainPanel.detailPanel;
+        window.curTask.mainPanel.commentsPanel.clock.reverse();
+        if(event)
+        {
+            dp.visible=true;
+            var tl=dp.findByID('title');
+            tl.changeText(event.title);
+            tl.x= (dp.w-tl.w)/2;
+            var al=dp.findByID('author');
+            al.changeText(event.authorName);
+            if(event.authorName=='展开评论'){
+                al.clicker.onclick=function(){window.curTask.mainPanel.commentBtn.clicker.onclick(); };
+                al.fc='rgba(172,223,235,0.9)';
+            }
+            else{
+                al.clicker.onclick=function(){};
+                al.fc='white';
+            }
+            al.x=(dp.w-al.w)/2;
+            dp.findByID('body').setText(event.text);
+            window.curTask.mainPanel.findByID('commentBtn').enable=true;
+        }
+        else
+        {
+            dp.findByID('title').changeText('');
+            dp.findByID('author').changeText('');
+            dp.findByID('body').setText('');
+            window.curTask.mainPanel.findByID('commentBtn').enable=false;
+        }
+        dp.event=event;
+    }
     function PublicEventsIndex(cats)
     {
+        window.eventsRecorder.load();
+        var recorder=window.eventsRecorder;
+        var serverEvents=[];var serverEvt,local;
         for(var j= 0,cat=cats[j];cat;cat=cats[++j]){
             var drop=new Drop(5,5+j*70,280,cat.name,'40px "幼圆"','rgba(172,223,235,0.5)', 'white', 'rgba(172,223,235,0.3)', true);
             drop.category=cat;
             var h=5;
             for(var i= 0,item=cat.events[i];item;item=cat.events[++i]){
                 var btn = new Button(5, h, 265, 45, item.mtitle, '28px "幼圆"', 'rgb(0,0,0,0)', true, null, 'white',false);
-                h += 47;
+                h += 47;local=undefined;
+                serverEvt={no:item.no,updateTime:Date.parse(item.updateTime)};
+                serverEvents.push(serverEvt);
+                var eventTime=recorder.getEventTime(item.no);
+                if(eventTime&& eventTime==serverEvt.updateTime){
+                    local=recorder.getEvent(item.no);
+                    if(local)
+                        item=local;
+                }
+                if(!local){
+                    drop.hb='rgba(172,223,235,0.9)';
+                    drop.onheaderClick=function(){
+                        this.hb='rgba(172,223,235,0.3)';
+                    };
+                    btn.fc='black';
+                    btn.clock.restart();
+                }
                 drop.addCtrl(btn, item.no);
                 btn.event=item;
                 btn.clicker.onclick=viewEventDetail;
@@ -1718,7 +1770,67 @@
             window.curTask.mainPanel.indexPanel.addCtrl(drop,'cat'+cat.no);
         }
         window.curTask.loaded=true;
+        recorder.save(serverEvents);
         window.channelMng.endChannel();
+    }
+    function viewEventDetail()
+    {
+        if(this.p.event.title==undefined||this.p.event.title==null){
+            window.channelMng.beginChannel(true,'eventDetail');
+            PublicEventService.GetEvent(this.p.event.no,
+                function(e,u){
+                    if(e.ok){
+                        u.event = e.data;
+                        window.eventsRecorder.saveEvent(e.data);
+                        viewEvent(e.data);
+                        if(e.data.imgUrl)
+                        {
+                            var img=document.createElement('img');
+                            img.style.display='none';
+                            img.setAttribute('src', e.data.imgUrl);
+                            u.img=img;
+                            img.onload=function()
+                            {
+                                changeBack(this);
+                            };
+                            u.clock.reset();
+                            u.clock.stop();
+                        }
+                        else
+                            changeBack(window.backImg);
+                    }
+                    else DisplayMsgWindow("亲,出错了", e.msg);
+                    window.channelMng.endChannel();
+                },null,this.p);
+        }
+        else{
+            var dp=window.curTask.mainPanel.detailPanel;
+            if(dp.event!==this.p.event){
+                viewEvent(this.p.event);
+                if(this.p.event.imgUrl){
+                    if(this.p.img)
+                        changeBack(this.p.img);
+                    else
+                    {
+                        var img=document.createElement('img');
+                        img.style.display='none';
+                        img.setAttribute('src', this.p.event.imgUrl);
+                        img.btn=this.p;
+                        img.onload=function()
+                        {
+                            changeBack(this);
+                            this.btn.img=this;
+                        }
+                        img.onerror = function () {
+                            changeBack(window.backImg);
+                        }
+                    }
+                }
+                else
+                    changeBack(window.backImg);
+            }
+        }
+        return true;
     }
     function MusicBtn()
     {
@@ -1907,7 +2019,8 @@
         body.drager=undefined;
         body.wheeler=undefined;
         body.setText(comment.body);
-        body.h=body.getMaxH()+3;
+        body.h = body.getMaxH() + 3;
+        body.setMaxLine(3);
         ep.addCtrl(nl,'name');
         ep.addCtrl(dl,'date');
         ep.addCtrl(body,'body');
@@ -1918,6 +2031,13 @@
         ep.bestBtn=best;
         ep.changeEval=changeEval;
         ep.comment=comment;
+        ep.body=body;
+        ep.onheaderClick=function(){
+            if(this.expanded)
+                this.body.setMaxLine();
+            else
+                this.body.setMaxLine(3);
+        };
         ep.changeEval(comment.authorEval,comment.goodCount,comment.bestCount);
         return ep;
     }
@@ -1996,7 +2116,6 @@
                 DisplayMsgWindow("囧", e.msg);
             window.channelMng.endChannel();
         }, null, event);
-
     }
     function updateComment(js,event,reversAnonymous)
     {
@@ -2140,7 +2259,6 @@
         };
         return btn;
     }
-
     //不要覆盖
     function viewEvent(event)
     {
@@ -2180,7 +2298,7 @@
     //不要覆盖
     function changeBack(img)
     {
-        if(img.width=0)
+        if(img.naturalWidth==0)
             img=window.backImg;
         if(window.Worker)
         {
@@ -2209,7 +2327,7 @@
 
     }
     //不要覆盖
-    function viewEventDetail(){
+   /* function viewEventDetail(){
         if(this.p.event.title==null){
             window.channelMng.beginChannel(true,'eventDetail');
             PublicEventService.GetEvent(this.p.event.no,
@@ -2247,6 +2365,7 @@
         }
         return true;
     }
+    */
 }
 //tools
 {
@@ -2283,6 +2402,55 @@
                     this.interval--;
                 return this.normal[parseInt(Math.random()*this.normal.length)];
             }
+        }
+    }
+    var eventsRecorder = {
+        _events:[],
+        _loaded: false,
+        save: function (events) {
+            var unuse=true;var key;
+            if(events) this._events=events;
+            for(var k= 0;k<window.localStorage.length;k++){
+                key=window.localStorage.key(k);
+                if(key.match(/pbEvent\d+/)){
+                    unuse=true;
+                    var no=parseInt(key.replace('pbEvent',''));
+                    for(var i= 0,e=this._events[i];e;e=this._events[++i])
+                        if(e.no==no){
+                            unuse=false;break;
+                        }
+                    if(unuse) window.localStorage.removeItem(key);
+                }
+            }
+            window.localStorage.setItem('pbEvents',JSON.stringify(this._events));
+        },
+        load: function () {
+            if (this._loaded) return this;
+            if (localStorage.pbEvents) {
+                this._events=JSON.parse(window.localStorage.getItem('pbEvents'));
+            }
+            this._loaded=true;
+            return this._events;
+        },
+        getEventTime: function (eventNo) {
+            for(var i= 0,e=this._events[i];e;e=this._events[++i])
+                if(e.no==eventNo) return e.updateTime;
+            return undefined;
+        },
+        putEventTime: function (no,time) {
+            for(var i= 0;i<this._events.length;i++)
+                if(this._events[i].no==no){
+                    this._events[i].updateTime=time;
+                    return true;
+                }
+            this._events.push({no:no,updateTime:time});
+            return true;
+        },
+        saveEvent:function(event){
+            window.localStorage.setItem('pbEvent'+event.no,JSON.stringify(event));
+        },
+        getEvent:function(eventNo){
+            return JSON.parse(window.localStorage.getItem('pbEvent'+eventNo));
         }
     }
 }

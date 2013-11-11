@@ -58,6 +58,8 @@ namespace Msg
             else
                 try
                 {
+                    var e=db.PublicEvents.Find (com.EventNo);
+                    e.UpdateTime = DateTime.Now;
                     db.Comments.Add(com);
                     db.SaveChanges();
                     reason = PublicEventInfo.CommentAddSuccess;
