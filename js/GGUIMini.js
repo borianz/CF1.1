@@ -1391,9 +1391,9 @@
         l.txt='  精彩内容,即将揭晓!  ';
         l.paintFun=function(ctx){
             var g=ctx.createLinearGradient(0,0,this.w,this.h);
-            g.addColorStop(0,'black');
-            g.addColorStop(this.clock.value,'white');
-            g.addColorStop(1,'black');
+            g.addColorStop(0,'white');
+            g.addColorStop(this.clock.value,'gray');
+            g.addColorStop(1,'white');
             ctx.fillStyle=g;
             ctx.font=this.font;
             ctx.fillText(this.txt,0,0);
@@ -1540,7 +1540,7 @@
         var recorder=window.eventsRecorder;
         var serverEvents=[];var serverEvt,local;
         for(var j= 0,cat=cats[j];cat;cat=cats[++j]){
-            var drop=new Drop(5,5+j*70,280,cat.name,'40px "幼圆"','rgba(172,223,235,0.5)', 'white', 'rgba(172,223,235,0.3)', true);
+            var drop=new Drop(5,5+j*70,280,cat.name,'40px "幼圆"','rgba(172,223,235,0.3)', 'white', 'rgba(172,223,235,0.3)', true);
             drop.category=cat;
             var h=5;
             for(var i= 0,item=cat.events[i];item;item=cat.events[++i]){
@@ -1555,7 +1555,7 @@
                         item=local;
                 }
                 if(!local){
-                    drop.hb='rgba(172,223,235,0.9)';
+                    drop.hb='rgba(172,223,235,0.7)';
                     drop.onheaderClick=function(){
                         this.hb='rgba(172,223,235,0.3)';
                     };
@@ -1725,7 +1725,7 @@
         var title=new Label(0,5,'在这里写评论','30px "幼圆"','black');
         var cp=new Panel(0,40,500,780,'rgba(0,0,0,0)');
         var tb=new TextBlock(5,570,600,100,'20px "微软雅黑"','black','rgba(255,255,255,0.7)');
-        var l=new Label(5,545,'我的评论:','22px "幼圆"');
+        var l=new Label(5,545,'我来说说','22px "幼圆"');
         var addbtn=new Button(610,635,70,40,'发表','25px "黑体"','rgba(172,223,235,0.7)');
         var anobtn=new Button(690,635,70,40,'匿名','25px "黑体"','rgba(172,223,235,0.7)');
         anobtn.visible=false;
@@ -2064,7 +2064,7 @@
 {
     var loadingGetter=
     {
-        important:[],
+        important:['没有一个冬天不可逾越','在所有人事已非的景色里，我最喜欢你','年华似水匆匆一瞥，多少岁月轻描淡写','将来的你一定会感激现在拼命的你','那些不能将你打败的，必将使你更加强大','相信我，你并不孤独'],
         normal:['加载中,请稍后','亲,等一下就好哦','你今天吃早餐了吗','精彩内容稍后呈现','吾日三省吾身:省钱,省电,省流量','嘿咻,嘿咻...'],
         load:function(){
             if(window.localStorage)
@@ -2087,16 +2087,20 @@
         get:function()
         {
             if(this.important.length>0)
-                return this.important.shift();
+            {
+                var w=this.important[parseInt(Math.random()*this.important.length)];
+                this.important.remove(w);
+                return w;
+            }
             else{
-                if(this.interval==0)
-                    this.load();
-                else
-                    this.interval--;
+                    if(this.interval==0)
+                        this.load();
+                    else
+                        this.interval--;
                 return this.normal[parseInt(Math.random()*this.normal.length)];
             }
         }
-    }
+    };
     var eventsRecorder = {
         _events:[],
         _loaded: false,

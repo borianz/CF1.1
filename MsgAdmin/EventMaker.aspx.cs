@@ -23,7 +23,7 @@ public partial class EventMaker : System.Web.UI.Page
         if (!Page.IsPostBack)
         {
             var r = client.Author.Role;
-            if (r == (short)MsgRole.Super)
+            if (r == (short)MsgRole.Super || r == (short)MsgRole.Teacher)
                 foreach (var c in PublicEventServer.Instance.Index)
                     CatSelect.Items.Add(new ListItem(c.name, c.no.ToString()));
             else if (r == (short)MsgRole.LixueAdmin)
@@ -48,8 +48,9 @@ public partial class EventMaker : System.Web.UI.Page
     {
         EventSelect.Items.Clear();
         int no = short.Parse(CatSelect.SelectedValue);
-        var events = client.Author.Role == (short)MsgRole.Super ? client.Events.Where(e => e.CategoryNo == no).Select(e => new { mtitle = e.MTitle, no = e.No }).ToArray() :
-client.Events.Where(e => e.CategoryNo == no && e.AuthorNo == client.Author.No).Select(e => new { mtitle = e.MTitle, no = e.No }).ToArray();
+        var events = (client.Author.Role == (short)MsgRole.Super || client.Author.Role == (short)MsgRole.Teacher) ? 
+            client.Events.Where(e => e.CategoryNo == no).Select(e => new { mtitle = e.MTitle, no = e.No }).ToArray() :
+            client.Events.Where(e => e.CategoryNo == no && e.AuthorNo == client.Author.No).Select(e => new { mtitle = e.MTitle, no = e.No }).ToArray();
         foreach (var e in events)
             EventSelect.Items.Add(new ListItem(e.mtitle, e.no.ToString()));
         if (EventSelect.Items.Count > 0)
@@ -186,7 +187,7 @@ client.Events.Where(e => e.CategoryNo == no && e.AuthorNo == client.Author.No).S
         {
             if (client.Author.Role != (short)MsgRole.Super && client.Author.No != pe.AuthorNo)
             { lblstatus.Text = "亲,只能修改自己的东西哦!"; return; }
-            bool refreshIndex =( pe.MTitle != txtMTitle.Text|| !pe.Enable) ;
+            bool refreshIndex =( pe.MTitle != txtMTitle.Text|| pe.Enable==disable.Checked) ;
             if (imgLoader.HasFile)
                 if (pe.ImgUrl != null)
                 {

@@ -182,16 +182,7 @@ function Init() {
             for (var i = window.backUIComponents.length - 1, item = window.backUIComponents[i]; item; item = window.backUIComponents[--i])
                 if (item.wheeler &&item.wheeler.fire(ctx, we)) return true;
     },false);
-    window.canvas.ondrop=function(e){
-        e.preventDefault();
-        var data= e.dataTransfer;
-        var file=data.files[0];
-        window.backImg.src=window.URL.createObjectURL(file);
-    };
-    window.canvas.ondragover=function(e){
-        e.preventDefault();
-        return false;
-    };
+   
     window.backStdClock.start();
     window.cmdStdClock.start();
     animate();

@@ -64,15 +64,13 @@
         window.channelMng.isLogIn = Sys.Services.AuthenticationService.get_isLoggedIn();
     }
     catch (ex) { DisplayLoadingWindow(); }
-    if(!window.channelMng.isLogIn) DisplayLoadingWindow();
     window.backImg = document.getElementById('img');
     window.backImg.onload = function () {
         canvas = document.getElementById('canvas');
         ctx = canvas.getContext('2d');
         InitBackUI(window.backImg);
         Init();
-        if (window.currentModalWindow && window.channelMng.isLogIn)
-         window.currentModalWindow.close();
+         if (!window.channelMng.isLogIn) DisplayLogWindow();
     };
     
   </script>

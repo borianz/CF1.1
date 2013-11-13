@@ -40,6 +40,7 @@ namespace Msg
                     dic.Add (cjs.no,cjs);
                 }
                 dic.OrderByDescending(pair => pair.Value.priority);
+                catDic = null;
                 catDic = dic;
             }
            
@@ -52,17 +53,15 @@ namespace Msg
                 if (cat != null)
                 {
                     var cjs = cat.ToEntityJS(false);
-                    foreach (var e in db.PublicEvents.Where (pe=>pe.CategoryNo==catNo&& pe.Enable).
-                        OrderByDescending (pe=>pe.Priority ).ThenByDescending (pe=>pe.UpdateTime ).
-                        ThenByDescending (pe=>pe.No ).Select(pe => new { no = pe.No, mtitle = pe.MTitle }))
+                    foreach (var e in db.PublicEvents.Where(pe => pe.CategoryNo == catNo && pe.Enable).
+                        OrderByDescending(pe => pe.Priority).ThenByDescending(pe => pe.UpdateTime).
+                        ThenByDescending(pe => pe.No).Select(pe => new { no = pe.No, mtitle = pe.MTitle }))
                         cjs.events.Add(new PublicEventJS { no = e.no, mtitle = e.mtitle });
                     if (catDic.ContainsKey(catNo))
-                        catDic[catNo] = cjs;
-                    else
-                    {
-                        catDic.Add(catNo, cjs);
-                        ReorderDic();
-                    }
+                        catDic.Remove(catNo);
+                    catDic.Add(catNo, cjs);
+                    ReorderDic();
+
                 }
             }
         }
@@ -84,6 +83,17 @@ namespace Msg
                     return null;
                 }
         }
+        public bool ChangeUpdateTime(int catNo, int eno, DateTime time)
+        {
+            try
+            {
+                catDic[catNo].events.First(e => e.no == eno).updateTime = time;
+                return true;
+            }
+            catch { }
+            return false;
+        }
+
     }
    
     public static partial class PublicEventInfo

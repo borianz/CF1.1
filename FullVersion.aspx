@@ -62,7 +62,6 @@
 </div>
 <script type="text/javascript">
     window.channelMng.isLogIn = Sys.Services.AuthenticationService.get_isLoggedIn();
-    if (!window.channelMng.isLogIn) DisplayLoadingWindow();
     window.backImg = new Image();
     window.backImg.src = 'img/GreenGrass.jpg';
     window.backImg.onload = function () {
@@ -71,8 +70,8 @@
         fullScreen(canvas);
         InitBackUI(window.backImg);
         Init();
-        GetImgdataIndexedBD();
-        CloseLoadingWindow();
+        GetImgdataIndexedBD(); 
+        if (!window.channelMng.isLogIn) DisplayLoadingWindow();
     };
     function fullScreen() {
         var docElm = document.documentElement;

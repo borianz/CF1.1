@@ -133,14 +133,14 @@ function DisplayLoadingWindow()
         else
             DisplayMsgWindow(h, p);
      }
-    else if(!window.localStorage.concealLoadingWindow) {
+    else {
         var h = '亲,欢迎!';
         var p  = '提示:按<b>F11</b>进入全屏模式后按<b>F5</b>重新刷新界面,体验Web App的魅力!';
         if(!window.channelMng.isLogIn){
             p+='</br></br><b>要登陆吗?</b>';
             DisplayConfirmWindow(h,p,function(){DisplayLogWindow();});
         }
-       else
+       else if(!window.localStorage.concealLoadingWindow)
             DisplayMsgWindow(h,p);
         window.localStorage.concealLoadingWindow=true;
     }

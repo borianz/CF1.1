@@ -61,6 +61,16 @@ function onCanvasMouseUp(e){
     }
 }
 function Init() {
+ window.canvas.ondrop=function(e){
+        e.preventDefault();
+        var data= e.dataTransfer;
+        var file=data.files[0];
+        window.backImg.src=window.URL.createObjectURL(file);
+    };
+    window.canvas.ondragover=function(e){
+        e.preventDefault();
+        return false;
+    };
     window.canvas.addEventListener('click',onCanvasClick , true);
     window.canvas.addEventListener('mousedown',function(e) {
         var ep = mouseArg(e);

@@ -215,6 +215,7 @@ namespace Msg
             else
                 try
                 {
+                    pe.UpdateTime = DateTime.Now;
                     db.PublicEvents.Add(pe);
                     db.SaveChanges();
                     server.RefreshCategory(pe.CategoryNo);
@@ -231,7 +232,13 @@ namespace Msg
         }
         public bool UpdatePublicEvent(PublicEvent pe,out string reason,bool reloadCategory=false)
         {
-            if (reloadCategory && pe.Enable && db.PublicEvents.Where(e => e.AuthorNo == pe.AuthorNo && e.Enable).Count() >= pe.Author.EventLimit)
+            var au = db.Authors.Find(pe.AuthorNo);
+            if (au == null)
+            {
+                reason = PublicEventInfo.AuthorNotExist;
+                return false;
+            }
+            if (reloadCategory && pe.Enable && db.PublicEvents.Where(e => e.AuthorNo == pe.AuthorNo && e.Enable).Count() > au.EventLimit)
             {
                 reason = PublicEventInfo.EventsOutOfRange;
                 return false;
@@ -240,8 +247,10 @@ namespace Msg
             db.Entry(pe).State = System.Data.EntityState.Modified;
             try
             {
+                pe.UpdateTime = DateTime.Now;
                 db.SaveChanges();
                 if (reloadCategory) server.RefreshCategory(pe.CategoryNo);
+                server.ChangeUpdateTime(pe.CategoryNo, pe.No, pe.UpdateTime);
                 reason = PublicEventInfo.SuccessOperation;
                 return true;
             }
@@ -251,6 +260,7 @@ namespace Msg
                 db.Entry(pe).State = System.Data.EntityState.Detached;
                 return false;
             }
+            
         }
         public bool DeletePublicEvent(int peNo, out string reason)
         {
@@ -302,6 +312,7 @@ namespace Msg
         public const string EventsOutOfRange = "亲,你发布信息的数目有限,请隐藏或者删除一部分信息";
         public const string InvalidAuthor = "亲,您暂时没有评论限权";
         public const string CommentNotExists = "亲,没有找到你的评论";
+        public const string AuthorNotExist = "您不是这篇文章的原作者";
         public const string CommentEnableSuccess = "亲,评论恢复成功</br>下次请谨慎删除哦!";
         public const string FailAndRefresh = "亲,操作失败了</br>刷新网页试试,如果仍然出错,请联系我们";
         public const string CommentDisableSuccess = "亲,删除评论成功</br>你无法再次评论这个文章了,但可以恢复这条评论";

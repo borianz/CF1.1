@@ -8,8 +8,6 @@
         Msg.PublicEventClient.MaxInstance = 20;
         var i =Lab2.Lab2Server.Instance.ExpIndex;
         var mi = Msg.PublicEventServer.Instance;
-     
-       
     }
 
     void Application_End(object sender, EventArgs e) 
