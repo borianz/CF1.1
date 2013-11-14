@@ -83,7 +83,10 @@ public class LabService : System.Web.Services.WebService {
             using (var client = Lab2Client.Get(User.Identity.Name))
             {
                 var js=client.GetStuExpJS(expNo);
-              return new OperationResult (true,js);
+                if (js == null)
+                    return new OperationResult(false ,"亲,暂时你还不能使用这个模块",null);
+                else
+                    return new OperationResult(true, js);
             }
         else
             return new OperationResult(b, r);

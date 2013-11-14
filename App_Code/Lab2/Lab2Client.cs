@@ -33,14 +33,14 @@ namespace Lab2
         }
         public void Dispose()
         {
-            if (UserName !=string.Empty && pool.Count < MaxInstance)
+            if (UserName !=string.Empty && UserName !=null  && pool.Count < MaxInstance)
                 pool.TryAdd(UserName, this);
             else
                 db.Dispose();
         }
         public void Dispose(bool addToPool)
         {
-            if (UserName!=string.Empty && addToPool)
+            if (UserName!=null && UserName!=string.Empty && addToPool)
                 pool.TryAdd(UserName, this);
             else
             {
@@ -218,12 +218,7 @@ namespace Lab2
         {
             StuExpJS state = new StuExpJS();
             if (Student == null)
-            {
-                state.canRead = false;
-                state.canSubmit = false;
-                state.hasSubmit = false;
-                state.seqInfo = "亲,你还没有开通实验数据上传功能";
-            }
+                return null;
             else
             {
                 var exp = db.Exps.Find(expNo);

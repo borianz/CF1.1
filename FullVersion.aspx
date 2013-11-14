@@ -67,7 +67,6 @@
     window.backImg.onload = function () {
         canvas = document.getElementById('canvas');
         ctx = canvas.getContext('2d');
-        fullScreen(canvas);
         InitBackUI(window.backImg);
         Init();
         GetImgdataIndexedBD(); 
@@ -86,6 +85,14 @@
            
         }
     }
+    PublicEventService.set_defaultFailedCallback(function (e) {
+        channelMng.endChannel();
+        DisplayMsgWindow('买噶的', '似乎出错了,请联系我们<br/>xlbaishushu@163.com');
+    });
+    LabService.set_defaultFailedCallback(function (e) {
+        channelMng.endChannel();
+        DisplayMsgWindow('买噶的', '似乎出错了,请联系我们<br/>xlbaishushu@163.com');
+    });
   </script>
 </body>
 </html>

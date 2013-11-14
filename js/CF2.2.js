@@ -418,6 +418,20 @@ function ChannelManager() {
     this.getProfiled = false;
     return this;
 }
+
+function fullScreen(onfullScreen)
+{
+    var docElm = document.documentElement;
+    if (docElm.requestFullscreen)
+        docElm.requestFullscreen();
+    else if (docElm.mozRequestFullScreen)
+            docElm.mozRequestFullScreen();
+    else if (docElm.webkitRequestFullScreen)
+            docElm.webkitRequestFullScreen();
+    else return false;
+    if(onfullScreen)onfullScreen();
+    return true;
+}
 ChannelManager.prototype = {
     get isLogIn() {
         return this._isLogIn;

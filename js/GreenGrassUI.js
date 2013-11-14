@@ -1266,6 +1266,7 @@
         if (window.channelMng.isLogIn) {
             window.channelMng.beginChannel(true, 'expDetail');
             LabService.UserPVDatails(exp.ExpNo, function (e, exp) {
+            if(e.ok){
                 window.curTask.cmdUIComponents.removeCtrl('submitPanel');
                 var rp=window.curTask.cmdUIComponents.findByID('right');
                 rp.findByID('deleteBtn').enable=e.data.hasSubmit;
@@ -1273,7 +1274,7 @@
                 var panel =rp.findByID('readPanel');
                 var seqlabel=new Label(35,200, e.data.seqInfo,'25px "幼圆"','white');
                 panel.addCtrl(seqlabel,'seqlabel');
-                var state=e.data;
+                var state=e.data;}
                 window.channelMng.endChannel();
             },null, exp);
        }

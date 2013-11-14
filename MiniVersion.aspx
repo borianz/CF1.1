@@ -71,8 +71,15 @@
         InitBackUI(window.backImg);
         Init();
          if (!window.channelMng.isLogIn) DisplayLogWindow();
-    };
-    
+     };
+     PublicEventService.set_defaultFailedCallback(function (e) {
+         channelMng.endChannel();
+         DisplayMsgWindow('买噶的', '似乎出错了,请联系我们<br/>xlbaishushu@163.com');
+     });
+     LabService.set_defaultFailedCallback(function (e) {
+         channelMng.endChannel();
+         DisplayMsgWindow('买噶的', '似乎出错了,请联系我们<br/>xlbaishushu@163.com');
+      });
   </script>
 </body>
 </html>
