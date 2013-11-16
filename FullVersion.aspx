@@ -23,7 +23,8 @@
 <asp:ScriptReference Path="~/js/Animation.js" ScriptMode="Release" />
 <asp:ScriptReference Path="~/js/CF2.2.js" ScriptMode="Release" />
 <asp:ScriptReference Path="~/js/Controls2.1.js" ScriptMode="Release" />
-<asp:ScriptReference Path="~/js/GreenGrassUI.js" ScriptMode="Release" />
+<asp:ScriptReference  Path="~/js/GGUIMini.js" ScriptMode="Release" />
+<asp:ScriptReference  Path="~/js/GreenGrassPlus.js" ScriptMode="Release" />
 <asp:ScriptReference Path="~/js/iFrameWindow.js" ScriptMode="Release" />
 <asp:ScriptReference Path="~/js/IndexDB.js" ScriptMode="Release" />
 <asp:ScriptReference Path="~/js/ImgDB.js"  ScriptMode="Release" />
@@ -62,6 +63,7 @@
 </div>
 <script type="text/javascript">
     window.channelMng.isLogIn = Sys.Services.AuthenticationService.get_isLoggedIn();
+    tipWindow.show(window.channelMng.isLogIn);
     window.backImg = new Image();
     window.backImg.src = 'img/GreenGrass.jpg';
     window.backImg.onload = function () {
@@ -70,7 +72,6 @@
         InitBackUI(window.backImg);
         Init();
         GetImgdataIndexedBD(); 
-        if (!window.channelMng.isLogIn) DisplayLoadingWindow();
     };
     function fullScreen() {
         var docElm = document.documentElement;

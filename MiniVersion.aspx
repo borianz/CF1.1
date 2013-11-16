@@ -64,13 +64,13 @@
         window.channelMng.isLogIn = Sys.Services.AuthenticationService.get_isLoggedIn();
     }
     catch (ex) { DisplayLoadingWindow(); }
+    tipWindow.show(window.channelMng.isLogIn);
     window.backImg = document.getElementById('img');
     window.backImg.onload = function () {
         canvas = document.getElementById('canvas');
         ctx = canvas.getContext('2d');
         InitBackUI(window.backImg);
         Init();
-         if (!window.channelMng.isLogIn) DisplayLogWindow();
      };
      PublicEventService.set_defaultFailedCallback(function (e) {
          channelMng.endChannel();

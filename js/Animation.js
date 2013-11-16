@@ -190,8 +190,8 @@ function simpleClock(duration,direction,timingFunction,range,offset,isCmdClock,i
     this.timingFunction = timingFunction?  timingFunction:linear;
     this.multiplier=range;
     this.offset=offset;
-    this.onend=infinite? function(){this.toggle();}:function(){}
-    this.onreverse=infinite? function(){this.toggle();}:function(){}
+    this.onend=infinite? function(){this.toggle();}:function(){};
+    this.onreverse=infinite? function(){this.toggle();}:function(){};
     this.startTime = 0;
     this.d = this.direction;
     this.t = (this.d== 1 ? 0.0 : 1.0);
@@ -261,8 +261,8 @@ function elasticClock(duration,range,offset,isCmdClock,mode,amplitude,period,inf
     this.p=period? period*duration:duration*0.3;
     this.multiplier=range;
     this.offset=offset;
-    this.onend=infinite? function(){this.toggle();}:function(){}
-    this.onreverse=infinite? function(){this.toggle();}:function(){}
+    this.onend=infinite? function(){this.toggle();}:function(){};
+    this.onreverse=infinite? function(){this.toggle();}:function(){};
     this.startTime = 0;
     this.d = this.direction;
     this.t = (this.d== 1 ? 0.0 : 1.0);
@@ -275,7 +275,7 @@ function elasticClock(duration,range,offset,isCmdClock,mode,amplitude,period,inf
             this.t = (this.d== 1 ? 0.0 : 1.0);
             this.isFinished=false;
         }
-    }
+    };
     this.reverse=function()
     {
         if(this.t==1) {
@@ -284,7 +284,7 @@ function elasticClock(duration,range,offset,isCmdClock,mode,amplitude,period,inf
             this.t = (this.d== 1 ? 0.0 : 1.0);
             this.startTime = this.timeProvider.ticks();
         }
-    }
+    };
     this.update=function()
     {
         if(!this.isFinished){
@@ -328,14 +328,14 @@ function elasticClock(duration,range,offset,isCmdClock,mode,amplitude,period,inf
                 this.onreverse();
             }
         }
-    }
+    };
     this.toggle=function()
     {
         if(this.t==0)
             this.start();
         else if(this.t==1)
             this.reverse();
-    }
+    };
     return this;
 }
 function clock(duration, delay, direction, reverses, iterations, timingFunction, range, multiplier, offset, isCmdClock) {
@@ -362,7 +362,7 @@ function clock(duration, delay, direction, reverses, iterations, timingFunction,
         this.isRunning = false;                         // Is this running?
         this.isFinished = false;                        // Is the entire clock run finished?
         this.value = 0.0;                               // Current computed clock value
-    }
+    };
     this.reset();
     this.started = new customEvent("started");
     this.stopped = new customEvent("stopped");
@@ -376,13 +376,13 @@ function clock(duration, delay, direction, reverses, iterations, timingFunction,
             this.isRunning = true;
             this.started.fire(null, { message: this.started.eventName });
         }
-    }
+    };
 
     // Re-start the clock (reset and start)
     this.restart = function () {
         this.reset();
         this.start();
-    }
+    };
 
     // Stop the clock
     this.stop = function () {
@@ -391,7 +391,7 @@ function clock(duration, delay, direction, reverses, iterations, timingFunction,
             this.isRunning = false;
             this.stopped.fire(null, { message: this.stopped.eventName });
         }
-    }
+    };
 
     // Toggle the clock
     this.toggle = function () {
@@ -400,7 +400,7 @@ function clock(duration, delay, direction, reverses, iterations, timingFunction,
                 this.stop();
             else
                 this.start();
-    }
+    };
 
     // Rewind the clock
     this.rewind = function () {
@@ -409,7 +409,7 @@ function clock(duration, delay, direction, reverses, iterations, timingFunction,
         if (this.isRunning && !this.isFinished)
             this.jumpTo(this.i);
 
-    }
+    };
 
     // Fast-forward the clock
     this.fastForward = function () {
@@ -418,7 +418,7 @@ function clock(duration, delay, direction, reverses, iterations, timingFunction,
         if (this.isRunning && !this.isFinished)
             this.jumpTo(this.i + 1);
 
-    }
+    };
 
     // Reverse the clock
     this.reverse = function () {
@@ -444,7 +444,7 @@ function clock(duration, delay, direction, reverses, iterations, timingFunction,
             this.startTime = this.timeProvider.ticks();
         }
 
-    }
+    };
     // Jump to iteration
     this.jumpTo = function (iteration) {
 
@@ -454,7 +454,7 @@ function clock(duration, delay, direction, reverses, iterations, timingFunction,
         var iterationTime = (this.delay * ticksPerSecond) +
             ((iteration * this.duration) * ticksPerSecond);
         this.startTime = (now - iterationTime);
-    }
+    };
 
     // Update function
     this.update = updateClock;
@@ -585,7 +585,7 @@ function customEvent() {
         if (this.subscribers.indexOf(f) != -1)
             this.subscribers.splice(this.subscribers.indexOf(f), 1);
 
-    }
+    };
     // Fire the event
     this.fire = function (sender, eventArgs) {
 

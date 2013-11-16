@@ -1585,7 +1585,7 @@
             if(window.channelMng.checkRole("MsgAdmin"))
                 DisplayMsgWindow("管理员","请点击<a target='_blank' href='MsgAdmin/EventMaker.aspx'>这里</a>进入");
             else
-                DisplayMsgWindow('亲,欢迎投稿!','请参见网站信息中的投稿须知');
+                DisplayMsgWindow('亲,欢迎投稿!','请参见网站信息中的联系我们');
         };
         return btn;
     }
@@ -1703,39 +1703,6 @@
             }
         };
         return p;
-    }
-    function viewEvent(event)
-    {
-        var dp=window.curTask.mainPanel.detailPanel;
-        window.curTask.mainPanel.commentsPanel.clock.reverse();
-        if(event)
-        {
-            dp.visible=true;
-            var tl=dp.findByID('title');
-            tl.changeText(event.title);
-            tl.x= (dp.w-tl.w)/2;
-            var al=dp.findByID('author');
-            al.changeText(event.authorName);
-            if(event.authorName=='展开评论'){
-                al.clicker.onclick=function(){window.curTask.mainPanel.commentBtn.clicker.onclick(); };
-                al.fc='rgba(172,223,235,0.9)';
-            }
-            else{
-                al.clicker.onclick=function(){};
-                al.fc='white';
-            }
-            al.x=(dp.w-al.w)/2;
-            dp.findByID('body').setText(event.text);
-            window.curTask.mainPanel.findByID('commentBtn').enable=true;
-        }
-        else
-        {
-            dp.findByID('title').changeText('');
-            dp.findByID('author').changeText('');
-            dp.findByID('body').setText('');
-            window.curTask.mainPanel.findByID('commentBtn').enable=false;
-        }
-        dp.event=event;
     }
     function PublicEventsIndex(cats)
     {
@@ -1979,7 +1946,7 @@
         p.title=title;
         p.cp=cp;
         p.anoBtn=anobtn;
-        p.bestClock=new simpleClock(1.5,1,linear,10,0,true,true);
+        p.bestClock=new simpleClock(0.5,1,linear,30,0,true,true);
         p.bestClock.start();
         p.changeComments=function(event,mycomment)
         {
@@ -2012,7 +1979,7 @@
     }
     function CommentExpand(y,comment)
     {
-        var ep=new Expand(5,y,750,105,'rgba(0,0,0,0)',720,5,25,25,'black');
+        var ep=new Expand(5,y,750,105,'rgba(0,0,0,0)',725,5,20,20,'black',comment.color);
         var nl=new Label(5,0,comment.anonymouse?'匿名者':comment.authorName,'25px "微软雅黑"',comment.color);
         var dl=new Label(nl.w+25,2,comment.dateString +":",'22px "幼圆"');
         var body=new Article(5,30,750,150,'22px "幼圆"',false,'22px "幼圆"','black','black','rgba(0,0,0,0)');
@@ -2275,7 +2242,15 @@
             var al=dp.findByID('author');
             al.changeText(event.authorName);
             if(event.authorName=='展开评论'){
-                al.clicker.onclick=function(){window.curTask.mainPanel.commentBtn.clicker.onclick(); };
+                al.clock=new simpleClock(0.2,1,cubicEaseInOut,10,-5,true,true);
+                al.clock.start();
+                al.transFun=function(ctx){ctx.translate(this.x+this.clock.value,this.y);};
+                al.clicker.onclick=function(){
+                    if(this.p.clock){
+                        this.p.clock=undefined;
+                        this.p.transFun=function(ctx){ctx.translate(this.x,this.y);};
+                    }
+                    window.curTask.mainPanel.commentBtn.clicker.onclick(); };
                 al.fc='rgba(172,223,235,0.9)';
             }
             else{

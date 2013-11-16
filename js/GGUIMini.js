@@ -1509,7 +1509,15 @@
             var al=dp.findByID('author');
             al.changeText(event.authorName);
             if(event.authorName=='展开评论'){
-                al.clicker.onclick=function(){window.curTask.mainPanel.commentBtn.clicker.onclick(); };
+                al.clock=new simpleClock(0.2,1,cubicEaseInOut,10,-5,true,true);
+                al.clock.start();
+                al.transFun=function(ctx){ctx.translate(this.x+this.clock.value,this.y);};
+                al.clicker.onclick=function(){
+                    if(this.p.clock){
+                        this.p.clock=undefined;
+                        this.p.transFun=function(ctx){ctx.translate(this.x,this.y);};
+                    }
+                    window.curTask.mainPanel.commentBtn.clicker.onclick(); };
                 al.fc='rgba(172,223,235,0.9)';
             }
             else{
@@ -1778,7 +1786,7 @@
         p.title=title;
         p.cp=cp;
         p.anoBtn=anobtn;
-        p.bestClock=new simpleClock(1.5,1,linear,10,0,true,true);
+        p.bestClock=new simpleClock(0.5,1,linear,30,0,true,true);
         p.bestClock.start();
         p.changeComments=function(event,mycomment)
         {
@@ -2151,5 +2159,24 @@
         getEvent:function(eventNo){
             return JSON.parse(window.localStorage.getItem('pbEvent'+eventNo));
         }
+    }
+    var tipWindow={
+        tips:[{title:'读图模式',msg:'点击"心路"上面的第 1 个按钮<br/>可以查看背景图片哦!'},
+            {title:'查看讨论',msg:'点击"心路"上面的第 3 个按钮<br/>发表和查看大家的讨论吧!'},
+            {title:'点赞狂魔',msg:'点击五角星或者爱心支持你喜欢的讨论<br/>详情请见"心路"的使用说明'},
+            {title:'联系我们',msg:'我们希望听到你的反馈,请发送邮件到<br/><b>xlbaishushu@163.com</b>'}],
+        show:function(logIn){
+            var i=parseInt(window.localStorage.tipIndex);
+            if(isNaN(i))i=0;
+            else if(i>=this.tips.length)i=0;
+            var tip=this.tips[i];
+            if(logIn)DisplayMsgWindow(tip.title,tip.msg);
+            else DisplayConfirmWindow(tip.title,tip.msg+'<br/>要登录吗',DisplayLogWindow);
+            window.localStorage.tipIndex=++i;
+        },
+        addTip:function(title,msg){
+            this.tips.push({title:title,msg:msg});
+        }
+
     }
 }

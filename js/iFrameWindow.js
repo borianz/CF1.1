@@ -178,7 +178,7 @@ function DisplayConfirmWindow(title,msg,confirmFun,userContext)
     c.style.display = "inline";
     c.userContext=userContext;
     c.confirmFun=confirmFun;
-    c.onclick =function(){if(this.confirmFun)this.confirmFun(this.userContext);window.currentModalWindow.close();};
+    c.onclick =function(){window.currentModalWindow.close();if(this.confirmFun)this.confirmFun(this.userContext);};
     document.getElementById('cancel').style.display="inline";
     document.getElementById('close').style.display="none";
     iframeDiv.content = content;

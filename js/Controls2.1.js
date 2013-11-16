@@ -571,7 +571,7 @@ function Panel(x, y, h, w, backColor) {
     };
     return this;
 }
-function Expand(x, y,w,h, backColor,ix,iy,iw,ih,strokeColor) {
+function Expand(x, y,w,h, backColor,ix,iy,iw,ih,strokeColor,arrayColor) {
     this._x = x;
     this._y = y;
     this.w = w;
@@ -585,6 +585,7 @@ function Expand(x, y,w,h, backColor,ix,iy,iw,ih,strokeColor) {
     this.onheaderClick=undefined;
     this.bc = backColor;
     this.sc=strokeColor;
+    this.ac=arrayColor? arrayColor:'black';
     this.paintFun = function (ctx) {
         var h=this.expanded? this.maxh:this.minh;
         ctx.strokeStyle=this.sc;
@@ -599,30 +600,22 @@ function Expand(x, y,w,h, backColor,ix,iy,iw,ih,strokeColor) {
         ctx.lineWidth=2;
         if(!this.expanded && this.maxh>this.minh){
             ctx.translate(this.ix,this.iy);
-            ctx.beginPath();
-            ctx.rect(0,0,this.iw,this.ih);
-            var hh=this.ih/2;
-            var hw=this.iw/2;
-            ctx.moveTo(0,hh);
-            ctx.lineTo(this.iw,hh);
-            ctx.moveTo(hw,0);
-            ctx.lineTo(hw,this.ih);
-            ctx.closePath();
-            ctx.stroke();
-           ctx.translate(-this.ix,-this.iy);
+            pointTrianglePath(this.iw,this.ih,ctx,false);
+            ctx.fillStyle=this.ac;
+            ctx.shadowBlur=10;
+            ctx.shadowColor=this.ac;
+            ctx.fill();
+            ctx.shadowBlur=0;
+            ctx.translate(-this.ix,-this.iy);
         }
         else if(this.expanded){
-            for (var i = 0; i < this.controls.length; i++)
-                if (this.controls[i].h + this.controls[i].y > 0 && this.controls[i].y <h)
-                    this.controls[i].paint(ctx);
             ctx.translate(this.ix,this.iy);
-            ctx.beginPath();
-            ctx.rect(0,0,this.iw,this.ih);
-            var hh=this.ih/2;
-            ctx.moveTo(0,hh);
-            ctx.lineTo(this.iw,hh);
-            ctx.closePath();
-            ctx.stroke();
+            pointTrianglePath(this.iw,this.ih,ctx,true);
+            ctx.fillStyle=this.ac;
+            ctx.shadowBlur=10;
+            ctx.shadowColor=this.ac;
+            ctx.fill();
+            ctx.shadowBlur=0;
             ctx.translate(-this.ix,-this.iy);
         }
     };

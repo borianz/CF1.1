@@ -11,7 +11,7 @@ function readBackImg(src,img){
             var canvas=document.getElementById('canvas');
             var ctx=canvas.getContext('2d');
             ctx.drawImage(this,0,0,canvas.width,canvas.height);
-            var dataurl=canvas.toDataURL('image/jpg',1);
+            var dataurl=canvas.toDataURL('image/jpeg',0.5);
             this.data.data=dataurl;
             saveBackImg(this.data);
             this.data=undefined;
@@ -33,7 +33,7 @@ function readBackImg(src,img){
                     var canvas=document.getElementById('canvas');
                     var ctx=canvas.getContext('2d');
                     ctx.drawImage(this,0,0,canvas.width,canvas.height);
-                    var dataurl=canvas.toDataURL('image/jpg',1);
+                    var dataurl=canvas.toDataURL('image/jpeg',0.5);
                     this.data.data=dataurl;
                     saveBackImg(this.data);
                     this.data=undefined;
