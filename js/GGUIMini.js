@@ -1145,120 +1145,10 @@
                 if(item.clock) item.clock.reverse();
             window.curTask.exit();
         } ;
-        var fb=new Button(10,50,50,50);
-        fb.imgMode=false;
-        fb.clicker.onclick=function(){
-            if(window.curTask.mainPanel.detailPanel){
-                var dp= window.curTask.mainPanel.detailPanel;
-                if(dp.clock.t==0){
-                    this.p.imgMode=true;
-                    window.curTask.mainPanel.findByID('exitBtn').visible=false;
-                    var logbtn=window.curTask.cmdUIComponents.findByID('logBtn');
-                    logbtn.clock.reverse();
-                    logbtn.enable=false;
-                    window.curTask.adminBtn.clock.reverse();
-                    window.curTask.adminBtn.enable=false;
-                }
-                else if(dp.clock.t==1){
-                    this.p.imgMode=false;
-                    window.curTask.mainPanel.findByID('exitBtn').visible=true;
-                    var logbtn=window.curTask.cmdUIComponents.findByID('logBtn');
-                    logbtn.clock.start();
-                    logbtn.enable=true;
-                    window.curTask.adminBtn.clock.start();
-                    window.curTask.adminBtn.enable=true;
-                }
-                dp.flip();
-                window.curTask.mainPanel.indexPanel.flip();
-            }
-
-        };
+        var fb=new PictureBtn();
         var publicMsg=new PublicMsgPanel();
         var cp=new CommentsPanel();
         msgPanel.indexPanel=publicMsg;
-        fb.paintFun=function(ctx){
-            ctx.fillStyle='rgba(0,0,0,0.3)';
-            ctx.fillRect(0,0,this.w,this.h);
-            if(!this.imgMode){
-                ctx.beginPath();
-                ctx.moveTo(48.5, 0.0);
-                ctx.lineTo(5.0, 0.0);
-                ctx.bezierCurveTo(2.2, 0.0, 0.0, 2.0, 0.0, 4.5);
-                ctx.lineTo(0.0, 43.9);
-                ctx.bezierCurveTo(0.0, 46.4, 2.2, 48.5, 5.0, 48.5);
-                ctx.lineTo(48.5, 48.5);
-                ctx.bezierCurveTo(51.3, 48.5, 53.5, 46.4, 53.5, 43.9);
-                ctx.lineTo(53.5, 4.5);
-                ctx.bezierCurveTo(53.5, 2.0, 51.3, 0.0, 48.5, 0.0);
-                ctx.closePath();
-                ctx.moveTo(5.0, 3.0);
-                ctx.lineTo(48.5, 3.0);
-                ctx.bezierCurveTo(49.4, 3.0, 50.2, 3.7, 50.2, 4.5);
-                ctx.lineTo(50.2, 35.6);
-                ctx.lineTo(44.5, 35.6);
-                ctx.lineTo(38.6, 24.4);
-                ctx.bezierCurveTo(38.4, 23.9, 37.9, 23.6, 37.3, 23.5);
-                ctx.bezierCurveTo(36.7, 23.5, 36.2, 23.7, 35.8, 24.1);
-                ctx.lineTo(32.0, 28.4);
-                ctx.lineTo(22.9, 15.1);
-                ctx.bezierCurveTo(22.6, 14.6, 22.0, 14.4, 21.4, 14.4);
-                ctx.bezierCurveTo(20.8, 14.4, 20.3, 14.7, 20.0, 15.2);
-                ctx.lineTo(9.0, 35.6);
-                ctx.lineTo(3.3, 35.6);
-                ctx.lineTo(3.3, 4.5);
-                ctx.bezierCurveTo(3.3, 3.7, 4.1, 3.0, 5.0, 3.0);
-                ctx.closePath();
-                ctx.moveTo(12.7, 35.6);
-                ctx.lineTo(21.7, 19.0);
-                ctx.lineTo(30.4, 31.9);
-                ctx.bezierCurveTo(30.7, 32.3, 31.2, 32.5, 31.7, 32.6);
-                ctx.bezierCurveTo(32.3, 32.6, 32.8, 32.4, 33.1, 32.0);
-                ctx.lineTo(36.8, 27.9);
-                ctx.lineTo(40.8, 35.6);
-                ctx.lineTo(12.7, 35.6);
-                ctx.closePath();
-                ctx.moveTo(48.5, 45.4);
-                ctx.lineTo(5.0, 45.4);
-                ctx.bezierCurveTo(4.1, 45.4, 3.3, 44.8, 3.3, 43.9);
-                ctx.lineTo(3.3, 38.6);
-                ctx.lineTo(50.2, 38.6);
-                ctx.lineTo(50.2, 43.9);
-                ctx.bezierCurveTo(50.2, 44.8, 49.4, 45.4, 48.5, 45.4);
-                ctx.closePath();
-                ctx.fillStyle = "rgb(255, 255, 255)";
-                ctx.fill();
-                ctx.beginPath();
-                ctx.moveTo(38.5, 19.7);
-                ctx.bezierCurveTo(42.1, 19.7, 45.1, 17.0, 45.1, 13.6);
-                ctx.bezierCurveTo(45.1, 10.3, 42.1, 7.6, 38.5, 7.6);
-                ctx.bezierCurveTo(34.8, 7.6, 31.8, 10.3, 31.8, 13.6);
-                ctx.bezierCurveTo(31.8, 17.0, 34.8, 19.7, 38.5, 19.7);
-                ctx.closePath();
-                ctx.moveTo(38.5, 10.6);
-                ctx.bezierCurveTo(40.3, 10.6, 41.8, 12.0, 41.8, 13.6);
-                ctx.bezierCurveTo(41.8, 15.3, 40.3, 16.7, 38.5, 16.7);
-                ctx.bezierCurveTo(36.6, 16.7, 35.1, 15.3, 35.1, 13.6);
-                ctx.bezierCurveTo(35.1, 12.0, 36.6, 10.6, 38.5, 10.6);
-                ctx.closePath();
-                ctx.fill();
-            }
-            else
-            {
-                roundRectPath(this.w,this.h,5,ctx);
-                ctx.lineWidth=2;
-                ctx.strokeStyle='white';
-                ctx.stroke();
-                ctx.moveTo(0,this.h/4);
-                ctx.lineTo(this.w,this.h/4);
-                ctx.moveTo(0,this.h/2);
-                ctx.lineTo(this.w,this.h/2);
-                ctx.moveTo(0,this.h/2);
-                ctx.lineTo(this.w,this.h/2);
-                ctx.moveTo(0,this.h/4*3);
-                ctx.lineTo(this.w,this.h/4*3);
-                ctx.stroke();
-            }
-        };
         var micon=new MusicBtn();
         var cicon=new CommentBtn();
         msgPanel.addCtrl(cp,'commentsPanel');
@@ -1453,6 +1343,8 @@
         var al=new Label(0,55,'','30px"幼圆"','white');
         al.clicker=new clicker(al);
         al.x=(p.w-al.w)/2;
+        al.clock=new simpleClock(0.2,1,expoEaseInOut,10,-5,true,true);
+        al.clock.start();
         p.addCtrl(al,'author');
         var body=new Article(5,90,770,580,'25px "幼圆"',false,'25px "幼圆"','white','white','rgba(0,0,0,0)',1.2);
         p.addCtrl(body,'body');
@@ -1509,20 +1401,16 @@
             var al=dp.findByID('author');
             al.changeText(event.authorName);
             if(event.authorName=='展开评论'){
-                al.clock=new simpleClock(0.2,1,cubicEaseInOut,10,-5,true,true);
-                al.clock.start();
                 al.transFun=function(ctx){ctx.translate(this.x+this.clock.value,this.y);};
                 al.clicker.onclick=function(){
-                    if(this.p.clock){
-                        this.p.clock=undefined;
-                        this.p.transFun=function(ctx){ctx.translate(this.x,this.y);};
-                    }
+                    this.p.transFun=function(ctx){ctx.translate(this.x,this.y);};
                     window.curTask.mainPanel.commentBtn.clicker.onclick(); };
                 al.fc='rgba(172,223,235,0.9)';
             }
             else{
                 al.clicker.onclick=function(){};
                 al.fc='white';
+                al.transFun=function(ctx){ctx.translate(this.x,this.y);};
             }
             al.x=(dp.w-al.w)/2;
             dp.findByID('body').setText(event.text);
@@ -1668,13 +1556,11 @@
             ctx.bezierCurveTo(43.2, 24.0, 43.3, 23.9, 43.5, 23.9);
             ctx.bezierCurveTo(44.3, 23.8, 44.9, 23.3, 44.9, 22.7);
             ctx.bezierCurveTo(44.9, 12.2, 35.5, 7.6, 29.3, 4.6);
-            ctx.closePath();
             ctx.moveTo(12.2, 37.8);
             ctx.bezierCurveTo(7.6, 37.8, 3.7, 36.1, 3.7, 34.0);
             ctx.bezierCurveTo(3.7, 32.0, 7.6, 30.2, 12.2, 30.2);
             ctx.bezierCurveTo(16.7, 30.2, 20.6, 32.0, 20.6, 34.0);
             ctx.bezierCurveTo(20.6, 36.1, 16.7, 37.8, 12.2, 37.8);
-            ctx.closePath();
             ctx.moveTo(24.3, 15.1);
             ctx.lineTo(24.3, 5.2);
             ctx.bezierCurveTo(25.2, 5.7, 26.1, 6.1, 27.1, 6.6);
@@ -1691,6 +1577,17 @@
     {
         var btn=new UIComponent(140,50,50,50);
         btn.clicker=new clicker(btn);
+        btn.spotter=new spotter(btn);
+        btn.fc='white';
+        btn.shadowBlur=0;
+        btn.spotter.onmouseIn=function(){
+            this.p.fc='yellow';
+            this.p.shadowBlur=20;
+        };
+        btn.spotter.onmouseOut=function(){
+            this.p.fc='white';
+            this.p.shadowBlur=0;
+        };
         btn.paintFun=function(ctx)
         {
             ctx.fillStyle='rgba(0,0,0,0.3)';
@@ -1711,10 +1608,134 @@
             ctx.bezierCurveTo(43.6, 1.7, 42.5, 0.5, 41.2, 0.5);
             ctx.closePath();
             ctx.lineWidth=3;
-            ctx.strokeStyle = "rgb(255, 255, 255)";
+            ctx.strokeStyle =this.fc;
+            ctx.shadowColor=this.fc;
+            ctx.shadowBlur=this.shadowBlur;
             ctx.stroke();
         };
         return btn;
+    }
+    function PictureBtn(){
+        var fb=new UIComponent(10,50,50,50);
+        fb.clicker=new clicker(fb);
+        fb.imgMode=false;
+        fb.clicker.onclick=function(){
+            if(window.curTask.mainPanel.detailPanel){
+                var dp= window.curTask.mainPanel.detailPanel;
+                if(dp.clock.t==0){
+                    this.p.imgMode=true;
+                    window.curTask.mainPanel.findByID('exitBtn').visible=false;
+                    var logbtn=window.curTask.cmdUIComponents.findByID('logBtn');
+                    logbtn.clock.reverse();
+                    logbtn.enable=false;
+                    window.curTask.adminBtn.clock.reverse();
+                    window.curTask.adminBtn.enable=false;
+                }
+                else if(dp.clock.t==1){
+                    this.p.imgMode=false;
+                    window.curTask.mainPanel.findByID('exitBtn').visible=true;
+                    var logbtn=window.curTask.cmdUIComponents.findByID('logBtn');
+                    logbtn.clock.start();
+                    logbtn.enable=true;
+                    window.curTask.adminBtn.clock.start();
+                    window.curTask.adminBtn.enable=true;
+                }dp.flip();
+                window.curTask.mainPanel.indexPanel.flip();
+            }};
+        fb.fc='white';
+        fb.shadowBlur=0;
+        fb.spotter=new spotter(fb);
+        fb.spotter.onmouseIn=function(){
+            this.p.fc='cornflowerblue';
+            this.p.shadowBlur=20;
+        };
+        fb.spotter.onmouseOut=function(){
+            this.p.fc='white';
+            this.p.shadowBlur=0;
+        };
+        fb.paintFun=function(ctx){
+            ctx.fillStyle='rgba(0,0,0,0.3)';
+            ctx.fillRect(0,0,this.w,this.h);
+            ctx.lineWidth=2;
+            ctx.shadowBlur=this.shadowBlur;
+            if(this.shadowBlur)ctx.shadowColor=this.fc;
+            ctx.strokeStyle=this.fc;
+            ctx.fillStyle=this.fc;
+            if(!this.imgMode){
+                ctx.beginPath();
+                ctx.moveTo(48.5, 0.0);
+                ctx.lineTo(5.0, 0.0);
+                ctx.bezierCurveTo(2.2, 0.0, 0.0, 2.0, 0.0, 4.5);
+                ctx.lineTo(0.0, 43.9);
+                ctx.bezierCurveTo(0.0, 46.4, 2.2, 48.5, 5.0, 48.5);
+                ctx.lineTo(48.5, 48.5);
+                ctx.bezierCurveTo(51.3, 48.5, 53.5, 46.4, 53.5, 43.9);
+                ctx.lineTo(53.5, 4.5);
+                ctx.bezierCurveTo(53.5, 2.0, 51.3, 0.0, 48.5, 0.0);
+                ctx.closePath();
+                ctx.moveTo(5.0, 3.0);
+                ctx.lineTo(48.5, 3.0);
+                ctx.bezierCurveTo(49.4, 3.0, 50.2, 3.7, 50.2, 4.5);
+                ctx.lineTo(50.2, 35.6);
+                ctx.lineTo(44.5, 35.6);
+                ctx.lineTo(38.6, 24.4);
+                ctx.bezierCurveTo(38.4, 23.9, 37.9, 23.6, 37.3, 23.5);
+                ctx.bezierCurveTo(36.7, 23.5, 36.2, 23.7, 35.8, 24.1);
+                ctx.lineTo(32.0, 28.4);
+                ctx.lineTo(22.9, 15.1);
+                ctx.bezierCurveTo(22.6, 14.6, 22.0, 14.4, 21.4, 14.4);
+                ctx.bezierCurveTo(20.8, 14.4, 20.3, 14.7, 20.0, 15.2);
+                ctx.lineTo(9.0, 35.6);
+                ctx.lineTo(3.3, 35.6);
+                ctx.lineTo(3.3, 4.5);
+                ctx.bezierCurveTo(3.3, 3.7, 4.1, 3.0, 5.0, 3.0);
+                ctx.closePath();
+                ctx.moveTo(12.7, 35.6);
+                ctx.lineTo(21.7, 19.0);
+                ctx.lineTo(30.4, 31.9);
+                ctx.bezierCurveTo(30.7, 32.3, 31.2, 32.5, 31.7, 32.6);
+                ctx.bezierCurveTo(32.3, 32.6, 32.8, 32.4, 33.1, 32.0);
+                ctx.lineTo(36.8, 27.9);
+                ctx.lineTo(40.8, 35.6);
+                ctx.lineTo(12.7, 35.6);
+                ctx.closePath();
+                ctx.moveTo(48.5, 45.4);
+                ctx.lineTo(5.0, 45.4);
+                ctx.bezierCurveTo(4.1, 45.4, 3.3, 44.8, 3.3, 43.9);
+                ctx.lineTo(3.3, 38.6);
+                ctx.lineTo(50.2, 38.6);
+                ctx.lineTo(50.2, 43.9);
+                ctx.bezierCurveTo(50.2, 44.8, 49.4, 45.4, 48.5, 45.4);
+                ctx.moveTo(38.5, 19.7);
+                ctx.bezierCurveTo(42.1, 19.7, 45.1, 17.0, 45.1, 13.6);
+                ctx.bezierCurveTo(45.1, 10.3, 42.1, 7.6, 38.5, 7.6);
+                ctx.bezierCurveTo(34.8, 7.6, 31.8, 10.3, 31.8, 13.6);
+                ctx.bezierCurveTo(31.8, 17.0, 34.8, 19.7, 38.5, 19.7);
+                ctx.closePath();
+                ctx.moveTo(38.5, 10.6);
+                ctx.bezierCurveTo(40.3, 10.6, 41.8, 12.0, 41.8, 13.6);
+                ctx.bezierCurveTo(41.8, 15.3, 40.3, 16.7, 38.5, 16.7);
+                ctx.bezierCurveTo(36.6, 16.7, 35.1, 15.3, 35.1, 13.6);
+                ctx.bezierCurveTo(35.1, 12.0, 36.6, 10.6, 38.5, 10.6);
+                ctx.closePath();
+                ctx.fill();
+            }
+            else
+            {
+                roundRectPath(this.w,this.h,5,ctx);
+                ctx.stroke();
+                ctx.moveTo(0,this.h/4);
+                ctx.lineTo(this.w,this.h/4);
+                ctx.moveTo(0,this.h/2);
+                ctx.lineTo(this.w,this.h/2);
+                ctx.moveTo(0,this.h/2);
+                ctx.lineTo(this.w,this.h/2);
+                ctx.moveTo(0,this.h/4*3);
+                ctx.lineTo(this.w,this.h/4*3);
+                ctx.stroke();
+            }
+        };
+        return fb;
     }
     function CommentsPanel()
     {

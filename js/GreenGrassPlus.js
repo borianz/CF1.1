@@ -243,50 +243,6 @@ function InitBackUI(img) {
     backUIComponents.addCtrl(recBtn, 'recBtn');
     return true;
 }
-
-function viewEvent(event)
-{
-    var dp=window.curTask.mainPanel.detailPanel;
-    window.curTask.mainPanel.commentsPanel.clock.reverse();
-    if(event)
-    {
-        dp.visible=true;
-        var tl=dp.findByID('title');
-        tl.changeText(event.title);
-        tl.x= (dp.w-tl.w)/2;
-        var al=dp.findByID('author');
-        al.changeText(event.authorName);
-        if(event.authorName=='展开评论'){
-            al.clock=new simpleClock(0.2,1,cubicEaseInOut,10,-5,true,true);
-            al.clock.start();
-            al.transFun=function(ctx){ctx.translate(this.x+this.clock.value,this.y);};
-            al.clicker.onclick=function(){
-                if(this.p.clock){
-                    this.p.clock=undefined;
-                    this.p.transFun=function(ctx){ctx.translate(this.x,this.y);};
-                }
-                window.curTask.mainPanel.commentBtn.clicker.onclick(); };
-            al.fc='rgba(172,223,235,0.9)';
-        }
-        else{
-            al.clicker.onclick=function(){};
-            al.fc='white';
-        }
-        al.x=(dp.w-al.w)/2;
-        dp.findByID('body').setText(event.text);
-        window.curTask.mainPanel.findByID('commentBtn').enable=true;
-    }
-    else
-    {
-        var tl=dp.findByID('title');
-        tl.changeText('');
-        var al=dp.findByID('author');
-        al.changeText('');
-        dp.findByID('body').setText('');
-        window.curTask.mainPanel.findByID('commentBtn').enable=false;
-    }
-    dp.event=event;
-}
 function changeBack(img)
 {
     if(img.naturalWidth==0)
