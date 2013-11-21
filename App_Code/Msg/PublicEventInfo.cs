@@ -22,6 +22,14 @@ namespace Msg
         Announcement = 1
 
     }
+    public enum BehaviorType
+    {
+        PbEventClick=0,
+        ImageMode=1,
+        Comments=2,
+        ChangeBack=3
+
+    }
     public enum EvalType
     {
         good=1, best=3
@@ -149,7 +157,19 @@ namespace Msg
             return a;
         }
     }
-
+    public class BehaviorJS
+    {
+        public DateTime updateTime { get; set; }
+        public int no { get; set; }
+        public int? userNo { get; set; }
+        public int eventNO { get; set; }
+        public short click { get; set; }
+        public byte type { get; set; }
+        public Behavior ToEntity()
+        {
+            return new Behavior() { Type=type, UpdateTime = updateTime, EventNo = eventNO, No = no, Click = click, UserNo = userNo };
+        }
+    }
     public static partial class EntityExtention
     {
         public static PublicEventJS ToEntityJS(this PublicEvent pe)

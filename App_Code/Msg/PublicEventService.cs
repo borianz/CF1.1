@@ -169,6 +169,22 @@ public class PublicEventService : System.Web.Services.WebService {
 
 
     }
+    [WebMethod]
+    public OperationResult SubmitBehaviors(BehaviorJS[] behaviors)
+    {
+      return  UsingClient(client =>
+        {
+            if (client.Author != null)
+                foreach (var b in behaviors)
+                    b.userNo = client.Author.No;
+            else
+                foreach (var b in behaviors)
+                    b.userNo = null;
+            return new OperationResult(client.AddBehaviors(behaviors.Select (js=>js.ToEntity ()).ToArray ()), null);
+        });
+
+
+    }
     private OperationResult UsingClient(Func<PublicEventClient, OperationResult> func)
     {
         using (var client = PublicEventClient.Get(User.Identity.Name))

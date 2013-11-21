@@ -99,7 +99,6 @@ public partial class EventMaker : System.Web.UI.Page
     }
     protected void UpdateEvent(PublicEvent pe)
     {
-        pe.AuthorNo = client.Author.No;
         pe.Text = textInput.Text;
         pe.Title = txtTitle.Text;
         pe.UpdateTime = DateTime.Now;
@@ -108,6 +107,7 @@ public partial class EventMaker : System.Web.UI.Page
         pe.Enable = !disable.Checked;
         pe.CategoryNo = int.Parse(CatSelect.SelectedValue);
         pe.Priority = short.Parse(PrioritySelect.SelectedValue);
+        
     }
     protected void FillForm(PublicEvent pe)
     {
@@ -196,9 +196,8 @@ public partial class EventMaker : System.Web.UI.Page
                 }
                 else
                     pe.ImgUrl = SaveImg(NewImgFileName(), path, System.Drawing.Image.FromStream(imgLoader.PostedFile.InputStream, true, true));
-            UpdateEvent(pe);
             string r;
-            client.UpdatePublicEvent(pe, out r,refreshIndex);
+            client.UpdatePublicEvent(pe.No,UpdateEvent, out r, refreshIndex);
             lblstatus.Text = r;
         }
         else

@@ -1,4 +1,5 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="MiniVersion.aspx.cs" Inherits="GreenGrass" %>
+<%@ OutputCache Location="Client" Duration="86400"  VaryByParam="none" %>
 <!DOCTYPE html>
 <html>
 <head id="Head1" runat="server">
@@ -20,9 +21,7 @@
 <asp:ServiceReference Path="~/PublicEventService.asmx" />
 </Services>
 <Scripts>
-<asp:ScriptReference Path="~/js/Animation.js" />
-<asp:ScriptReference Path="~/js/CF2.2Mini.js" />
-<asp:ScriptReference Path="~/js/Controls2.1.js" />
+<asp:ScriptReference Path="~/js/CFMiniCompress.js" />
 <asp:ScriptReference Path="~/js/GGUIMini.js" />
 <asp:ScriptReference Path="~/js/iFrameWindow.js" />
 </Scripts>
@@ -60,10 +59,7 @@
    
 </div>
 <script type="text/javascript">
-    try {
-        window.channelMng.isLogIn = Sys.Services.AuthenticationService.get_isLoggedIn();
-    }
-    catch (ex) { DisplayLoadingWindow(); }
+    window.channelMng.isLogIn = Sys.Services.AuthenticationService.get_isLoggedIn();
     tipWindow.show(window.channelMng.isLogIn);
     window.backImg = document.getElementById('img');
     window.backImg.onload = function () {

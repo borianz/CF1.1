@@ -57,6 +57,11 @@
                         <asp:ListItem>师范</asp:ListItem>
                         <asp:ListItem>基础</asp:ListItem>
                         <asp:ListItem>应用</asp:ListItem>
+                        <asp:ListItem>应用 研</asp:ListItem>
+                        <asp:ListItem Value="基地 研"></asp:ListItem>
+                        <asp:ListItem Value="发展 研"></asp:ListItem>
+                        <asp:ListItem Value="map 研"></asp:ListItem>
+                        <asp:ListItem Value="其他"></asp:ListItem>
                     </asp:DropDownList>
                     <asp:RegularExpressionValidator ID="RegularExpressionValidator2" runat="server" 
                         ControlToValidate="txtGradeNumber" ErrorMessage="请输入两位年级" 

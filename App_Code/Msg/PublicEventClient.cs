@@ -24,6 +24,7 @@ namespace Msg
         public IEnumerable<PublicEvent> Events { get { return db.PublicEvents; } }
         public IEnumerable<Comment> Comments { get { return db.Comments; } }
         public IEnumerable<Evalution> Evaluations { get { return db.Evaluations; } }
+        public IEnumerable<Behavior> Behaviors { get { return db.Behaviors; } }
         public Author GetAuthor(int no)
         {
             return db.Authors.Find(no);
@@ -98,10 +99,10 @@ namespace Msg
         {
             var cs = db.Comments.Include("Author").Where(c => !c.Deleted && c.EventNo == evetNo).
                 OrderByDescending(c => c.Score).ThenBy(c => c.No).Skip(skip).Take (take).
-                Select(c => new {c.Good, c.Best,c.Anonymous, realname = c.Author.RealName, c.SetDate, c.Priority, c.No, c.Body, c.Color,ano=c.Author.No  }).ToArray();
+                Select(c => new {c.Good, c.Best,c.Anonymous, realname = c.Author.RealName,grade=c.Author.Grade , c.SetDate, c.Priority, c.No, c.Body, c.Color,ano=c.Author.No  }).ToArray();
             var coms = cs.Select(c => new CommentJS
             {
-                authorName = c.realname,
+                authorName = c.realname+' '+c.grade,
                 body = c.Body,
                 color = c.Color,
                 no = c.No,
@@ -230,8 +231,14 @@ namespace Msg
                 }
             return false;
         }
-        public bool UpdatePublicEvent(PublicEvent pe,out string reason,bool reloadCategory=false)
+        public bool UpdatePublicEvent(int eventNo,Action<PublicEvent> update,out string reason,bool reloadCategory=false)
         {
+            var pe = db.PublicEvents.Find(eventNo);
+            if (pe == null)
+            {
+                reason = PublicEventInfo.EventNotFound;
+                return false;
+            }
             var au = db.Authors.Find(pe.AuthorNo);
             if (au == null)
             {
@@ -243,8 +250,7 @@ namespace Msg
                 reason = PublicEventInfo.EventsOutOfRange;
                 return false;
             }
-            db.PublicEvents.Attach(pe);
-            db.Entry(pe).State = System.Data.EntityState.Modified;
+            update(pe);
             try
             {
                 pe.UpdateTime = DateTime.Now;
@@ -290,7 +296,28 @@ namespace Msg
             pool.TryRemove(userName, out client);
             return client ?? new PublicEventClient(userName);
         }
-
+        public bool AddBehaviors(Behavior[] behaviors)
+        {
+            try
+            {
+                foreach (var b in behaviors)
+                {
+                    b.UpdateTime = DateTime.Now;
+                    db.Behaviors.Add(b);
+                }
+                db.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    Console.WriteLine(ex.InnerException.Message);
+                else
+                    Console.WriteLine(ex.Message);
+                db.Behaviors.Local.Clear();
+            } 
+            return false;
+        }
 
         public void Dispose()
         {

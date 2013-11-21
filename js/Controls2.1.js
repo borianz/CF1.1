@@ -1,10 +1,3 @@
-/**
- * Created with JetBrains WebStorm.
- * User: Administrator
- * Date: 13-8-5
- * Time: 下午2:48
- * To change this template use File | Settings | File Templates.
- */
 function roundRectPath(w, h, r, ctx) {
     ctx.beginPath();
     ctx.moveTo(r, 0);
@@ -151,7 +144,6 @@ function Article(x, y, w, h, font, flCenter, flfont, fcolor, flcolor, backColor,
             return true;
         }
         return false;
-
     };
     this.moveUp = function () {
         var texh = (this.lines.length - this.curline) * this.fh;
@@ -163,7 +155,10 @@ function Article(x, y, w, h, font, flCenter, flfont, fcolor, flcolor, backColor,
         }
         return false;
     };
-    this.setText = function (string) {if(string)this.lines = breakText(string, ctx, this.w, this.font);else this.lines=new Array();};
+    this.setText = function (string) {
+        if(string)this.lines = breakText(string, ctx, this.w, this.font);
+        else this.lines=new Array();
+        this.curline=0;};
     this.addText = function (string) {if(string)this.lines=this.lines.concat(breakText(string, window.ctx, this.w, this.font));};
     this.paintFun = function (ctx) {
         ctx.textBaseline = 'hanging';
@@ -469,7 +464,8 @@ function Panel(x, y, h, w, backColor) {
             this.controls[i].dispose();
         }
         this.controls = new Array();
-        this.maxh = 0;
+        this.maxh = 10;
+        this.baseLine=0;
     };
     this.paintFun = function (ctx) {
         ctx.beginPath();

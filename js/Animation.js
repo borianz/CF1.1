@@ -1,10 +1,3 @@
-/**
- * Created with JetBrains WebStorm.
- * User: Administrator
- * Date: 13-7-16
- * Time: 下午11:22
- * To change this template use File | Settings | File Templates.
- */
 function VelocityCollide(tank, vx, vy) {
     var K = tank >= 0 ? Math.atan(tank) : Math.PI + Math.atan(tank);
     var tan0=(tank-vy/vx)/(1+tank*vy/vx);

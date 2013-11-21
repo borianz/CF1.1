@@ -227,6 +227,7 @@ function InitBackUI(img) {
     var msgBtn = new BtnMsg();
     msgBtn.clicker.onclick=function()
     {
+        window.behaviorRecorder.load(true);
         var t=window.tasks.findByID('Msg');
         if(!t){
             t=new MsgTask();

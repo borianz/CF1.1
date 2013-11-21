@@ -7,10 +7,19 @@
     <Schema Namespace="MsgDBModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2005" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
         <EntityContainer Name="MsgDBModelStoreContainer">
           <EntitySet Name="Author" EntityType="MsgDBModel.Store.Author" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Behavior" EntityType="MsgDBModel.Store.Behavior" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="Category" EntityType="MsgDBModel.Store.Category" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="Comment" EntityType="MsgDBModel.Store.Comment" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="Evalution" EntityType="MsgDBModel.Store.Evalution" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="PublicEvent" EntityType="MsgDBModel.Store.PublicEvent" store:Type="Tables" Schema="dbo" />
+          <AssociationSet Name="FK_Behavior_Author" Association="MsgDBModel.Store.FK_Behavior_Author">
+            <End Role="Author" EntitySet="Author" />
+            <End Role="Behavior" EntitySet="Behavior" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Behavior_PublicEvent" Association="MsgDBModel.Store.FK_Behavior_PublicEvent">
+            <End Role="PublicEvent" EntitySet="PublicEvent" />
+            <End Role="Behavior" EntitySet="Behavior" />
+          </AssociationSet>
           <AssociationSet Name="FK_Comment_Author" Association="MsgDBModel.Store.FK_Comment_Author">
             <End Role="Author" EntitySet="Author" />
             <End Role="Comment" EntitySet="Comment" />
@@ -51,6 +60,17 @@
           <Property Name="Role" Type="smallint" Nullable="false" />
           <Property Name="EventLimit" Type="smallint" Nullable="false" />
           <Property Name="Enable" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Behavior">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Name="No" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="EventNo" Type="int" />
+          <Property Name="UserNo" Type="int" />
+          <Property Name="Click" Type="smallint" Nullable="false" />
+          <Property Name="UpdateTime" Type="datetime" Nullable="false" />
+          <Property Name="Type" Type="tinyint" Nullable="false" />
         </EntityType>
         <EntityType Name="Category">
           <Key>
@@ -108,6 +128,30 @@
           <Property Name="SetTime" Type="datetime" Nullable="false" />
           <Property Name="CanComment" Type="bit" Nullable="false" />
         </EntityType>
+        <Association Name="FK_Behavior_Author">
+          <End Role="Author" Type="MsgDBModel.Store.Author" Multiplicity="0..1" />
+          <End Role="Behavior" Type="MsgDBModel.Store.Behavior" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Author">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="Behavior">
+              <PropertyRef Name="UserNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Behavior_PublicEvent">
+          <End Role="PublicEvent" Type="MsgDBModel.Store.PublicEvent" Multiplicity="0..1" />
+          <End Role="Behavior" Type="MsgDBModel.Store.Behavior" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PublicEvent">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="Behavior">
+              <PropertyRef Name="EventNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Comment_Author">
           <End Role="Author" Type="MsgDBModel.Store.Author" Multiplicity="1" />
           <End Role="Comment" Type="MsgDBModel.Store.Comment" Multiplicity="*" />
@@ -145,7 +189,9 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Evalution_Comment">
-          <End Role="Comment" Type="MsgDBModel.Store.Comment" Multiplicity="1" />
+          <End Role="Comment" Type="MsgDBModel.Store.Comment" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="Evalution" Type="MsgDBModel.Store.Evalution" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Comment">
@@ -230,6 +276,15 @@
             <End Role="Comment" EntitySet="Comments" />
             <End Role="Evalution" EntitySet="Evalutions" />
           </AssociationSet>
+          <EntitySet Name="Behaviors" EntityType="MsgDBModel.Behavior" />
+          <AssociationSet Name="FK_Behavior_Author" Association="MsgDBModel.FK_Behavior_Author">
+            <End Role="Author" EntitySet="Authors" />
+            <End Role="Behavior" EntitySet="Behaviors" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Behavior_PublicEvent" Association="MsgDBModel.FK_Behavior_PublicEvent">
+            <End Role="PublicEvent" EntitySet="PublicEvents" />
+            <End Role="Behavior" EntitySet="Behaviors" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="PublicEvent">
           <Key>
@@ -253,6 +308,7 @@
           <Property Type="Boolean" Name="CanComment" Nullable="false" DefaultValue="True" />
           <NavigationProperty Name="Evalutions" Relationship="MsgDBModel.FK_Evalution_Evalution" FromRole="PublicEvent" ToRole="Evalution" />
           <NavigationProperty Name="Comments" Relationship="MsgDBModel.FK_Comment_PublicEvent" FromRole="PublicEvent" ToRole="Comment" />
+          <NavigationProperty Name="Behaviors" Relationship="MsgDBModel.FK_Behavior_PublicEvent" FromRole="PublicEvent" ToRole="Behavior" />
         </EntityType>
         <EntityType Name="Author">
           <Key>
@@ -268,6 +324,7 @@
           <Property Type="Boolean" Name="Enable" Nullable="false" DefaultValue="True" />
           <NavigationProperty Name="Evalutions" Relationship="MsgDBModel.FK_Evalution_Author" FromRole="Author" ToRole="Evalution" />
           <NavigationProperty Name="Comments" Relationship="MsgDBModel.FK_Comment_Author" FromRole="Author" ToRole="Comment" />
+          <NavigationProperty Name="Behaviors" Relationship="MsgDBModel.FK_Behavior_Author" FromRole="Author" ToRole="Behavior" />
         </EntityType>
         <EntityType Name="Category">
           <Key>
@@ -397,6 +454,43 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="Behavior">
+          <Key>
+            <PropertyRef Name="No" />
+          </Key>
+          <Property Type="Int32" Name="No" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="EventNo" />
+          <Property Type="Int32" Name="UserNo" />
+          <Property Type="Int16" Name="Click" Nullable="false" />
+          <Property Type="DateTime" Name="UpdateTime" Nullable="false" />
+          <NavigationProperty Name="Author" Relationship="MsgDBModel.FK_Behavior_Author" FromRole="Behavior" ToRole="Author" />
+          <NavigationProperty Name="PublicEvent" Relationship="MsgDBModel.FK_Behavior_PublicEvent" FromRole="Behavior" ToRole="PublicEvent" />
+          <Property Type="Byte" Name="Type" Nullable="false" DefaultValue="0" />
+        </EntityType>
+        <Association Name="FK_Behavior_Author">
+          <End Type="MsgDBModel.Author" Role="Author" Multiplicity="0..1" />
+          <End Type="MsgDBModel.Behavior" Role="Behavior" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Author">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="Behavior">
+              <PropertyRef Name="UserNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Behavior_PublicEvent">
+          <End Type="MsgDBModel.PublicEvent" Role="PublicEvent" Multiplicity="0..1" />
+          <End Type="MsgDBModel.Behavior" Role="Behavior" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PublicEvent">
+              <PropertyRef Name="No" />
+            </Principal>
+            <Dependent Role="Behavior">
+              <PropertyRef Name="EventNo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -476,6 +570,18 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Behaviors">
+            <EntityTypeMapping TypeName="MsgDBModel.Behavior">
+              <MappingFragment StoreEntitySet="Behavior">
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="UpdateTime" ColumnName="UpdateTime" />
+                <ScalarProperty Name="Click" ColumnName="Click" />
+                <ScalarProperty Name="UserNo" ColumnName="UserNo" />
+                <ScalarProperty Name="EventNo" ColumnName="EventNo" />
+                <ScalarProperty Name="No" ColumnName="No" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -501,17 +607,17 @@
         <EntityTypeShape EntityType="MsgDBModel.Author" Width="1.5" PointX="6.25" PointY="0.75" Height="2.9251310221354165" />
         <EntityTypeShape EntityType="MsgDBModel.Category" Width="1.5" PointX="0.5" PointY="5.5" Height="1.7790128580729174" />
         <AssociationConnector Association="MsgDBModel.FK_PublicEvent_Author" >
-          <ConnectorPoint PointX="6.25" PointY="1.15625" />
-          <ConnectorPoint PointX="2.25" PointY="1.15625" />
+          <ConnectorPoint PointX="6.25" PointY="1.1562500000000002" />
+          <ConnectorPoint PointX="2.25" PointY="1.1562500000000002" />
         </AssociationConnector>
         <AssociationConnector Association="MsgDBModel.FK_PublicEvent_category" >
           <ConnectorPoint PointX="1.375" PointY="5.5" />
-          <ConnectorPoint PointX="1.375" PointY="5.20328857421875" />
+          <ConnectorPoint PointX="1.375" PointY="5.3943082682291656" />
         </AssociationConnector>
         <EntityTypeShape EntityType="MsgDBModel.Evalution" Width="1.5" PointX="3.125" PointY="1.625" Height="2.7341113281249996" />
         <AssociationConnector Association="MsgDBModel.FK_Evalution_Author" >
-          <ConnectorPoint PointX="6.25" PointY="2.6500655110677087" />
-          <ConnectorPoint PointX="4.625" PointY="2.6500655110677087" />
+          <ConnectorPoint PointX="6.25" PointY="2.7455753580729167" />
+          <ConnectorPoint PointX="4.625" PointY="2.7455753580729167" />
         </AssociationConnector>
         <AssociationConnector Association="MsgDBModel.FK_Evalution_Evalution" >
           <ConnectorPoint PointX="2.25" PointY="2.9920556640625" />
@@ -519,16 +625,30 @@
         </AssociationConnector>
         <EntityTypeShape EntityType="MsgDBModel.Comment" Width="1.5" PointX="5.25" PointY="4.625" Height="3.8802294921874996" />
         <AssociationConnector Association="MsgDBModel.FK_Comment_Author" >
-          <ConnectorPoint PointX="6.5" PointY="3.6751310221354165" />
+          <ConnectorPoint PointX="6.5" PointY="3.8661507161458331" />
           <ConnectorPoint PointX="6.5" PointY="4.625" />
         </AssociationConnector>
         <AssociationConnector Association="MsgDBModel.FK_Comment_PublicEvent" >
-          <ConnectorPoint PointX="2.25" PointY="4.9141442871093748" />
-          <ConnectorPoint PointX="5.25" PointY="4.9141442871093748" />
+          <ConnectorPoint PointX="2.25" PointY="5.0409066341145836" />
+          <ConnectorPoint PointX="5.25" PointY="5.0409066341145836" />
         </AssociationConnector>
         <AssociationConnector Association="MsgDBModel.FK_Evalution_Comment" >
           <ConnectorPoint PointX="5.25" PointY="4.625" />
           <ConnectorPoint PointX="4.625" PointY="4.359111328125" />
+        </AssociationConnector>
+        <EntityTypeShape EntityType="MsgDBModel.Behavior" Width="1.5" PointX="8.5" PointY="3.875" Height="2.3520719401041674" />
+        <AssociationConnector Association="MsgDBModel.FK_Behavior_Author" >
+          <ConnectorPoint PointX="7.75" PointY="2.3080753580729167" />
+          <ConnectorPoint PointX="9.25" PointY="2.3080753580729167" />
+          <ConnectorPoint PointX="9.25" PointY="3.875" />
+        </AssociationConnector>
+        <AssociationConnector Association="MsgDBModel.FK_Behavior_PublicEvent" >
+          <ConnectorPoint PointX="2.25" PointY="4.4920556640625" />
+          <ConnectorPoint PointX="4.8541666666666661" PointY="4.4920556640624989" />
+          <ConnectorPoint PointX="5.0208333333333321" PointY="4.4920556640625" />
+          <ConnectorPoint PointX="6.416666666666667" PointY="4.4920556640624989" />
+          <ConnectorPoint PointX="6.583333333333333" PointY="4.4920556640625" />
+          <ConnectorPoint PointX="8.5" PointY="4.4920556640625" />
         </AssociationConnector>
       </Diagram>
     </Diagrams>

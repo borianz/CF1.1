@@ -11,7 +11,7 @@ public class index : IHttpHandler {
     }
     private void RedirectBasicVersion(HttpResponse response)
     {
-        response.Redirect("BasicVersion.aspx", true);
+        response.Redirect("MiniVersion.aspx", true);
         response.End();
 
     }

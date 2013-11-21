@@ -248,6 +248,7 @@
         var msgBtn = new BtnMsg();
         msgBtn.clicker.onclick=function()
         {
+            window.behaviorRecorder.load(true);
             var t=window.tasks.findByID('Msg');
             if(!t){
                 t=new MsgTask();
@@ -1145,6 +1146,7 @@
                 if(item.clock) item.clock.reverse();
             window.curTask.exit();
         } ;
+        var rb=new RefreshBtn();
         var fb=new PictureBtn();
         var publicMsg=new PublicMsgPanel();
         var cp=new CommentsPanel();
@@ -1152,6 +1154,7 @@
         var micon=new MusicBtn();
         var cicon=new CommentBtn();
         msgPanel.addCtrl(cp,'commentsPanel');
+        msgPanel.addCtrl(rb,'refreshBtn');
         msgPanel.addCtrl(cicon,'commentBtn');
         msgPanel.addCtrl(fb,'flipBtn');
         msgPanel.addCtrl(micon,'musicBtn');
@@ -1517,7 +1520,7 @@
                         {
                             changeBack(this);
                             this.btn.img=this;
-                        }
+                        };
                         img.onerror = function () {
                             changeBack(window.backImg);
                         }
@@ -1527,6 +1530,7 @@
                     changeBack(window.backImg);
             }
         }
+        behaviorRecorder.record('pbeventClick'+this.p.event.no);
         return true;
     }
     function MusicBtn()
@@ -1592,26 +1596,53 @@
         {
             ctx.fillStyle='rgba(0,0,0,0.3)';
             ctx.fillRect(0,0,this.w,this.h);
-            ctx.translate(2,0);
             ctx.beginPath();
-            ctx.moveTo(41.2, 0.5);
-            ctx.lineTo(2.8, 0.5);
-            ctx.bezierCurveTo(1.5, 0.5, 0.5, 1.7, 0.5, 3.2);
-            ctx.lineTo(0.5, 35.4);
-            ctx.bezierCurveTo(0.5, 36.9, 1.5, 38.1, 2.8, 38.1);
-            ctx.lineTo(25.6, 38.1);
-            ctx.lineTo(37.1, 47.1);
-            ctx.lineTo(35.7, 38.1);
-            ctx.lineTo(41.2, 38.1);
-            ctx.bezierCurveTo(42.5, 38.1, 43.6, 36.9, 43.6, 35.4);
-            ctx.lineTo(43.6, 3.2);
-            ctx.bezierCurveTo(43.6, 1.7, 42.5, 0.5, 41.2, 0.5);
+            ctx.moveTo(8.6, 18.6);
+            ctx.lineTo(25.8, 18.6);
+            ctx.lineTo(25.8, 16.3);
+            ctx.lineTo(8.6, 16.3);
+            ctx.lineTo(8.6, 18.6);
+            ctx.moveTo(8.6, 23.3);
+            ctx.lineTo(21.0, 23.3);
+            ctx.lineTo(21.0, 21.0);
+            ctx.lineTo(8.6, 21.0);
+            ctx.lineTo(8.6, 23.3);
+            ctx.moveTo(8.6, 14.0);
+            ctx.lineTo(25.8, 14.0);
+            ctx.lineTo(25.8, 11.6);
+            ctx.lineTo(8.6, 11.6);
+            ctx.lineTo(8.6, 14.0);
+            ctx.moveTo(47.8, 28.5);
+            ctx.bezierCurveTo(47.8, 20.7, 41.3, 14.4, 33.2, 14.0);
+            ctx.bezierCurveTo(31.8, 6.1, 25.0, 0.0, 16.7, 0.0);
+            ctx.bezierCurveTo(7.5, 0.0, 0.0, 7.6, 0.0, 16.9);
+            ctx.bezierCurveTo(0.0, 23.2, 3.4, 28.7, 8.5, 31.6);
+            ctx.bezierCurveTo(8.5, 33.0, 8.4, 34.7, 8.0, 36.6);
+            ctx.bezierCurveTo(6.7, 41.8, 5.9, 42.1, 8.0, 41.7);
+            ctx.bezierCurveTo(12.8, 40.7, 16.2, 36.7, 17.5, 33.7);
+            ctx.bezierCurveTo(17.8, 33.7, 18.0, 33.7, 18.2, 33.7);
+            ctx.bezierCurveTo(20.4, 39.2, 26.0, 43.1, 32.5, 43.1);
+            ctx.bezierCurveTo(32.5, 43.1, 32.6, 43.1, 32.6, 43.1);
+            ctx.bezierCurveTo(33.9, 45.5, 36.1, 48.1, 39.2, 48.8);
+            ctx.bezierCurveTo(40.7, 49.1, 40.1, 48.9, 39.2, 44.2);
+            ctx.bezierCurveTo(39.0, 43.4, 38.9, 42.5, 38.8, 41.8);
+            ctx.bezierCurveTo(44.1, 39.5, 47.8, 34.4, 47.8, 28.5);
+            ctx.moveTo(16.7, 31.4);
+            ctx.bezierCurveTo(16.5, 31.4, 16.2, 31.4, 16.0, 31.4);
+            ctx.bezierCurveTo(15.4, 33.6, 13.4, 37.3, 10.5, 38.6);
+            ctx.bezierCurveTo(9.3, 39.1, 9.3, 39.3, 10.1, 36.0);
+            ctx.bezierCurveTo(10.8, 33.2, 10.6, 30.8, 10.5, 30.1);
+            ctx.bezierCurveTo(5.4, 27.8, 1.9, 22.7, 1.9, 16.9);
+            ctx.bezierCurveTo(1.9, 8.8, 8.5, 2.3, 16.7, 2.3);
+            ctx.bezierCurveTo(24.9, 2.3, 31.5, 8.8, 31.5, 16.9);
+            ctx.bezierCurveTo(31.5, 24.9, 24.9, 31.4, 16.7, 31.4);
             ctx.closePath();
-            ctx.lineWidth=3;
             ctx.strokeStyle =this.fc;
             ctx.shadowColor=this.fc;
+            ctx.fillStyle=this.fc;
             ctx.shadowBlur=this.shadowBlur;
             ctx.stroke();
+            ctx.fill();
         };
         return btn;
     }
@@ -1737,6 +1768,45 @@
         };
         return fb;
     }
+    function RefreshBtn(){
+        var ui=new UIComponent(50,10,30,30);
+        ui.paintFun=function(ctx){
+            ctx.beginPath();
+            ctx.moveTo(26.1, 20.0);
+            ctx.bezierCurveTo(24.8, 19.1, 23.2, 19.2, 22.4, 20.2);
+            ctx.bezierCurveTo(19.7, 23.8, 14.0, 24.1, 9.7, 20.9);
+            ctx.bezierCurveTo(5.4, 17.7, 4.1, 12.2, 6.8, 8.6);
+            ctx.bezierCurveTo(9.3, 5.3, 14.3, 4.8, 18.5, 7.3);
+            ctx.lineTo(16.2, 10.3);
+            ctx.bezierCurveTo(16.0, 10.6, 16.0, 11.0, 16.3, 11.4);
+            ctx.bezierCurveTo(16.4, 11.5, 16.5, 11.6, 16.6, 11.7);
+            ctx.bezierCurveTo(16.8, 11.9, 17.1, 12.0, 17.4, 12.0);
+            ctx.lineTo(27.5, 11.8);
+            ctx.bezierCurveTo(27.8, 11.8, 28.1, 11.7, 28.2, 11.5);
+            ctx.bezierCurveTo(28.4, 11.3, 28.4, 11.0, 28.3, 10.7);
+            ctx.lineTo(25.6, 0.9);
+            ctx.bezierCurveTo(25.5, 0.5, 25.2, 0.2, 24.7, 0.1);
+            ctx.bezierCurveTo(24.3, -0.1, 23.9, 0.0, 23.7, 0.3);
+            ctx.lineTo(21.4, 3.4);
+            ctx.bezierCurveTo(14.7, -0.9, 6.2, -0.2, 2.2, 5.2);
+            ctx.bezierCurveTo(-2.1, 10.9, 0.0, 19.6, 6.9, 24.7);
+            ctx.bezierCurveTo(13.7, 29.8, 22.7, 29.4, 27.0, 23.7);
+            ctx.bezierCurveTo(27.8, 22.6, 27.4, 21.0, 26.1, 20.0);
+            ctx.closePath();
+            ctx.fillStyle='white';
+            ctx.fill();
+        }
+        ui.clicker=new clicker(ui);
+        ui.clicker.onclick=function(){
+            window.curTask.mainPanel.indexPanel.clearCtrls();
+            window.curTask.mainPanel.commentsPanel.clock.reverse();
+            viewEvent();
+            window.curTask.loaded=false;
+            window.channelMng.beginChannel(true,'publicEvents');
+            PublicEventService.GetIndex(function(e){ PublicEventsIndex(e);});
+        };
+        return ui;
+    }
     function CommentsPanel()
     {
         var p=new Panel(310,0,680,780,'rgba(255,255,255,0.7)');
@@ -1759,6 +1829,35 @@
         var l=new Label(5,545,'我来说说','22px "幼圆"');
         var addbtn=new Button(610,635,70,40,'发表','25px "黑体"','rgba(172,223,235,0.7)');
         var anobtn=new Button(690,635,70,40,'匿名','25px "黑体"','rgba(172,223,235,0.7)');
+        var sort=new Select(610,545,160,'25px "黑体"',['较新回复','最少支持','最多支持','较老回复'],'rgba(172,223,235,0.7)','black','回复排序方式','black');
+        sort.onSelected=function(num){
+            var cms=this.p.cp.controls;
+            switch (num){
+              case 0:
+                  cms.sort(function(a,b){
+                      return a.comment.setDate> b.comment.setDate? -1:1;
+                  });
+                  break;
+              case 1:
+                  cms.sort(function(a,b){
+                      return a.comment.score<b.comment.score? -1:1;
+                  });
+                  break;
+              case 2:
+                  cms.sort(function(a,b){
+                      return a.comment.score> b.comment.score? -1:1;
+                  });
+                  break;
+              case 3:
+                  cms.sort(function(a,b){
+                      return a.comment.setDate< b.comment.setDate? -1:1;
+                  });
+                  break;
+          }
+            for(var i=0;i<cms.length;i++)
+                cms[i].y=i*110+5;
+
+        };
         anobtn.visible=false;
         p.addCtrl(l,'mc');
         p.addCtrl(title,'title');
@@ -1766,6 +1865,7 @@
         p.addCtrl(tb,'tb');
         p.addCtrl(addbtn,'addBtn');
         p.addCtrl(anobtn,'anoBtn');
+        p.addCtrl(sort,'sortSelect');
         p.commit=addbtn;
         p.tb=tb;
         anobtn.clicker.onclick=function(){
@@ -1814,8 +1914,11 @@
             this.title.changeText(event.title);
             title.x=(p.w-title.w)/2;
             this.cp.clearCtrls();
-            for(var i= 0,comment=event.comments[i];comment;comment=event.comments[++i])
+            for(var i= 0,comment=event.comments[i];comment;comment=event.comments[++i]){
                 this.cp.addCtrl(new CommentExpand(i*110+5,comment));
+                comment.score=comment.good+comment.best*3;
+            }
+
             this.event=event;
             if(!event.mycomment && mycomment)
                 event.mycomment=mycomment;
@@ -1996,35 +2099,66 @@
         btn.isBest=false;
         btn.paintFun=function(ctx){
             ctx.beginPath();
-            ctx.moveTo(25.6, 0.0);
-            ctx.lineTo(4.4, 0.0);
-            ctx.bezierCurveTo(2.0, 0.0, 0.0, 2.0, 0.0, 4.4);
-            ctx.lineTo(0.0, 25.6);
-            ctx.bezierCurveTo(0.0, 28.0, 2.0, 30.0, 4.4, 30.0);
-            ctx.lineTo(25.6, 30.0);
-            ctx.bezierCurveTo(28.0, 30.0, 30.0, 28.0, 30.0, 25.6);
-            ctx.lineTo(30.0, 4.4);
-            ctx.bezierCurveTo(30.0, 2.0, 28.0, 0.0, 25.6, 0.0);
-            ctx.moveTo(27.5, 24.5);
-            ctx.bezierCurveTo(27.5, 26.2, 26.2, 27.5, 24.5, 27.5);
-            ctx.lineTo(5.5, 27.5);
-            ctx.bezierCurveTo(3.8, 27.5, 2.5, 26.2, 2.5, 24.5);
-            ctx.lineTo(2.5, 5.5);
-            ctx.bezierCurveTo(2.5, 3.8, 3.8, 2.5, 5.5, 2.5);
-            ctx.lineTo(24.5, 2.5);
-            ctx.bezierCurveTo(26.2, 2.5, 27.5, 3.8, 27.5, 5.5);
-            ctx.lineTo(27.5, 24.5);
-            ctx.moveTo(15.0, 5.7);
-            ctx.lineTo(12.0, 11.8);
-            ctx.lineTo(5.3, 12.8);
-            ctx.lineTo(10.1, 17.6);
-            ctx.lineTo(9.0, 24.3);
-            ctx.lineTo(15.0, 21.1);
-            ctx.lineTo(21.0, 24.3);
-            ctx.lineTo(19.9, 17.6);
-            ctx.lineTo(24.7, 12.8);
-            ctx.lineTo(18.0, 11.8);
-            ctx.lineTo(15.0, 5.7);
+            ctx.moveTo(28.9, 12.3);
+            ctx.bezierCurveTo(28.9, 10.9, 27.7, 9.7, 26.3, 9.7);
+            ctx.lineTo(19.3, 9.7);
+            ctx.bezierCurveTo(19.4, 8.7, 19.6, 7.0, 19.6, 5.3);
+            ctx.bezierCurveTo(19.6, 2.0, 17.8, 0.5, 16.0, 0.5);
+            ctx.bezierCurveTo(13.8, 0.5, 13.8, 2.8, 13.8, 5.8);
+            ctx.bezierCurveTo(13.8, 7.9, 10.5, 11.1, 8.8, 12.6);
+            ctx.bezierCurveTo(8.4, 12.4, 8.0, 12.3, 7.6, 12.3);
+            ctx.lineTo(3.2, 12.3);
+            ctx.bezierCurveTo(1.7, 12.3, 0.5, 13.5, 0.5, 15.0);
+            ctx.lineTo(1.4, 22.9);
+            ctx.bezierCurveTo(1.6, 24.3, 2.6, 25.5, 4.1, 25.5);
+            ctx.lineTo(7.6, 25.5);
+            ctx.bezierCurveTo(8.8, 25.5, 9.7, 24.8, 10.1, 23.8);
+            ctx.lineTo(11.5, 24.5);
+            ctx.bezierCurveTo(11.7, 24.6, 11.8, 24.6, 12.0, 24.6);
+            ctx.lineTo(23.8, 24.6);
+            ctx.bezierCurveTo(25.2, 24.6, 26.3, 23.5, 26.3, 22.2);
+            ctx.bezierCurveTo(26.3, 21.8, 26.2, 21.5, 26.0, 21.2);
+            ctx.bezierCurveTo(26.7, 20.7, 27.1, 20.0, 27.1, 19.1);
+            ctx.bezierCurveTo(27.1, 18.7, 27.0, 18.4, 26.9, 18.0);
+            ctx.bezierCurveTo(27.6, 17.6, 28.0, 16.8, 28.0, 15.9);
+            ctx.bezierCurveTo(28.0, 15.4, 27.9, 14.9, 27.7, 14.6);
+            ctx.bezierCurveTo(28.4, 14.1, 28.9, 13.3, 28.9, 12.3);
+            ctx.moveTo(23.8, 22.9);
+            ctx.lineTo(12.2, 22.9);
+            ctx.lineTo(10.3, 21.9);
+            ctx.bezierCurveTo(10.3, 21.9, 10.2, 14.2, 10.0, 13.9);
+            ctx.bezierCurveTo(11.6, 12.5, 15.6, 8.8, 15.6, 5.8);
+            ctx.bezierCurveTo(15.6, 4.0, 15.6, 2.3, 16.0, 2.3);
+            ctx.bezierCurveTo(16.9, 2.3, 17.8, 3.3, 17.8, 5.3);
+            ctx.bezierCurveTo(17.8, 7.8, 17.4, 10.4, 17.4, 10.4);
+            ctx.bezierCurveTo(17.3, 10.7, 17.4, 11.0, 17.6, 11.2);
+            ctx.bezierCurveTo(17.8, 11.4, 18.0, 11.5, 18.3, 11.5);
+            ctx.lineTo(26.3, 11.5);
+            ctx.bezierCurveTo(26.7, 11.5, 27.1, 11.9, 27.1, 12.3);
+            ctx.bezierCurveTo(27.1, 12.8, 26.7, 13.2, 26.3, 13.2);
+            ctx.lineTo(25.3, 13.2);
+            ctx.bezierCurveTo(24.8, 13.2, 24.4, 13.6, 24.4, 14.1);
+            ctx.bezierCurveTo(24.4, 14.6, 24.8, 15.0, 25.3, 15.0);
+            ctx.lineTo(25.4, 15.0);
+            ctx.bezierCurveTo(25.4, 15.0, 25.4, 15.0, 25.4, 15.0);
+            ctx.bezierCurveTo(25.9, 15.0, 26.3, 15.4, 26.3, 15.9);
+            ctx.bezierCurveTo(26.3, 16.3, 25.9, 16.7, 25.4, 16.7);
+            ctx.lineTo(24.8, 16.7);
+            ctx.bezierCurveTo(24.7, 16.7, 24.7, 16.7, 24.7, 16.7);
+            ctx.bezierCurveTo(24.7, 16.7, 24.7, 16.7, 24.7, 16.7);
+            ctx.lineTo(24.4, 16.7);
+            ctx.bezierCurveTo(23.9, 16.7, 23.5, 17.1, 23.5, 17.6);
+            ctx.bezierCurveTo(23.5, 18.1, 23.9, 18.5, 24.4, 18.5);
+            ctx.lineTo(24.7, 18.5);
+            ctx.bezierCurveTo(25.1, 18.5, 25.4, 18.8, 25.4, 19.1);
+            ctx.bezierCurveTo(25.4, 19.5, 25.1, 19.8, 24.7, 19.8);
+            ctx.lineTo(23.8, 19.8);
+            ctx.bezierCurveTo(23.8, 19.8, 23.8, 19.8, 23.8, 19.8);
+            ctx.bezierCurveTo(23.8, 19.8, 23.8, 19.8, 23.8, 19.8);
+            ctx.bezierCurveTo(23.3, 19.8, 22.9, 20.2, 22.9, 20.7);
+            ctx.bezierCurveTo(22.9, 21.2, 23.3, 21.6, 23.8, 21.6);
+            ctx.bezierCurveTo(24.2, 21.6, 24.5, 21.8, 24.5, 22.2);
+            ctx.bezierCurveTo(24.5, 22.6, 24.2, 22.9, 23.8, 22.9);
             ctx.closePath();
             if(this.selected)
                 ctx.fillStyle = "rgb(255, 255, 47)";
@@ -2033,7 +2167,7 @@
             ctx.fill();
             ctx.textBaseline='hanging';
             ctx.font='25px "Arial"';
-            ctx.fillText(this.count,35,3,40);
+            ctx.fillText(this.count,35,0,40);
         };
         return btn;
     }
@@ -2046,33 +2180,15 @@
         btn.count=g;
         btn.paintFun=function(ctx){
             ctx.beginPath();
-            ctx.moveTo(25.6, 0.0);
-            ctx.lineTo(4.4, 0.0);
-            ctx.bezierCurveTo(2.0, 0.0, 0.0, 2.0, 0.0, 4.4);
-            ctx.lineTo(0.0, 25.6);
-            ctx.bezierCurveTo(0.0, 28.0, 2.0, 30.0, 4.4, 30.0);
-            ctx.lineTo(25.6, 30.0);
-            ctx.bezierCurveTo(28.0, 30.0, 30.0, 28.0, 30.0, 25.6);
-            ctx.lineTo(30.0, 4.4);
-            ctx.bezierCurveTo(30.0, 2.0, 28.0, 0.0, 25.6, 0.0);
-            ctx.moveTo(27.5, 24.5);
-            ctx.bezierCurveTo(27.5, 26.2, 26.2, 27.5, 24.5, 27.5);
-            ctx.lineTo(5.5, 27.5);
-            ctx.bezierCurveTo(3.8, 27.5, 2.5, 26.2, 2.5, 24.5);
-            ctx.lineTo(2.5, 5.5);
-            ctx.bezierCurveTo(2.5, 3.8, 3.8, 2.5, 5.5, 2.5);
-            ctx.lineTo(24.5, 2.5);
-            ctx.bezierCurveTo(26.2, 2.5, 27.5, 3.8, 27.5, 5.5);
-            ctx.lineTo(27.5, 24.5);
-            ctx.moveTo(20.1, 8.5);
-            ctx.bezierCurveTo(15.7, 8.5, 15.1, 11.6, 15.1, 11.6);
-            ctx.lineTo(14.9, 11.6);
-            ctx.bezierCurveTo(14.9, 11.6, 14.3, 8.5, 9.9, 8.5);
-            ctx.bezierCurveTo(5.5, 8.5, 3.6, 14.8, 8.7, 17.9);
-            ctx.bezierCurveTo(14.3, 21.4, 14.9, 23.5, 14.9, 23.5);
-            ctx.lineTo(15.1, 23.5);
-            ctx.bezierCurveTo(15.1, 23.5, 15.7, 21.4, 21.4, 17.9);
-            ctx.bezierCurveTo(26.4, 14.8, 24.5, 8.5, 20.1, 8.5);
+            ctx.moveTo(20.7, 0.0);
+            ctx.bezierCurveTo(14.4, 0.0, 13.5, 4.8, 13.5, 4.8);
+            ctx.lineTo(13.3, 4.8);
+            ctx.bezierCurveTo(13.3, 4.8, 12.4, 0.0, 6.1, 0.0);
+            ctx.bezierCurveTo(-0.2, 0.0, -2.9, 9.6, 4.3, 14.3);
+            ctx.bezierCurveTo(12.4, 19.7, 13.3, 22.9, 13.3, 22.9);
+            ctx.lineTo(13.5, 22.9);
+            ctx.bezierCurveTo(13.5, 22.9, 14.4, 19.7, 22.5, 14.3);
+            ctx.bezierCurveTo(29.6, 9.6, 27.0, 0.0, 20.7, 0.0);
             ctx.closePath();
             if(this.selected){
                 ctx.fillStyle = "rgb(243, 42, 10)";
@@ -2085,7 +2201,7 @@
             ctx.fill();
             ctx.textBaseline='hanging';
             ctx.font='25px "Arial"';
-            ctx.fillText(this.count,35,3,40);
+            ctx.fillText(this.count,35,0,40);
         };
         return btn;
     }
@@ -2180,11 +2296,11 @@
         getEvent:function(eventNo){
             return JSON.parse(window.localStorage.getItem('pbEvent'+eventNo));
         }
-    }
+    };
     var tipWindow={
         tips:[{title:'读图模式',msg:'点击"心路"上面的第 1 个按钮<br/>可以查看背景图片哦!'},
             {title:'查看讨论',msg:'点击"心路"上面的第 3 个按钮<br/>发表和查看大家的讨论吧!'},
-            {title:'点赞狂魔',msg:'点击五角星或者爱心支持你喜欢的讨论<br/>详情请见"心路"的使用说明'},
+            {title:'点赞狂魔',msg:'你的支持是对作者的肯定和感谢<br/>记得对你喜欢的评论点赞哦!'},
             {title:'联系我们',msg:'我们希望听到你的反馈,请发送邮件到<br/><b>xlbaishushu@163.com</b>'}],
         show:function(logIn){
             var i=parseInt(window.localStorage.tipIndex);
@@ -2199,5 +2315,67 @@
             this.tips.push({title:title,msg:msg});
         }
 
+    };
+    var behaviorRecorder={
+        _ids:[],
+        _loaded:false,
+        _lastSubmit:undefined,
+        record:function(key){
+            this.load();
+            if(this._ids.indexOf(key)==-1){
+                if(!window.localStorage.behaviorKeys)window.localStorage.behaviorKeys=key;
+                else window.localStorage.behaviorKeys=window.localStorage.behaviorKeys+'\t'+key;
+                this._ids.push(key);
+            }
+            var i=parseInt(window.localStorage.getItem(key));
+            if(isNaN(i))i=0;
+            window.localStorage.setItem(key,++i);
+        },
+        load:function(submit){
+            if(!this._loaded){
+                this._lastSubmit=window.localStorage.lastSubmit?new Date(parseInt(window.localStorage.lastSubmit)):new Date(1);
+                if(window.localStorage.behaviorKeys)
+                    this._ids=window.localStorage.behaviorKeys.split('\t');
+                else {
+                    this._ids=[];
+                }
+                this._loaded=true;
+                if(submit)
+                    this.submit();
+            }
+
+        },
+        submit:function()
+        {
+            if(Date.now()-this._lastSubmit>1000*60*60*24*3)
+            {
+                var pbs=[];var b, c;
+                for(var i= 0,key=this._ids[i];key;key=this._ids[++i]){
+                    if(key.indexOf('pbeventClick')==0){
+                        c= window.localStorage.getItem(key);
+                        if(c==0)continue;
+                        b= new Msg.BehaviorJS();
+                        b.click=c;
+                        b.type=0;
+                        b.eventNo=key.replace('pbeventClick','');
+                        pbs.push(b);
+                    }}
+                if(pbs.length>0)
+                    PublicEventService.SubmitBehaviors(pbs, function (e,pbs) {
+                        if(e.ok){
+                            behaviorRecorder._lastSubmit=Date.now();
+                            window.localStorage.lastSubmit=behaviorRecorder._lastSubmit;
+                            for(var i= 0,b=pbs[i];b;b=pbs[++i])
+                                window.localStorage.removeItem('pbeventClick'+ b.eventNo);
+                        } }, function (e) {
+                    },pbs);
+                else{
+                        this._lastSubmit=Date.now();
+                        window.localStorage.lastSubmit=this._lastSubmit;
+                    }
+
+            }
+        }
     }
+
 }

@@ -39,5 +39,6 @@ namespace Msg
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Evalution> Evaluations { get; set; }
+        public DbSet<Behavior> Behaviors { get; set; }
     }
 }

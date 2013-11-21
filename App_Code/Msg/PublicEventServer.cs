@@ -55,8 +55,8 @@ namespace Msg
                     var cjs = cat.ToEntityJS(false);
                     foreach (var e in db.PublicEvents.Where(pe => pe.CategoryNo == catNo && pe.Enable).
                         OrderByDescending(pe => pe.Priority).ThenByDescending(pe => pe.UpdateTime).
-                        ThenByDescending(pe => pe.No).Select(pe => new { no = pe.No, mtitle = pe.MTitle }))
-                        cjs.events.Add(new PublicEventJS { no = e.no, mtitle = e.mtitle });
+                        ThenByDescending(pe => pe.No).Select(pe => new { no = pe.No, mtitle = pe.MTitle,update=pe.UpdateTime  }))
+                        cjs.events.Add(new PublicEventJS { no = e.no, mtitle = e.mtitle,updateTime=e.update });
                     if (catDic.ContainsKey(catNo))
                         catDic.Remove(catNo);
                     catDic.Add(catNo, cjs);

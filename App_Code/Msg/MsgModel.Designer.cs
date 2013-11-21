@@ -17,7 +17,6 @@ using System.Runtime.Serialization;
 using System.Xml.Serialization;
 
 
-
 namespace Msg
 {
     #region 上下文
@@ -145,6 +144,22 @@ namespace Msg
             }
         }
         private ObjectSet<Comment> _Comments;
+    
+        /// <summary>
+        /// 没有元数据文档可用。
+        /// </summary>
+        public ObjectSet<Behavior> Behaviors
+        {
+            get
+            {
+                if ((_Behaviors == null))
+                {
+                    _Behaviors = base.CreateObjectSet<Behavior>("Behaviors");
+                }
+                return _Behaviors;
+            }
+        }
+        private ObjectSet<Behavior> _Behaviors;
 
         #endregion
 

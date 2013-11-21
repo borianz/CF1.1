@@ -1,4 +1,5 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="FullVersion.aspx.cs" Inherits="GreenGrass" %>
+<%@ OutputCache Location="Client" Duration="86400" VaryByParam="none"  %>
 <!DOCTYPE html>
 <html>
 <head id="Head1" runat="server">
@@ -20,14 +21,10 @@
 <asp:ServiceReference Path="~/PublicEventService.asmx" />
 </Services>
 <Scripts>
-<asp:ScriptReference Path="~/js/Animation.js" ScriptMode="Release" />
-<asp:ScriptReference Path="~/js/CF2.2.js" ScriptMode="Release" />
-<asp:ScriptReference Path="~/js/Controls2.1.js" ScriptMode="Release" />
+<asp:ScriptReference Path="~/js/CFCompress.js" ScriptMode="Release" />
 <asp:ScriptReference  Path="~/js/GGUIMini.js" ScriptMode="Release" />
 <asp:ScriptReference  Path="~/js/GreenGrassPlus.js" ScriptMode="Release" />
 <asp:ScriptReference Path="~/js/iFrameWindow.js" ScriptMode="Release" />
-<asp:ScriptReference Path="~/js/IndexDB.js" ScriptMode="Release" />
-<asp:ScriptReference Path="~/js/ImgDB.js"  ScriptMode="Release" />
 </Scripts>
 </asp:ScriptManager>
 </form>
@@ -94,6 +91,7 @@
         channelMng.endChannel();
         DisplayMsgWindow('买噶的', '似乎出错了,请联系我们<br/>xlbaishushu@163.com');
     });
+   
   </script>
 </body>
 </html>

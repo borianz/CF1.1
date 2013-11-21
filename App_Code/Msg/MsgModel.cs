@@ -20,6 +20,7 @@ namespace Msg
             this.PublicEvents = new HashSet<PublicEvent>();
             this.Evalutions = new HashSet<Evalution>();
             this.Comments = new HashSet<Comment>();
+            this.Behaviors = new HashSet<Behavior>();
         }
     
         public string UserName { get; set; }
@@ -33,6 +34,30 @@ namespace Msg
         public virtual ICollection<PublicEvent> PublicEvents { get; set; }
         public virtual ICollection<Evalution> Evalutions { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
+        public virtual ICollection<Behavior> Behaviors { get; set; }
+    }
+}
+namespace Msg
+{
+    using System;
+    using System.Collections.Generic;
+    
+    public partial class Behavior
+    {
+        public Behavior()
+        {
+            this.Type = 0;
+        }
+    
+        public int No { get; set; }
+        public Nullable<int> EventNo { get; set; }
+        public Nullable<int> UserNo { get; set; }
+        public short Click { get; set; }
+        public System.DateTime UpdateTime { get; set; }
+        public byte Type { get; set; }
+    
+        public virtual Author Author { get; set; }
+        public virtual PublicEvent PublicEvent { get; set; }
     }
 }
 namespace Msg
@@ -117,6 +142,7 @@ namespace Msg
             this.CanComment = true;
             this.Evalutions = new HashSet<Evalution>();
             this.Comments = new HashSet<Comment>();
+            this.Behaviors = new HashSet<Behavior>();
         }
     
         public string Title { get; set; }
@@ -138,5 +164,6 @@ namespace Msg
         public virtual Category Category { get; set; }
         public virtual ICollection<Evalution> Evalutions { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
+        public virtual ICollection<Behavior> Behaviors { get; set; }
     }
 }
