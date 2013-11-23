@@ -537,7 +537,7 @@ function Panel(x, y, h, w, backColor) {
     };
     this.clicker.onclick = function (e) {
         return true;
-    }
+    };
     this.wheeler.onwheelDown = function () {
         var d=this.p.h-this.p.maxh;
         if (this.p.baseLine >d) {
@@ -1091,13 +1091,265 @@ function BoxedInput() {
         return show;
     }
 }
+function CubicPanel(x,y,w,h,iscmdclock,scaleValue,projectAngle,projectValue){
+    this._x=x;
+    this._y=y;
+    this.w=w;
+    this.h=h;
+    this.scaleValue=scaleValue? (1-scaleValue):0.5;
+    this.projectAngle=projectAngle? projectAngle:Math.PI/3;
+    this.projectValue=projectValue? projectValue:0.3;
+    this.panel0=new Panel(0,0,h,w);
+    this.panel1=new Panel(0,0,h,w);
+    this.panel2=new Panel(0,0,h,w);
+    this.panel3=new Panel(0,0,h,w);
+    this.rotating=false;
+    this.clicker=new clicker(this.panel0);
+    this.clicker.fire = function (ctx, e) {
+        this.pathFun(ctx);
+        if (ctx.isPointInPath(e.ox, e.oy)) {
+            var ctrls = this.p.controls;
+            for (var i = ctrls.length - 1, item = ctrls[i]; item; item = ctrls[--i])
+                if (item.clicker && item.clicker.fire(window.ctx, e)) return true;
+            return true;
+        }
+        else
+            return false;
+    };
+    this.wheeler=new wheeler(this.panel0);
+    this.wheeler.onwheelDown = function () {
+        var d=this.p.h-this.p.maxh;
+        if (this.p.baseLine >d) {
+            if(d<-35)
+                this.p.moveBaseline(-35);
+            else
+                this.p.moveBaseline(-this.p.baseLine);
+            return true;
+        }
+        return false;
+    };
+    this.wheeler.onwheelUp = function () {
+        if (this.p.baseLine < 0) {
+            if(this.p.baseLine<-35)
+                this.p.moveBaseline(35);
+            else
+                this.p.moveBaseline(-this.p.baseLine);
+            return true;
+        }
+        return false;
+    };
+    this.drager=new drager(this.panel0);
+    this.drager.onDragEnd = function (e) {
+        this.p.mouseY = 0;
+        var ctrls = this.p.controls;
+        if (this.p.h >= this.p.maxh) {
+            for (var i = 0, item = ctrls[i]; item; item = ctrls[++i])
+                item.y -= this.p.baseLine;
+            this.p.baseLine = 0;
+        }
+        else {
+            if (this.p.baseLine > 0) {
+                for (var i = 0, item = ctrls[i]; item; item = ctrls[++i])
+                    item.y -= this.p.baseLine;
+                this.p.baseLine = 0;
+            }
+            else if (this.p.h > (this.p.baseLine + this.p.maxh)) {
+                var d = this.p.h - this.p.maxh - this.p.baseLine;
+                for (var i = 0, item = ctrls[i]; item; item = ctrls[++i])
+                    item.y += d;
+                this.p.baseLine += d;
+            }
+        }
+    };
+    this.drager.onDragMove = function (e) {
+        if (this.p.maxh <= this.p.h)return;
+        var dy = e.cy - this.p.mouseY;
+        if (dy > 20) dy = 20;
+        else if (dy < -20) dy = -20;
+        this.p.moveBaseline(dy);
+        this.p.mouseY = e.cy;
+    };
+    this.scaleClock=new simpleClock(0.3,1,quadEaseInOut,this.projectValue,0,iscmdclock,false);
+    this.rotateClock=new simpleClock(0.5,1,linear,Math.PI/2,0,iscmdclock,false);
+    this.toPanel=function(num){
+        if(!this.animated){
+            var to;
+            switch (num){
+                case 0:
+                    to=this.panel0;
+                    break;
+                case 1:
+                    to=this.panel1;
+                    break;
+                case 2:
+                    to=this.panel2;
+                    break;
+                case 3:
+                    to=this.panel3;
+                    break;
+                default :return false;
+            }
+            var interval=to.oof-this.panel.oof;
+            if(interval==0) return this.panel;
+            else if(interval<0)interval+=this.cons.pi2;
+            this.rotateClock.multiplier=interval;
+            this.rotateClock.reset();
+            this.rotateClock.lastValue=0;
+            this.scaleClock.start();
+            this.animated=true;
+            this.controls.forEach(function(p){p.visible=true;});
+            this.setPanel(to);
+            adjustChildern(to);
+            return to;
+        }
+        return this.panel;
+    };
+    this.transformArgs=function(scale,axis,rotate){
+        var a=Math.sin(rotate);var b=Math.cos(rotate);
+        var px=scale*Math.cos(axis);var py=scale*Math.sin(axis);
+        return{px:px,py:py,a:a,b:b};
+    };
+    this.panelArg=function(px,py,a,b,c){return{x1:b+a*px,y1:a*py,dx:((1-px)*a+(px+1)*(1-b))*c,dy:py*(1-b-a)*c}; };
+    this.update = function () {
+        if (!this.enable) return;
+        if(this.animated){
+            var c=this.w/2;
+            if(this.rotating){
+                this.rotateClock.lastValue=this.rotateClock.value;
+                this.rotateClock.update();
+                this.panel0.offset+=this.rotateClock.value-this.rotateClock.lastValue;
+                if(this.panel0.offset>=this.cons.pi2)this.panel0.offset-=this.cons.pi2;
+                else if(this.panel0.offset<0)this.panel0.offset+=this.cons.pi2;
+                var ta=this.transformArgs(this.projectValue,-this.projectAngle,-this.panel0.offset);
+            }
+            else{
+                this.scaleClock.update();
+                var ta=this.transformArgs(this.scaleClock.value,-this.scaleClock.t*this.projectAngle,-this.panel0.offset);
+            }
+            this.panel0.arg=this.panelArg(ta.px,ta.py,ta.a,ta.b,c);
+            this.panel1.arg=this.panelArg(ta.px,ta.py,ta.b,-ta.a,c);
+            this.panel2.arg=this.panelArg(ta.px,ta.py,-ta.a,-ta.b,c);
+            this.panel3.arg=this.panelArg(ta.px,ta.py,-ta.b,ta.a,c);
+        }else this.panel.update();
+    };
+    this.cons={pi2:Math.PI*2,hpi:Math.PI/2,hpi3:Math.PI*1.5};
+    this.comparer={a:this.cons.hpi-0.5,b:Math.PI-0.5,c:this.cons.hpi3-0.5,d:this.cons.pi2-0.5};
+    this.paintFun=function(ctx){
+        if(this.animated){
+            if(this.rotating)
+                this.sortPanels();
+            switch (this.paintOrder){
+                case 0:
+                    this.panel2.paint(ctx);
+                    this.panel3.paint(ctx);
+                    this.panel1.paint(ctx);
+                    this.panel0.paint(ctx);
+                    break;
+                case 1:
+                    this.panel3.paint(ctx);
+                    this.panel0.paint(ctx);
+                    this.panel2.paint(ctx);
+                    this.panel1.paint(ctx);
+                    break;
+                case 2:
+                    this.panel0.paint(ctx);
+                    this.panel1.paint(ctx);
+                    this.panel3.paint(ctx);
+                    this.panel2.paint(ctx);
+                    break;
+                case 3:
+                    this.panel1.paint(ctx);
+                    this.panel2.paint(ctx);
+                    this.panel0.paint(ctx);
+                    this.panel3.paint(ctx);
+                    break;
+
+            }
+        }else
+        {
+            ctx.save();
+            this.panel.paintFun(ctx);
+            for (var i = 0, item = this.panel.controls[i]; item; item = this.panel.controls[++i]) {
+                if (item.h + item.y > 0 && item.y <= this.h)
+                    item.paint(ctx);
+            }
+            ctx.restore();
+        }
+    };
+    this.transFun=function(ctx){
+        ctx.translate(this.x,this.y);
+        if(this.animated){
+            if(this.rotating)
+                var st=this.scaleValue;
+            else
+                var st=this.scaleClock.t*this.scaleValue;
+            var scale=1-st;
+            ctx.transform(scale,0,0,scale,this.w/2*st,this.h/2*st);
+        }
+    };
+    this.sortPanels=function(){
+        var offset=this.panel0.offset;
+        var com=this.comparer;
+        if(offset<com.a)
+            this.paintOrder=0;
+        else if(offset<com.b)
+            this.paintOrder=1;
+        else if(offset<com.c)
+            this.paintOrder=2;
+        else if(offset<com.d)
+            this.paintOrder=3;
+        else
+            this.paintOrder=0;
+    };
+    this.scaleClock.onend=function(){
+        this.p.rotateClock.restart();
+        this.p.rotating=true;
+    };
+    this.rotateClock.onend=function(){
+        this.p.scaleClock.reverse();
+        this.p.rotating=false;
+    };
+    this.scaleClock.onreverse=function(){
+        this.p.animated=false;
+        this.p.controls.forEach(function(p){p.visible=false;});
+        this.p.panel.visible=true;
+    };
+    this.paintOrder=0;this.scaleClock.p=this;this.rotateClock.p=this;
+    this.controls=[this.panel0,this.panel1,this.panel2,this.panel3];
+    this.setPanel=function(panel){
+        this.panel=panel;
+        this.drager.p=panel;
+        this.clicker.p=panel;
+        this.wheeler.p=panel;
+        this.controls[0]=panel;
+    };
+    this.addCtrl=function(ctrl,id){this.panel.addCtrl(ctrl,id);};
+    for(var i= 0,p=this.controls[i];i<4;p=this.controls[++i]){
+        p.oof=this.cons.hpi*i;p.offset= p.oof;p.p=this;
+        p.transFun=function(ctx){ctx.transform(this.arg.x1,this.arg.y1,0,1,this.arg.dx,this.arg.dy);}
+    }
+    this.setPanel(this.panel0);
+    this.animated=false;
+    return this;
+}
+function ImgeCaher(){
+    var canvas=document.createElement('canvas');
+    var ctx=canvas.getContext('2d');
+    canvas.style.display='none';
+    this.getPatternData=function(imgOrCanvas,x,y,w,h){
+        canvas.width=w;
+        canvas.height=h;
+        ctx.drawImage(imgOrCanvas,x,y,w,h,0,0,w,h);
+        return {pattern:ctx.createPattern(canvas,'no-repeat'),x:x,y:y,w:w,h:h};
+    }
+}
+var imgCacher=new ImgeCaher();
 var ta = {
     textblock: undefined,
     unbind: function () {
         if (this.textblock)this.textblock.conceal();
     }
 };
-
 var boxInput = new BoxedInput();
 UIComponent.prototype = {
     get absX() {
@@ -1163,7 +1415,7 @@ BoxedInput.prototype = {
     get value() {
         return this.getValue();
     }
-}
+};
 
 function eventer() {
     this.p;
@@ -1277,11 +1529,9 @@ function drager(parent) {
             if (this.p.controls) {
                 var ctrls = this.p.controls;
                 for (var i = 0; i < ctrls.length; i++)
-                    if (ctrls[i].drager && ctrls[i].drager.fire(ctx, e)) {
-                        this.isEnter = false;
-                        break;
-                    }
-
+                    if (ctrls[i].drager && ctrls[i].drager.fire(ctx, e)) break;
+                if(window.activeDrager!==this) this.isEnter=false;
+                return this.isEnter;
             }
             return true;
         }
@@ -1297,6 +1547,7 @@ drager.prototype = new eventer();
 clicker.prototype = new eventer();
 spotter.prototype = new eventer();
 wheeler.prototype = new eventer();
+CubicPanel.prototype=new UIComponent();
 Panel.prototype = new UIComponent();
 Button.prototype = new UIComponent();
 Label.prototype = new UIComponent();

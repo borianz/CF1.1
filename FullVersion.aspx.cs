@@ -9,6 +9,7 @@ public partial class GreenGrass : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-
+        Response.CacheControl = "public";
+       
     }
 }

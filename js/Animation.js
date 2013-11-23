@@ -202,7 +202,15 @@ function simpleClock(duration,direction,timingFunction,range,offset,isCmdClock,i
         this.startTime = this.timeProvider.ticks();
         this.d= this.direction;
         this.t = (this.d== 1 ? 0.0 : 1.0);
+        this.value=0;
         this.isFinished=false;
+    };
+    this.reset=function(){
+        this.startTime = this.timeProvider.ticks();
+        this.d= this.direction;
+        this.t = (this.d== 1 ? 0.0 : 1.0);
+        this.value=0;
+        this.isFinished=true;
     };
     this.reverse=function()
      {

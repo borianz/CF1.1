@@ -5,12 +5,16 @@
 <head id="Head1" runat="server">
     <title>实验心理学数据中心</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280,height=720,initial-scale=1,user-scalable=no" />
     <style type="text/css">
         a
         {
-            color:Blue;
+            color:blue;
         }
     </style>
+    <script src="jsCompress/CFMiniCompress.js" type="text/javascript"></script>
+    <script src="jsCompress/IFrameCompress.js" type="text/javascript"></script>
+    <script src="jsCompress/GGUICompress.js" type="text/javascript"></script>
 </head>
 <body style="background-color:Black" >
 <form id="form1" style="display:none; " runat="server">
@@ -20,11 +24,6 @@
 <asp:ServiceReference Path="~/RecruitService.asmx" />
 <asp:ServiceReference Path="~/PublicEventService.asmx" />
 </Services>
-<Scripts>
-<asp:ScriptReference Path="~/js/CFMiniCompress.js" />
-<asp:ScriptReference Path="~/js/GGUIMini.js" />
-<asp:ScriptReference Path="~/js/iFrameWindow.js" />
-</Scripts>
 </asp:ScriptManager>
 </form>
 <canvas style="position:absolute" id='canvas' width="600" height=600></canvas>
@@ -59,12 +58,12 @@
    
 </div>
 <script type="text/javascript">
-    window.channelMng.isLogIn = Sys.Services.AuthenticationService.get_isLoggedIn();
-    tipWindow.show(window.channelMng.isLogIn);
-    window.backImg = document.getElementById('img');
-    window.backImg.onload = function () {
+ window.backImg = document.getElementById('img');
+ window.backImg.onload = function () {
+      window.channelMng.isLogIn = Sys.Services.AuthenticationService.get_isLoggedIn();
         canvas = document.getElementById('canvas');
         ctx = canvas.getContext('2d');
+        tipWindow.show(window.channelMng.isLogIn);
         InitBackUI(window.backImg);
         Init();
      };

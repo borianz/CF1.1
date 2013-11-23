@@ -18,12 +18,13 @@ public class PublicEventService : System.Web.Services.WebService {
 
    
     public PublicEventService () {
-        
+     
     }
     [WebMethod]
     public CategoryJS[] GetIndex()
     {
         return PublicEventServer.Instance.Index;
+        
     }
     [WebMethod]
     public OperationResult GetEvent(int eveNo)

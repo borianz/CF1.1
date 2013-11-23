@@ -203,15 +203,13 @@ function rePaint() {
             item.paint(window.ctx);
         }
     }
-    try {
-        if (window.curTask)
-            for (var k = 0, item = curTask.cmdUIComponents[k]; item; item = curTask.cmdUIComponents[++k]) {
+    if (window.curTask)
+        for (var k = 0, item = curTask.cmdUIComponents[k]; item; item = curTask.cmdUIComponents[++k]) {
                 item.update();
                 item.paint(window.ctx);
             }
-    }
-    catch (ex) {
-    }
+
+
 }
 function Task(ID) {
     this.ID = ID;

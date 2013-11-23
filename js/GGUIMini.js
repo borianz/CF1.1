@@ -934,12 +934,12 @@
     function LabSindexPanel(ets) {
         var panel =new Panel(18, 65, 485, 390, 'rgba(0,0,0,0)');
         for (var i = 0; i < ets.length; i++) {
-            var drop = new Drop(10, 12 + i * 70, 370, ets[i].ExpTypeName, '40px "幼圆"', 'rgba(172,223,235,0.5)', 'white', 'rgba(172,223,235,0.3)', true);
+            var drop = new Drop(10, 12 + i * 70, 370, ets[i].ExpTypeName, '40px "黑体"', 'rgba(172,223,235,0.5)', 'white', 'rgba(172,223,235,0.3)', true);
             var exps = ets[i].Exps;
             var h=5;
             for (var j = 0; j < exps.length; j++) {
                 if (!exps[j].CanSubmit) continue;
-                var btn = new Button(2, h, 360, 45, exps[j].ExpName, '28px "幼圆"', 'rgb(0,0,0,0)', true, null, 'white', true);
+                var btn = new Button(2, h, 360, 45, exps[j].ExpName, '28px "黑体"', 'rgb(0,0,0,0)', true, null, 'white', true);
                 h += 47;
                 drop.addCtrl(btn, exps[j].ExpNo);
                 btn.exp = exps[j];
@@ -1205,7 +1205,7 @@
     function LogBtn()
     {
         var txt=window.channelMng.isLogIn? '注销':'登陆';
-        var btn=new FloatButton(1100+Math.random()*50,10,100,60,txt,'40px 幼圆','rgb(250,250,51)',true,1110,0,1200,180);
+        var btn=new FloatButton(1100+Math.random()*50,10,100,60,txt,'40px 黑体','rgb(250,250,51)',true,1110,0,1200,180);
         btn.update=function(){
             this.clock.update();
             this.animation.update();
@@ -1262,7 +1262,7 @@
     }
     function AdminBtn()
     {
-        var btn=new FloatButton(1100+Math.random()*50,210,100,60,'投稿','40px 幼圆','rgb(250,250,51)',true,1110,210,1200,410);
+        var btn=new FloatButton(1100+Math.random()*50,210,100,60,'投稿','40px 黑体','rgb(250,250,51)',true,1110,210,1200,410);
         btn.clicker.onclick=function()
         {
             window.channelMng.isLogIn = Sys.Services.AuthenticationService.get_isLoggedIn();
@@ -1281,7 +1281,7 @@
         l.update=function(){
             this.clock.update();
         };
-        l.font='48px 幼圆';
+        l.font='48px 黑体';
         l.clock=new simpleClock(1,1,linear,1,0,true,true);
         l.txt='  精彩内容,即将揭晓!  ';
         l.paintFun=function(ctx){
@@ -1340,16 +1340,16 @@
     function EventDetailPanel()
     {
         var p=new Panel(310,5,680,780,'rgba(0,0,0,0.7)');
-        var tl=new Label(0,10,'','40px "幼圆"','white');
+        var tl=new Label(0,10,'','35px "宋体"','white');
         tl.x= (p.w-tl.w)/2;
         p.addCtrl(tl,'title');
-        var al=new Label(0,55,'','30px"幼圆"','white');
+        var al=new Label(0,50,'','30px"宋体 "','white');
         al.clicker=new clicker(al);
         al.x=(p.w-al.w)/2;
         al.clock=new simpleClock(0.2,1,expoEaseInOut,10,-5,true,true);
         al.clock.start();
         p.addCtrl(al,'author');
-        var body=new Article(5,90,770,580,'25px "幼圆"',false,'25px "幼圆"','white','white','rgba(0,0,0,0)',1.2);
+        var body=new Article(5,85,770,580,'22px "宋体"',false,'22px "宋体"','white','white','rgba(0,0,0,0)',1.2);
         p.addCtrl(body,'body');
         p.clock=new simpleClock(0.5,1,null,Math.PI/2,0,true,false);
         p.clock.onreverse=function()
@@ -1441,11 +1441,11 @@
         var recorder=window.eventsRecorder;
         var serverEvents=[];var serverEvt,local;
         for(var j= 0,cat=cats[j];cat;cat=cats[++j]){
-            var drop=new Drop(5,5+j*70,280,cat.name,'40px "幼圆"','rgba(172,223,235,0.3)', 'white', 'rgba(172,223,235,0.3)', true);
+            var drop=new Drop(5,5+j*70,280,cat.name,'40px "黑体"','rgba(172,223,235,0.3)', 'white', 'rgba(172,223,235,0.3)', true);
             drop.category=cat;
             var h=5;
             for(var i= 0,item=cat.events[i];item;item=cat.events[++i]){
-                var btn = new Button(5, h, 265, 45, item.mtitle, '28px "幼圆"', 'rgb(0,0,0,0)', true, null, 'white',false);
+                var btn = new Button(5, h, 265, 45, item.mtitle, '28px "黑体"', 'rgb(0,0,0,0)', true, null, 'white',false);
                 h += 47;local=undefined;
                 serverEvt={no:item.no,updateTime:Date.parse(item.updateTime)};
                 serverEvents.push(serverEvt);
@@ -1823,10 +1823,10 @@
         p.clock.onreverse=function(){
             window.curTask.mainPanel.detailPanel.visible=true;
         };
-        var title=new Label(0,5,'在这里写评论','30px "幼圆"','black');
+        var title=new Label(0,5,'在这里写评论','30px "黑体"','black');
         var cp=new Panel(0,40,500,780,'rgba(0,0,0,0)');
-        var tb=new TextBlock(5,570,600,100,'20px "微软雅黑"','black','rgba(255,255,255,0.7)');
-        var l=new Label(5,545,'我来说说','22px "幼圆"');
+        var tb=new TextBlock(5,570,600,100,'18px "宋体"','black','rgba(255,255,255,0.7)');
+        var l=new Label(5,545,'我来说说','22px "黑体"');
         var addbtn=new Button(610,635,70,40,'发表','25px "黑体"','rgba(172,223,235,0.7)');
         var anobtn=new Button(690,635,70,40,'匿名','25px "黑体"','rgba(172,223,235,0.7)');
         var sort=new Select(610,545,160,'25px "黑体"',['较新回复','最少支持','最多支持','较老回复'],'rgba(172,223,235,0.7)','black','回复排序方式','black');
@@ -1944,16 +1944,16 @@
     function CommentExpand(y,comment)
     {
         var ep=new Expand(5,y,750,105,'rgba(0,0,0,0)',720,5,25,25,'black');
-        var nl=new Label(5,0,comment.anonymouse?'匿名者':comment.authorName,'25px "微软雅黑"',comment.color);
-        var dl=new Label(nl.w+25,2,comment.dateString +":",'22px "幼圆"');
-        var body=new Article(5,30,750,150,'22px "幼圆"',false,'22px "幼圆"','black','black','rgba(0,0,0,0)');
+        var nl=new Label(8,0,comment.anonymouse?'匿名者':comment.authorName,'bold 22px "宋体"',comment.color);
+        var dl=new Label(nl.w+25,2,comment.dateString +":",'20px "黑体"');
+        var body=new Article(5,30,750,150,'18px "宋体"',false,'18px "宋体"','black','black','rgba(0,0,0,0)');
         var good=new GoodBtn(comment.good);
         var best=new BestBtn(comment.best);
         body.drager=undefined;
         body.wheeler=undefined;
         body.setText(comment.body);
         body.h = body.getMaxH() + 3;
-        body.setMaxLine(3);
+        body.setMaxLine(4);
         ep.addCtrl(nl,'name');
         ep.addCtrl(dl,'date');
         ep.addCtrl(body,'body');
@@ -1969,7 +1969,7 @@
             if(this.expanded)
                this.body.setMaxLine();
             else
-                this.body.setMaxLine(3);
+                this.body.setMaxLine(4);
         };
         ep.changeEval(comment.authorEval,comment.goodCount,comment.bestCount);
         return ep;

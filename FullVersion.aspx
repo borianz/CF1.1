@@ -11,6 +11,10 @@
             color:Blue;
         }
     </style>
+    <script src="jsCompress/CFCompress.js" type="text/javascript"></script>
+    <script src="jsCompress/GGUICompress.js" type="text/javascript"></script>
+    <script src="js/GreenGrassPlus.js" type="text/javascript"></script>
+    <script src="jsCompress/IFrameCompress.js" type="text/javascript"></script>
 </head>
 <body style="background-color:Black" >
 <form id="form1" style="display:none; " runat="server">
@@ -20,12 +24,6 @@
 <asp:ServiceReference Path="~/RecruitService.asmx" />
 <asp:ServiceReference Path="~/PublicEventService.asmx" />
 </Services>
-<Scripts>
-<asp:ScriptReference Path="~/js/CFCompress.js" ScriptMode="Release" />
-<asp:ScriptReference  Path="~/js/GGUIMini.js" ScriptMode="Release" />
-<asp:ScriptReference  Path="~/js/GreenGrassPlus.js" ScriptMode="Release" />
-<asp:ScriptReference Path="~/js/iFrameWindow.js" ScriptMode="Release" />
-</Scripts>
 </asp:ScriptManager>
 </form>
 <canvas style="position:absolute" id='canvas' width="600" height=600></canvas>
@@ -58,7 +56,7 @@
        
     </div>
 </div>
-<script type="text/javascript">
+ <script type="text/javascript">
     window.channelMng.isLogIn = Sys.Services.AuthenticationService.get_isLoggedIn();
     tipWindow.show(window.channelMng.isLogIn);
     window.backImg = new Image();
